@@ -52,25 +52,25 @@ This endpoint enqueues a message in the downlink queue for a specific device ide
 ### For my non-nerds:  Let's do it step by step:
 
 Start by generating an API key in your [Chirpstack Console](https://console.meteoscientific.com/front/login).  
-![Image description](./005-images/get_API_key_from_Chirpstack.png)
+![Get an API Key from Chirpstack](/images/tutorial-extras/002-images/get_API_key_from_Chirpstack.png)
 
 **Save that somewhere secure**, you'll need it later!
 
 Now, head over to the [SwaggerUI API page](https://console.meteoscientific.com/rest-api/) and let's test this sucker.  First, for the "Authorize" button, up at the top right.
 
-![Image description](./005-images/top_of_REST_API_look_for_authorize_button.png)
+![Image description](/images/tutorial-extras/002-images/top_of_REST_API_look_for_authorize_button.png)
 
 Paste in "Bearer" then your API key and hit "Close".
 
-![Image description](./005-images/entering_API_key_in_Chirpstack_Rest_API_to_test_using_Bearer.png)
+![Image description](/images/tutorial-extras/002-images/entering_API_key_in_Chirpstack_Rest_API_to_test_using_Bearer.png)
 
 Now scroll down to [just above Gateway Service](https://console.meteoscientific.com/rest-api/#/DeviceService/DeviceService_Enqueue) and expand the **POST** with **queue** in it, like this:
 
-![Image description](./005-images/scroll_down_to_POST_queue_just_above_GatewayService.png)
+![Image description](/images/tutorial-extras/002-images/scroll_down_to_POST_queue_just_above_GatewayService.png)
 
 Expand that **POST** and then hit **Try it out**.
 
-![Image description](./005-images/expand_POST_and_try_it_out.png)
+![Image description](/images/tutorial-extras/002-images/expand_POST_and_try_it_out.png)
 
 Fill in your **DevEUI** and the body:
 ```{
@@ -85,14 +85,14 @@ Fill in your **DevEUI** and the body:
 
 Like this, then hit **Execute**.
 
-![Image description](./005-images/fill_in_deveui_and_body_then_execute.png)
+![Image description](/images/tutorial-extras/002-images/fill_in_deveui_and_body_then_execute.png)
 
 You should see the **response curl** and your light should change color to red (`mQAA/wA=`)
 
-![Image description](./005-images/response_curl_and_light_turns_red.png)
+![Image description](/images/tutorial-extras/002-images/response_curl_and_light_turns_red.png)
 
 Great, now you've got your curl script and the light works, woohoo!
-![Image description](./005-images/red_kuando_busylight.JPG)
+![Image description](/images/tutorial-extras/002-images/red_kuando_busylight.JPG)
 
 ---
 
