@@ -1,13 +1,14 @@
 ---
-sidebar_position: 7
-title: Configure a LoRaWAN Sensor
+sidebar_position: 8
 ---
 
 # Configure a LoRaWAN Sensor
 
-Ok, you just got a new sensor in the mail.  It came with a `DevEUI`, `AppEUI`, `AppKey` and maybe some other fancy stuff.  
+Ok, you just got a new sensor in the mail.  It came with an `DevEUI`, `AppEUI`, `AppKey` and maybe some other fancy stuff. 
 
-It's set to fire off a packet every 4 hours, but you want to test it by running it every minute.  How do you configure it?
+You've added it to your [MetSci Console](https://console.meteoscientific.com/front/) following the [Add A Device tutorial](/docs/tutorial-basics/005-adding-a-device.md), but...
+
+It's set to fire off a packet every 4 hours.  You want to test it by running it every minute.  How do you configure it?
 
 Some devices have bluetooth (`BLE`) connectivity.  The manufacturer will have a config app you can use, and it'll usually be pretty easy.
 
@@ -15,7 +16,7 @@ Other devices are a little nerdier...
 
 # Maximum Nerd
 
-We're going full nerd today.
+We're going full nerd today.  
 
 You'll need the following stuff. 
 
@@ -133,7 +134,7 @@ Type in `AT+VER=?` and hit `Enter`.  You won't see anything when you type, but s
 v1.1.4 US915
 ```
 
-If you want to poke the bear, now that you've confirmed you're talking to and hearing back what it says, hit the black reset button (shown in the image above).
+If you want to poke the bear, now that you've confirmed you're talking to and hearing back what it says, hit the black reset button on the LDDS75(shown in the image above).
 
 That should get you something like this:
 ```bash
@@ -229,10 +230,15 @@ rxDone
 Rssi= -55
 ```
 
-And that's it, you're off to the races with configuring a device.  From here, you can use those same documents to figure out downlink commands to send over the air, and once your device is deployed in the field you can manage it with those.  
+And that's it, you're off to the races with configuring a device.  If you want to get the configs for your device, try `AT+CFG`. 
+
+From here, you can use those same documents I linked to above to figure out downlink commands to send over the air, and once your device is deployed in the field you can manage it with those.  
 
 I would strongly suggest that before you deploy any device, you test it both on the bench and in the backyard. 
 
 Enjoy the LoRaWAN journey!
 
+### Credits
+
+Enormous thanks to Travis Teague for all the assistance with this; he is and remains a world-class nerd and one of my fave IoT wizards.
 

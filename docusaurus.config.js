@@ -91,7 +91,7 @@ const config = {
             items: [
               {
                 label: 'Tutorials',
-                to: '/docs/intro',
+                to: '/docs/category/tutorial---basics',
               },
               {
                 label: 'YouTube',
