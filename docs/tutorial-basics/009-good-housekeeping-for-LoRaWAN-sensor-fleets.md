@@ -238,7 +238,7 @@ For large deployments with very different sensor types, you might consider split
 ```
 
 ### Medium Deployments (100-1000 devices)
-// ... scaling patterns ..
+// ... scaling patterns ...
 
 ### Large Deployments (1000+ devices)
 // ... enterprise patterns ...
