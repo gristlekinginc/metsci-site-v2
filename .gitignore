@@ -26,16 +26,11 @@ build/
 
 # Draft Pages
 docs/tutorial-extras/004-metsci-demo-dash.md
-docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md
 
 # Draft documents
 **/DRAFT--*.md
 **/draft--*.md
 **/draft-*.md
 **/DRAFT-*.md
-
-# Or specifically exclude these files
-docs/tutorial-extras/004-metsci_demo_dash.md
-docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md
 
 
