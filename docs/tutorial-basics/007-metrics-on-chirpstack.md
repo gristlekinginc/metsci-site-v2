@@ -1,14 +1,11 @@
 ---
 sidebar_position: 7
-title: Metrics & Decoders
+title: "Setting Up Metrics & Decoders"
 ---
+
 # Setting Up Metrics & Decoders
 
-In this guide, we'll walk through how to work with decoders and measurements in ChirpStack using a MileSight AM319 device. This process involves configuring device profiles, creating or modifying codecs, and ensuring your device metrics are displayed correctly.
-
-We'll use the AM319 because it's got a big hairy payload with lots of different measurements, from temp to CO2 levels to PM2.5 and an occupancy sensor.  These mean we can practice setting up a bunch of measurements AND think a little bit about how we set up data for eventual storage somewhere.
-
-As an example, if you want to feed this data into an InfluxDB at some point, you'll need to think through how you process the 
+This guide walks you through the practical steps of configuring decoders and measurements in ChirpStack. Before diving in, we recommend reading our [Data Structure Planning Guide](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md) to understand how to organize your data effectively.
 
 ## Prerequisites
 
@@ -17,47 +14,158 @@ Before starting, ensure you have:
 - Basic understanding of ChirpStack console navigation.
 > Note: You can use any device you'd like, the AM319 is just the demo I have handy for this.
 
-## Step 1: Adding the Device
+## Step 1: Planning Your Data Structure
+1. Review the [Data Structure Planning Guide](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md)
+2. Identify which measurements you need
+3. Decide on your tag structure
+4. Plan your field names and types
 
-First, [add the AM319 device](/docs/tutorial-basics/005-adding-a-device.md) to your MetSci account. The AM319 is part of the MileSight AM300 series. You can [find the relevant documentation](https://www.milesight.com/iot/product/lorawan-sensor/am319) on MileSight's website.
+## Step 2: Implementing in ChirpStack
 
-### Viewing Device Metrics
+### Configuring Device Profiles
+1. Navigate to Device Profiles
+2. Add or modify codec based on your planned structure
+3. Configure measurements to match your data plan
 
-Once the device is added and running, navigate to the application and select your device. In the device view, you can access **Device Metrics**. This is useful for testing, as it allows you to see various measurements like CO2, humidity, Lux, ozone, and particulate matter (PM) directly within ChirpStack without needing to set up an integration.
+### Setting Up Measurements
+1. Define measurements using consistent naming from your plan
+2. Configure correct measurement types:
+   - Use `gauge` for continuous values (temperature, humidity)
+   - Use `string` for status values (occupancy)
+   - Use `counter` for cumulative values
 
-## Step 2: Configuring Device Profiles
+### Example Implementation
+Here's a real-world example using the AM319 indoor air quality sensor:
 
-To display device metrics properly, you'll need to configure the device profile:
+```javascript
+// Codec by MeteoScientific
+// Feel free to share and modify as needed
+// https://www.meteoscientific.com
 
-1. **Navigate to Device Profiles**: Select the device profile for the AM319.
-2. **Add or Modify Codec**: 
-   - MileSight provides a codec for their devices. If the provided codec doesn't work, you can modify it using ChatGPT or write your own. For this example, I used ChatGPT to troubleshoot and correct issues with the default codec.
+function decodeUplink(input) {
+    const bytes = input.bytes;
+    let decoded = {};
+    let i = 0;
 
-### Using ChatGPT to Modify Codec
+    while (i < bytes.length) {
+        const channel = bytes[i++];
+        const type = bytes[i++];
 
-If you encounter errors with the provided codec, you can use ChatGPT to assist in debugging. Here's a summary of how I did it:
+        try {
+            switch (channel) {
+                case 0x03: // Air Temperature
+                    if (type !== 0x67) throw "Unexpected type for Temperature";
+                    decoded.air_temperature = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 10.0).toFixed(1));  // in °C
+                    i += 2;
+                    break;
 
-1. **Provide the Error and Decoder**: Explain the issue to ChatGPT, providing as much detail as possible, including the error messages and the decoder code.
-2. **Iterate and Test**: Work through the corrections suggested by ChatGPT, testing the output after each adjustment.
-3. **Cross-Reference with Documentation**: Ensure that the channels and types in the decoder align with the device's documentation. For example, some channels may not exist for your specific device model, which could cause errors.
+                case 0x04: // Air Humidity
+                    if (type !== 0x68) throw "Unexpected type for Humidity";
+                    decoded.air_humidity = parseFloat((bytes[i++] / 2.0).toFixed(1));  // in %
+                    break;
 
-## Step 3: Displaying Device Measurements
+                case 0x05: // PIR status (Occupied / Vacant)
+                    if (type !== 0x00) throw "Unexpected type for PIR Status";
+                    decoded.occupancy_status = (bytes[i++] === 1) ? "Occupied" : "Vacant";
+                    break;
 
-After configuring the codec, you need to ensure that the measurements are displayed:
+                case 0x06: // Light level
+                    if (type !== 0xCB) throw "Unexpected type for Light Level";
+                    const llIndex = bytes[i++];
+                    const luxRanges = [
+                        [0, 5],
+                        [6, 50],
+                        [51, 100],
+                        [101, 500],
+                        [501, 2000],
+                        [2001, 99999],
+                    ];
+                    if (llIndex < luxRanges.length) {
+                        const [lower, upper] = luxRanges[llIndex];
+                        const avgValue = (lower + upper) / 2;
+                        decoded.light_level = parseFloat(avgValue.toFixed(1));  // in lux
+                    } else {
+                        decoded.light_level = 0.0;  // Explicit float
+                    }
+                    break;
 
-1. **Trigger Uplink Events**: Go to your device's **Events** section and look for recent uplinks. You'll find objects like `O3` (Ozone), `CO2` (Carbon Dioxide), and more. Note these names.
-2. **Update Measurements in Device Profile**: 
-   - Go back to **Device Profiles** and navigate to **Measurements**.
-   - Add each measurement, specifying the correct name and type (e.g., `gauge` for continuous values, `string` for true/false values like occupancy status).
-   - Example: CO2 is a gauge, and occupancy status (PIR) is a string.
+                case 0x07: // CO2
+                    if (type !== 0x7D) throw "Unexpected type for CO2";
+                    decoded.co2 = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 100.0).toFixed(2));  // in ppm
+                    i += 2;
+                    break;
 
-3. **Submit Changes**: Save your changes and wait for the next uplink to verify that your measurements are being recorded and displayed correctly.
+                case 0x08: // TVOC
+                    if (type !== 0x7D) throw "Unexpected type for TVOC";
+                    decoded.tvoc = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 100.0).toFixed(2));  // in ppm
+                    i += 2;
+                    break;
 
-### Notes on Measurements
+                case 0x09: // Pressure
+                    if (type !== 0x73) throw "Unexpected type for Pressure";
+                    decoded.barometric_pressure = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 10.0).toFixed(1));  // in hPa
+                    i += 2;
+                    break;
 
-- Some measurements, like PM 2.5, only upload data when certain thresholds are exceeded. Ensure you're aware of these conditions when testing.
+                case 0x0B: // PM2.5
+                    if (type !== 0x7D) throw "Unexpected type for PM2.5";
+                    decoded.pm2_5 = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 100.0).toFixed(2));  // in µg/m³
+                    i += 2;
+                    break;
 
-## Step 4: Testing and Debugging
+                case 0x0C: // PM10
+                    if (type !== 0x7D) throw "Unexpected type for PM10";
+                    decoded.pm10 = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 100.0).toFixed(2));  // in µg/m³
+                    i += 2;
+                    break;
+
+                case 0x0D: // O3
+                    if (type !== 0x7D) throw "Unexpected type for O3";
+                    decoded.o3 = parseFloat(((bytes[i] | (bytes[i + 1] << 8)) / 100.0).toFixed(2));  // in ppm
+                    i += 2;
+                    break;
+
+                default:
+                    console.warn("Ignoring unknown channel: " + channel);
+                    break;
+            }
+        } catch (err) {
+            console.warn("Error decoding channel " + channel + ": " + err);
+        }
+    }
+
+    return { data: decoded };
+}
+```
+
+Example output from a real device:
+```json
+{
+    "data": {
+        "air_temperature": 19.1,
+        "air_humidity": 59.5,
+        "occupancy_status": "Vacant",
+        "light_level": 2.5,
+        "co2": 5.04,
+        "tvoc": 1.00,
+        "barometric_pressure": 1005.6,
+        "pm2_5": 0.43,
+        "pm10": 0.72,
+        "o3": 0.07
+    }
+}
+```
+
+This example demonstrates:
+- Domain-specific field naming (`air_temperature`, `air_humidity` for air quality sensors)
+- Consistent unit handling (°C, %, ppm, µg/m³, hPa)
+- Error handling for malformed payloads
+- InfluxDB-compatible data types:
+  - All numerical values as explicit floats with appropriate decimal places
+  - String values for status fields
+- Type validation for each channel
+
+## Step 3: Testing and Verification
 
 To expedite testing, you may want to adjust the uplink interval on your device so that it sends data more frequently. This allows for quicker debugging and verification of your setup.
 
