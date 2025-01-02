@@ -10,15 +10,15 @@ const config = {
   title: 'MetSci',
   tagline: 'Integrating Sensors Into Your World',
   favicon: 'img/metsci_favicon.ico',
-  url: process.env.SITE_URL || 'https://meteoscientific.github.io', // Use environment variable if available
-  baseUrl: '/', 
+  url: 'https://www.meteoscientific.com',
+  baseUrl: '/',
   organizationName: 'meteoscientific',
-  projectName: 'website', 
+  projectName: 'website',
+  deploymentBranch: 'main',
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-
-  trailingSlash: false, 
 
   i18n: {
     defaultLocale: 'en',
@@ -27,11 +27,10 @@ const config = {
 
   presets: [
     [
-      'classic',
-      /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
+      '@docusaurus/preset-classic',
+      {
         docs: {
-          sidebarPath: './sidebars.js',
+          sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/meteoscientific/website/tree/main/', 
         },
         blog: {
@@ -49,7 +48,7 @@ const config = {
         theme: {
           customCss: './src/css/custom.css',
         },
-      }),
+      },
     ],
   ],
 

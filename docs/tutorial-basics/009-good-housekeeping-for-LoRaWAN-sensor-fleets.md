@@ -2,7 +2,7 @@
 sidebar_position: 9
 title: DRAFT -- Structure Your Data
 ---
-
+![Draft warning](../images/draft-warning.png)
 
 # Good Housekeeping for LoRaWAN Sensor Fleets
 
