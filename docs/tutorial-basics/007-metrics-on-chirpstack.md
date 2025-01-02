@@ -1,9 +1,14 @@
 ---
 sidebar_position: 7
+title: Metrics & Decoders
 ---
 # Setting Up Metrics & Decoders
 
 In this guide, we'll walk through how to work with decoders and measurements in ChirpStack using a MileSight AM319 device. This process involves configuring device profiles, creating or modifying codecs, and ensuring your device metrics are displayed correctly.
+
+We'll use the AM319 because it's got a big hairy payload with lots of different measurements, from temp to CO2 levels to PM2.5 and an occupancy sensor.  These mean we can practice setting up a bunch of measurements AND think a little bit about how we set up data for eventual storage somewhere.
+
+As an example, if you want to feed this data into an InfluxDB at some point, you'll need to think through how you process the 
 
 ## Prerequisites
 
@@ -14,7 +19,7 @@ Before starting, ensure you have:
 
 ## Step 1: Adding the Device
 
-First, add the AM319 device to your ChirpStack application. The AM319 is part of the MileSight AM300 series. You can find the relevant documentation on MileSight's website.
+First, [add the AM319 device](/docs/tutorial-basics/005-adding-a-device.md) to your MetSci account. The AM319 is part of the MileSight AM300 series. You can [find the relevant documentation](https://www.milesight.com/iot/product/lorawan-sensor/am319) on MileSight's website.
 
 ### Viewing Device Metrics
 

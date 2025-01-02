@@ -10,6 +10,12 @@
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 
+  /* Link color overrides */
+  --ifm-link-color: #0000EE; /* Darker blue for links */
+  --ifm-link-hover-color: #551A8B; /* Slightly lighter blue for hover */
+  --ifm-link-hover-decoration: underline; /* Optional: Add underline on hover */
+
+
   /* Highlight & Warning Colors */
   --ifm-color-text-light: #f5f5f5; /* Light gray for text and backgrounds */
   --ifm-color-text-dark: #666666; /* Dark gray for text */
@@ -30,8 +36,49 @@
   --ifm-color-primary-lighter: #5bc7fa; /* Even lighter shade of blue */
   --ifm-color-primary-lightest: #6dcefc; /* Lightest shade of blue */
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  /* Link Color Overrides */
+  --ifm-link-color: #89CFF0; /* Light blue for better contrast in dark mode */
+  --ifm-link-hover-color: #00BFFF; /* Brighter cyan for hover */
+  --ifm-link-hover-decoration: underline; /* Add underline on hover */
  }
 
+ /* Centered Button Styles */
+.centered-button-container {
+  text-align: center; /* Center the button container */
+  margin: 20px 0; /* Add spacing above and below */
+}
 
+.custom-button {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 18px; /* Slightly larger font size */
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  color: white; /* Button text color */
+  background-color: var(--ifm-color-primary-light); /* Light blue */
+  border: 2px solid var(--ifm-color-primary); /* Blue border */
+  border-radius: 8px; /* More rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
 
+.custom-button:hover {
+  background-color: var(--ifm-color-primary); /* Darker blue on hover */
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
 
+.custom-button:active {
+  background-color: var(--ifm-color-primary-dark); /* Even darker blue */
+  transform: scale(1); /* Reset size on click */
+}
+
+[data-theme='dark'] .custom-button {
+  background-color: var(--ifm-color-primary-darker); /* Darker blue for dark mode */
+  color: white;
+}
+
+[data-theme='dark'] .custom-button:hover {
+  background-color: var(--ifm-color-primary-darkest); /* Standout darker blue */
+}

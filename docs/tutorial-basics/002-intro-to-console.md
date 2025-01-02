@@ -6,6 +6,11 @@ sidebar_position: 2
 
 This lesson will walk you through the process of using the **MeteoScientific (MetSci) Console**. You can follow along by visiting [console.meteoscientific.com](https://console.meteoscientific.com). This guide will give you an overview of the console and how data flows within the LoRaWAN network.
 
+## Want to Watch?
+
+If you'd rather do this via video, check that out here:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pLJh061R_9w?si=-VJDDDX79X5D2Xfk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Understanding Data Flow
 
 Before diving into the console, let's break down the flow of data in the system:

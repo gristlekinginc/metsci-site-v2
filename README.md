@@ -62,7 +62,7 @@ We welcome contributions to improve the documentation and guides. If you'd like 
    ```
 4. Push your changes to your fork:
    ```bash
-   git push origin feature-name
+   git push origin main
    ```
 5. Submit a pull request to this repository's `main` branch.
 

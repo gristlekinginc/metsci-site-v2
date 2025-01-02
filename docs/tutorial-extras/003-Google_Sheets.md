@@ -26,7 +26,7 @@ I'll be using a weather station, the [SeeedStudio S2120 8-in-1 LoRaWAN version.]
 
 4. Your sheet should now look something like this:
 
-![Google Sheet Columns](./003-images/columns_g_sheet.png)
+![Google Sheet Columns](/images/tutorial-extras/003-images/columns_g_sheet.png)
 
 
 ## Step 2: Create a Google Apps Script
@@ -100,7 +100,7 @@ Save the script by clicking the disk icon or pressing Ctrl + S (Windows) or Cmd 
 # Step 3: Deploy the Script as a Web App
 After saving the script, click on the Deploy button in the top-right corner of the editor.
 
-![Save and Deploy](./003-images/save_deploy_g_script.png)
+![Save and Deploy](/images/tutorial-extras/003-images/save_deploy_g_script.png)
 
 Select **Manage Deployments**.
 
@@ -127,13 +127,13 @@ Under HTTP Integration, click Add.
 
 In the Event Endpoint URL(s) field, paste the Web App URL you copied from Google Apps Script.
 
-![App Integration](./003-images/met_sci_integration.png)
+![App Integration](/images/tutorial-extras/003-images/met_sci_integration.png)
 
 Make sure the payload encoding is set to JSON.
 
 **Optional** I've heard that adding a header with `Content-Type` and then `application/json` will make it work.  Only try that if you need to.  It would look like this:
 
-![Optional additional header](./003-images/header_content_type_application_json.png)
+![Optional additional header](/images/tutorial-extras/003-images/header_content_type_application_json.png)
 
 Click Submit to save the integration.
 
@@ -142,7 +142,7 @@ If you can trigger the device (I couldn't on the weather station since it was de
 
 Check your Google Sheet to see if the data has been appended to the next available row.  It should look like this:
 
-![Sheet correctly filling with data](./003-images/sheet%20looks%20like%20this.png)
+![Sheet correctly filling with data](/images/tutorial-extras/003-images/sheet_looks_like_this.png)
 
 If the data appears correctly, your integration is successfully set up!
 

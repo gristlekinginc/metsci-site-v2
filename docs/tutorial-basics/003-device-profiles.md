@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 # Device Profiles
 
@@ -8,6 +8,11 @@ This is a lesson on how to use the device profiles part of the MeteoScientific C
 ## Getting Started
 
 If you haven't already signed up for a console account [console.meteoscientific.com](https://console.meteoscientific.com) knock that out now.  It's free to sign up, you get a few DC to test things out, and without an account none of the rest of this will make sense.
+
+## Want to Watch?
+
+I get it, it's nice to have a video walk-through for this.  If you'd rather watch than read, check it out here:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rr77pVG1bDk?si=0CXmAFAsQgl6d_2r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## What is a Device Profile?
 

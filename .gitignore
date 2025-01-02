@@ -23,3 +23,14 @@ yarn-error.log*
 .env
 
 build/
+
+# Draft Pages
+docs/tutorial-extras/004-metsci-demo-dash.md
+
+# Draft documents
+**/DRAFT--*.md
+**/draft--*.md
+**/draft-*.md
+**/DRAFT-*.md
+
+

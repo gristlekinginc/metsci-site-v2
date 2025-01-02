@@ -1,5 +1,6 @@
 ---
-sidebar_position: 4
+sidebar_position: 5
+title: Add A Device
 ---
 
 # Add A Device
@@ -7,6 +8,10 @@ sidebar_position: 4
 ### Step 1: Prepare the ChirpStack Console
 
 Here we are in our ChirpStack console, currently in the dashboard with nothing going on. Before we get started, you’ll need three things. I’m assuming you already have a device profile and an application set up, in this case, a soil moisture sensor. However, you’ll also need three other important pieces of information that come with every sensor.
+
+## Want to Watch?
+If watching a video is easier for you than reading, I've recorded one for ya here:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rhNYKyC3Avs?si=1LimXlj78xfzqPb-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### The Three Key Identifiers
 

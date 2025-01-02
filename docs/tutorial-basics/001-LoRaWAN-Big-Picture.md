@@ -8,6 +8,10 @@ sidebar_position: 1
 
 Let's start with a map of the territory. You're going to hear some terms for the first time. If you don't understand them at first, don't worry about it—we're just getting some reps in so that you have a chance to hear all these terms multiple times.
 
+If you'd prefer a video walk through, go here:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/_VSy5-AQe7E?si=GjTkUVBOlMdWQbLZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Introduction to the Helium Network
 
 Let's start at the very beginning. We are going to use what's called the **Helium Network**. The Helium Network is a global **LoRaWAN**, which stands for Long Range Wide Area Network. It's a wireless or radio network.
