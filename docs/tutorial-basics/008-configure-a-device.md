@@ -1,5 +1,6 @@
 ---
 sidebar_position: 8
+title: Configure A Device
 ---
 
 # Configure a LoRaWAN Sensor
@@ -26,7 +27,6 @@ You'll need the following stuff.
  - USB-TTL adapter.  I'm going to use a [Bus Pirate v5](https://buspirate.com/get/).  As I write this (late December 2024) there's a v6 out.  Get it if you want to.  
  - DuPont Wires.  These are what you use to connect the Bus Pirate and the device.  You can [get a set here](https://amzn.to/3BYYfPy) for under $10.
  
-
 ![Bus Pirate and LDDS75 sensor](/images/tutorial-basics/008-images/bus-pirate-ldds75.png)
 
 ### Software

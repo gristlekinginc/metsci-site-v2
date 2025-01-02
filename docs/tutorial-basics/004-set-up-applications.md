@@ -7,6 +7,11 @@ sidebar_position: 4
 
 When you're in your [Console](https://console.meteoscientific.com/front/login) and first sign in, go down to **Applications** on the left-hand side. I've already set up a couple of applications, but before we jump into those, let's take a look at what an application actually is.
 
+## Want to Watch?
+
+If learning by watching is easier for you, the video for this is here:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/if3FsIUoInk?si=hyjZ2ct_pzykOtks" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ### What is an Application?
 
 It's really simple:  An **application** is just a group of devices that are similar. For example, it could be a group of weather stations, trash can fill level sensors, traffic counters, or parking sensors at a specific garage.

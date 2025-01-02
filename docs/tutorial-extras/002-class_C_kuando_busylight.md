@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+title: Class C via API
 ---
 
 # Class C via API
@@ -52,6 +53,7 @@ This endpoint enqueues a message in the downlink queue for a specific device ide
 ### For my non-nerds:  Let's do it step by step:
 
 Start by generating an API key in your [Chirpstack Console](https://console.meteoscientific.com/front/login).  
+
 ![Get an API Key from Chirpstack](/images/tutorial-extras/002-images/get_API_key_from_Chirpstack.png)
 
 **Save that somewhere secure**, you'll need it later!

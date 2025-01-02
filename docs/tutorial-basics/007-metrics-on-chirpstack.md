@@ -1,5 +1,6 @@
 ---
 sidebar_position: 7
+title: Metrics & Decoders
 ---
 # Setting Up Metrics & Decoders
 
