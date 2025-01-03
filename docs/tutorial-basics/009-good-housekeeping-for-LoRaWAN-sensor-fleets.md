@@ -222,13 +222,15 @@ For large deployments with very different sensor types, you might consider split
 
 ### Small Deployments (1-100 devices)
 - Use simple, flat data structure
+- Store all metadata as tags
 - Example implementation:
 ```javascript
 {
     "measurement": "sensor_data",
     "tags": {
         "device_id": "am319_001",
-        "location": "office"
+        "location": "office",
+        "sensor_type": "AM319"
     },
     "fields": {
         "temperature": 22.5,
@@ -238,10 +240,83 @@ For large deployments with very different sensor types, you might consider split
 ```
 
 ### Medium Deployments (100-1000 devices)
-// ... scaling patterns ...
+- Group devices by type and location
+- Use hierarchical tags
+- Consider separating metadata to reduce cardinality
+- Example implementation:
+```javascript
+{
+    "measurement": "environmental_sensors",
+    "tags": {
+        "region": "west",
+        "building": "HQ",
+        "floor": "3",
+        "sensor_type": "AM319"
+    },
+    "fields": {
+        "temperature": 22.5,
+        "humidity": 65,
+        "device_id": "am319_001"  // Moved to field to reduce tag cardinality
+    }
+}
+```
 
 ### Large Deployments (1000+ devices)
-// ... enterprise patterns ...
+- Separate measurements by sensor type
+- Use external metadata store
+- Implement data retention policies
+- Example implementation:
+```javascript
+// Main data measurement
+{
+    "measurement": "temperature_sensors",
+    "tags": {
+        "region": "west",
+        "sensor_group": "environmental"
+    },
+    "fields": {
+        "value": 22.5,
+        "device_id": "am319_001",
+        "metadata_version": "2024.1"
+    }
+}
+
+// Separate metadata store (updated less frequently)
+{
+    "measurement": "device_metadata",
+    "tags": {
+        "device_id": "am319_001",
+        "sensor_type": "AM319"
+    },
+    "fields": {
+        "location": "HQ-3F-Room301",
+        "install_date": "2024-01-15",
+        "firmware": "1.2.3",
+        "calibration_date": "2024-01-01"
+    }
+}
+```
+
+### Key Scaling Considerations
+1. **Data Volume Management**
+   - Implement downsampling for historical data
+   - Use retention policies based on data importance
+   - Consider multi-tier storage solutions
+
+2. **Query Optimization**
+   - Index frequently queried tags
+   - Use time-based partitioning
+   - Implement query caching where appropriate
+
+3. **Metadata Management**
+   - Store static metadata separately
+   - Version control your metadata
+   - Implement metadata update procedures
+
+4. **Monitoring and Maintenance**
+   - Track database size and growth
+   - Monitor query performance
+   - Set up alerts for anomalies
 
 ## Implementing in ChirpStack
 Once you've planned your data structure using these guidelines, see our [Metrics & Decoders guide](/docs/tutorial-basics/007-metrics-on-chirpstack.md) for implementation details.
