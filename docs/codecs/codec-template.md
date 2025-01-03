@@ -51,7 +51,7 @@ Brief description of the device and its primary use case.
 Configuration instructions or link to configuration guide.
 
 ## Additional Resources
-- [Data Structure Guidelines](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets)
-- [Device Manual](link)
-- [Manufacturer Website](link)
+- [Data Structure Guidelines](/docs/tutorial-basics/good-housekeeping-for-LoRaWAN-sensor-fleets)
+- [Device Manual](#)
+- [Manufacturer Website](#)
 ``` 

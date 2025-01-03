@@ -99,9 +99,10 @@ The LDDS75 can be configured using a USB-TTL adapter. Key configuration options 
 - Interrupt thresholds
 - LoRaWAN parameters
 
-For detailed configuration instructions, see our [device configuration guide](/docs/tutorial-basics/008-configure-a-device).
+For detailed configuration instructions, see our [device configuration guide](/docs/tutorial-basics/configure-a-device).
 
 ## Additional Resources
 - [Data Structure Guidelines](/docs/tutorial-basics/good-housekeeping-for-LoRaWAN-sensor-fleets)
 - [Device Manual](https://www.dragino.com/downloads/downloads/LoRa_End_Node/LDDS75/LDDS75_LoRaWAN_User_Manual_v1.1.0.pdf)
-- [Manufacturer Website](https://www.dragino.com/products/lora-lorawan-end-node/item/174-ldds75.html) 
+- [Manufacturer Website](https://www.dragino.com/products/lora-lorawan-end-node/item/174-ldds75.html)
+- [Configuration Guide](/docs/tutorial-basics/configure-a-device) 

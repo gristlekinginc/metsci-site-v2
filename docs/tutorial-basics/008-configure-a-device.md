@@ -7,7 +7,7 @@ title: Configure A Device
 
 Ok, you just got a new sensor in the mail.  It came with an `DevEUI`, `AppEUI`, `AppKey` and maybe some other fancy stuff. 
 
-You've added it to your [MetSci Console](https://console.meteoscientific.com/front/) following the [Add A Device tutorial](/docs/tutorial-basics/005-adding-a-device.md), but...
+You've added it to your [MetSci Console](https://console.meteoscientific.com/front/) following the [Add A Device tutorial](/docs/tutorial-basics/adding-a-device), but...
 
 It's set to fire off a packet every 4 hours.  You want to test it by running it every minute.  How do you configure it?
 

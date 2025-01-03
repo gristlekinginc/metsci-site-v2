@@ -1,11 +1,11 @@
 ---
 sidebar_position: 7
-title: "Setting Up Metrics & Decoders"
+title: "Metrics & Decoders"
 ---
 
 # Setting Up Metrics & Decoders
 
-This guide walks you through the practical steps of configuring decoders and measurements in ChirpStack. Before diving in, we recommend reading our [Data Structure Planning Guide](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md) to understand how to organize your data effectively.
+This guide walks you through the practical steps of configuring decoders and measurements in ChirpStack. Before diving in, we recommend reading our [Data Structure Planning Guide](/docs/tutorial-basics/good-housekeeping-for-LoRaWAN-sensor-fleets) to understand how to organize your data effectively.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ Before starting, ensure you have:
 > Note: You can use any device you'd like, the AM319 is just the demo I have handy for this.
 
 ## Step 1: Planning Your Data Structure
-1. Review the [Data Structure Planning Guide](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md)
+1. Review the [Data Structure Planning Guide](/docs/tutorial-basics/good-housekeeping-for-LoRaWAN-sensor-fleets)
 2. Identify which measurements you need
 3. Decide on your tag structure
 4. Plan your field names and types
