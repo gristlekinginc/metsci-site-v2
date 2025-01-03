@@ -18,13 +18,17 @@ Let's start at the very beginning. We are going to use what's called the **Heliu
 
 ## How It Works
 
-The way that the whole thing works is that there are sensors that you **deploy**, or put out in the wild.  Let's use the example of a soil moisture sensor. That sensor picks up data, like how moist the soil is. It then takes that data and puts it into what's called a packet. This packet is sent wirelessly over the radio waves to a local **Hotspot**. There are hotspots all over the place; in fact, in the developed world, there's probably nowhere that is not covered by a hotspot as far as radio coverage.
+The way that the whole thing works is that there are sensors that you **deploy**, or put out in the wild.  Let's use the example of a soil moisture sensor. That sensor picks up data, like how moist the soil is. It then takes that data and puts it into what's called a packet. This packet is sent wirelessly over the radio waves to a local **Hotspot**. 
+
+In the rest of the LoRaWAN world, **Hotspots** are called *Gateways**, but in Helium we call 'em hotspots.
+
+There are hotspots all over the place; in fact, in the developed world, there's probably nowhere that is not covered by a hotspot as far as radio coverage.
 
 The sensor sends the packet up to the hotspot. The hotspot receives the packet and sends it on to what's called an **LNS**, or a LoRaWAN Network Server. 
 
-Once it gets to the LNS, that packet gets decoded. When it goes over the air, it's sent in really short form and might look like something random, such as `l7294 = 4B`. Whatever it is, it needs to be decoded. It'll get decoded to something like "the soil moisture is 72%," "the temperature is 82 degrees," or "the relative humidity is XYZ."
+Once it gets to the LNS, that packet gets decoded. When it goes over the air, it's sent in really short form and might look like something random, such as `AAcyF0InPJw=`. Whatever it is, it needs to be decoded. It'll get decoded to something like "the soil moisture is 72%," "the temperature is 82 degrees," or "the relative humidity is XYZ."
 
-Once that packet is decoded in the LNS via a **Console** (one of which is run by MeteoScientific), it is then sent to an **app**, where you or your customers get to see it. That will be a graph of the temperature over time, a graph of the soil moisture over time, or an indication of whether or not a rat is in a trap or a porta potty is full—however you're using sensors and devices in your business.
+Once that packet is decoded in the LNS via a **Console** (one of which is run by [MeteoScientific](https://console.meteoscientific.com/front/)) it is then sent to an **app**, where you or your customers get to see it. That will be a graph of the temperature over time, a graph of the soil moisture over time, or an indication of whether or not a rat is in a trap or a porta potty is full—however you're using sensors and devices in your business.
 
 ## Summary
 

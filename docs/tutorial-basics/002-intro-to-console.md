@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # How to Use the LoRaWAN Console
 
-This lesson will walk you through the process of using the **MeteoScientific (MetSci) Console**. You can follow along by visiting [console.meteoscientific.com](https://console.meteoscientific.com). This guide will give you an overview of the console and how data flows within the LoRaWAN network.
+This lesson will walk you through the process of using the **MeteoScientific (MetSci) Console**. You can follow along by visiting [console.meteoscientific.com](https://console.meteoscientific.com) and signing up for an account; you'll get 400 free data credits to start. This guide will give you an overview of the console and how data flows within the LoRaWAN network.
 
 ## Want to Watch?
 
@@ -19,7 +19,7 @@ Before diving into the console, let's break down the flow of data in the system:
 2. **Hotspots**: The packet is received by a hotspot, which then forwards it to the MetSci console through the Internet.
 3. **LoRaWAN Network Server**: The packet passes through a LoRaWAN Network Server (LNS), which decodes the data.
 4. **Console Decoding**: The MetSci console interprets the decoded data, determining if a pipe is leaking, the current temperature, wind speed, etc.
-5. **Applications**: Finally, the decoded data is sent to an application (e.g., the MetSci app), or it can be integrated with other systems.
+5. **Applications**: Finally, the decoded data is sent to an application or it can be integrated with other systems to trigger an action; say, if a door is opened a light gets turned on.
 
 Today, we'll be focusing on the **MetSci Console**. 
 
@@ -27,7 +27,9 @@ Today, we'll be focusing on the **MetSci Console**.
 
 1. **Sign In**: Head over to [console.meteoscientific.com](https://console.meteoscientific.com) and sign up for an account. 
 2. **Dashboard Overview**: After signing in, you'll land on the dashboard, where you'll see four cards: 
-   - **Active Devices**: This is the most important card. Here, you can view devices you’ve set up.
+
+![MetSci Console Dashboard](/images/tutorial-basics/002-images/metsci-demo-console-dashboard.png)
+   - **Active Devices**: This is the most important card. Here, you can view devices you've set up.
    - **Active Gateways**: You can safely ignore this for now; all Helium's gateways are your active gateways.
    - **Device Data Rate Usage**: This is more technical, and we'll cover it in a separate video.
    - **Gateway Map**: This doesn't show in Console.  You'll need to use the [Helium Explorer](https://explorer.helium.com) to view all gateways.
@@ -57,11 +59,11 @@ Here's a quick breakdown:
 ## Additional Features
 
 - **Purchase Data Credits**: You can purchase additional data credits directly through the console.
-- **Service Requests**: If you encounter any issues, you can submit a service request here, although it's far more helpful to the public if you submit over on the [Github Issues](https://github.com/meteoscientific/website/issues) page.
-- **Migrating from Legacy**: If you're transitioning from the original Helium Console (almost no one is as of August 2024), there's an option to migrate your data.
+- **Service Requests**: If you encounter any issues, you can submit a service request here, although it's far more helpful to the public if you submit over on the [Github Issues](https://github.com/gristlekinginc/metsci-site-v2/issues) page.
+- **Migrating from Legacy**: If you're transitioning from the original Helium Console (almost no one is as of January 2025), there's an option to migrate your data.
 - **User Profile**: You can update your profile details at any time, including your name, address, and company info.
 
 ## Conclusion
 
-That wraps up this overview of the MetSci Console! We’ll dive deeper into specific features in the following lessons. If you haven't signed up for a console account yet, head over to [console.meteoscientific.com](https://console.meteoscientific.com), sign up, and poke around.
+That wraps up this overview of the MetSci Console! We'll dive deeper into specific features in the following lessons. If you haven't signed up for a console account yet, head over to [console.meteoscientific.com](https://console.meteoscientific.com), sign up, and poke around.
 
