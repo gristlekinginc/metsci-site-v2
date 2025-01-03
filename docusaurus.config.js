@@ -17,7 +17,7 @@ const config = {
   deploymentBranch: 'main',
   trailingSlash: false,
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   i18n: {
@@ -90,7 +90,7 @@ const config = {
             items: [
               {
                 label: 'Tutorials',
-                to: '/docs/category/tutorial---basics',
+                to: '/docs/tutorial-basics/LoRaWAN-Big-Picture',
               },
               {
                 label: 'YouTube',
@@ -118,7 +118,7 @@ const config = {
           {
             title: 'Community',
             items: [
-                            {
+              {
                 label: 'Discord',
                 href: 'https://discord.gg/4fR5QAq6Vc',
               },

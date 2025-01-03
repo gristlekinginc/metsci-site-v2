@@ -16,7 +16,7 @@ const sidebars = {
   tutorialSidebar: [
     {
       type: 'category',
-      label: 'Tutorial - Basics',
+      label: 'Tutorial Basics',
       items: [
         'tutorial-basics/LoRaWAN-Big-Picture',
         'tutorial-basics/intro-to-console',
@@ -25,11 +25,12 @@ const sidebars = {
         'tutorial-basics/adding-a-device',
         'tutorial-basics/metrics-on-chirpstack',
         'tutorial-basics/configure-a-device',
+        'tutorial-basics/good-housekeeping-for-LoRaWAN-sensor-fleets',
       ],
     },
     {
       type: 'category',
-      label: 'Tutorial - Extras',
+      label: 'Tutorial Extras',
       items: [
         'tutorial-extras/documentation',
         'tutorial-extras/class_C_kuando_busylight',
@@ -41,7 +42,7 @@ const sidebars = {
       label: 'Codec Library',
       items: [
         'codecs/overview',
-                {
+        {
           type: 'category',
           label: 'Codecs',
           items: ['codecs/codecs/dragino-ldds75'],
