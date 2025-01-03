@@ -12,8 +12,8 @@ const config = {
   favicon: 'img/metsci_favicon.ico',
   url: 'https://www.meteoscientific.com',
   baseUrl: '/',
-  organizationName: 'meteoscientific',
-  projectName: 'website',
+  organizationName: 'gristlekinginc',
+  projectName: 'metsci-site-v2',
   deploymentBranch: 'main',
   trailingSlash: false,
 
@@ -31,7 +31,7 @@ const config = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/meteoscientific/website/tree/main/', 
+          editUrl: 'https://github.com/gristlekinginc/metsci-site-v2/tree/main/', 
         },
         blog: {
           path: './blog', 
@@ -41,7 +41,7 @@ const config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          editUrl: 'https://github.com/meteoscientific/website/tree/main/', 
+          editUrl: 'https://github.com/gristlekinginc/metsci-site-v2/tree/main/', 
           blogSidebarCount: 'ALL',
           blogSidebarTitle: 'All Blog Posts',
         },
@@ -72,7 +72,7 @@ const config = {
           { to: '/pricing', label: 'Pricing', position: 'left' }, 
           { to: 'https://console.meteoscientific.com/front/login', label: 'Console', position: 'left' },
           {
-            href: 'https://github.com/meteoscientific/website', 
+            href: 'https://github.com/gristlekinginc/metsci-site-v2', 
             label: 'GitHub',
             position: 'right',
           },
