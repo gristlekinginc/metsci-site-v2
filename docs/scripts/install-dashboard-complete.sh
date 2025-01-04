@@ -56,9 +56,33 @@ perform_rollback() {
     echo "Rollback complete. Please check the error message above and try again."
 }
 
-# Check system requirements
+# Enhanced check_requirements function
 check_requirements() {
     echo "Performing system checks..."
+
+    # Check internet connectivity first
+    echo "Testing internet connection..."
+    if ! ping -c 1 google.com &> /dev/null; then
+        if ! ping -c 1 8.8.8.8 &> /dev/null; then
+            error_exit "No internet connection detected. Please check your network."
+        else
+            error_exit "DNS resolution failed. Check your network settings."
+        fi
+    fi
+
+    # Check repository access
+    echo "Verifying repository access..."
+    repos=(
+        "https://deb.nodesource.com/setup_20.x"
+        "https://repos.influxdata.com/influxdata-archive_compat.key"
+        "https://packages.grafana.com/gpg.key"
+    )
+    
+    for repo in "${repos[@]}"; do
+        if ! curl -sL "$repo" -o /dev/null; then
+            error_exit "Cannot access repository: $repo"
+        fi
+    done
 
     # Check if running on Pi
     if ! grep -q "Raspberry Pi" /proc/cpuinfo; then
@@ -70,31 +94,52 @@ check_requirements() {
         error_exit "This script requires a 64-bit OS (aarch64)"
     fi
 
-    # Check available memory
+    # Enhanced memory check with warning
     total_mem=$(free -m | awk '/^Mem:/{print $2}')
     if [ "$total_mem" -lt 1800 ]; then
-        error_exit "Insufficient memory. 2GB RAM recommended"
+        error_exit "Insufficient memory. 2GB RAM minimum required, 4GB+ recommended"
+    elif [ "$total_mem" -lt 3800 ]; then
+        echo -e "${YELLOW}Warning: Running with less than 4GB RAM might impact performance${NC}"
+        read -p "Continue anyway? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 
-    # Check internet connectivity
-    if ! ping -c 1 -W 5 google.com &> /dev/null; then
-        error_exit "Internet connection required. Check your network connection."
+    # Enhanced disk space check
+    root_space=$(df / | awk 'NR==2 {print $4}')
+    if [ "$root_space" -lt 5242880 ]; then  # 5GB in KB
+        error_exit "Insufficient disk space. At least 5GB required on root partition"
     fi
 
     # Check required ports availability
+    echo "Checking required ports..."
     for port in 1880 3000 8086; do
         if netstat -tuln | grep -q ":$port "; then
-            error_exit "Port $port is already in use. Please free this port before continuing."
+            echo -e "${YELLOW}Warning: Port $port is already in use${NC}"
+            read -p "Continue anyway? (y/n) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                error_exit "Please free port $port before continuing"
+            fi
         fi
     done
 
-    # Check disk space
-    available_space=$(df / | awk 'NR==2 {print $4}')
-    if [ "$available_space" -lt 5242880 ]; then  # 5GB in KB
-        error_exit "Insufficient disk space. At least 5GB required."
-    fi
+    # Check for existing installations
+    services=("nodered" "influxdb" "grafana-server")
+    for service in "${services[@]}"; do
+        if systemctl is-active --quiet $service; then
+            echo -e "${YELLOW}Warning: $service is already installed and running${NC}"
+            read -p "Would you like to reinstall $service? (y/n) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                error_exit "Please remove or stop existing $service installation first"
+            fi
+        fi
+    done
 
-    echo "System requirements met. Proceeding with installation..."
+    echo "✓ System requirements met. Proceeding with installation..."
 }
 
 # Verify repository access
@@ -341,6 +386,12 @@ verify_services() {
         echo "✓ $service verified"
     done
     
+    # Check credentials file
+    if [ ! -f ~/metsci-credentials.txt ]; then
+        error_exit "Credentials file was not created" "rollback"
+    fi
+    echo "✓ Credentials file created successfully"
+    
     echo "All services verified and running!"
 }
 
@@ -371,6 +422,13 @@ install_influxdb() {
 
     sudo apt-get update
     sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
+
+    # After installation, verify version
+    influx_version=$(influx version 2>/dev/null || echo "FAIL")
+    if [[ "$influx_version" == "FAIL" ]]; then
+        error_exit "InfluxDB installation failed" "rollback"
+    fi
+    echo "✓ InfluxDB $influx_version installed successfully"
 }
 
 # Add Grafana repository setup
@@ -381,6 +439,13 @@ install_grafana() {
 
     sudo apt-get update
     sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
+
+    # After installation, verify version
+    grafana_version=$(grafana-server -v 2>/dev/null || echo "FAIL")
+    if [[ "$grafana_version" == "FAIL" ]]; then
+        error_exit "Grafana installation failed" "rollback"
+    fi
+    echo "✓ Grafana $grafana_version installed successfully"
 }
 
 # Run the main installation

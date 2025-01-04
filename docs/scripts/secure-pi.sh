@@ -65,6 +65,22 @@ EOL
 echo -e "${YELLOW}Note: For enhanced SSH security, consider setting up SSH keys:${NC}"
 echo "https://www.raspberrypi.com/documentation/computers/remote-access.html#passwordless-ssh-access"
 
+# Before UFW setup
+echo "Checking existing firewall configuration..."
+if sudo ufw status | grep -q "Status: active"; then
+    echo -e "${YELLOW}UFW is already active. Current rules:${NC}"
+    sudo ufw status numbered
+    read -p "Would you like to reset UFW to default settings? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Resetting UFW..."
+        sudo ufw --force reset
+    else
+        echo "Keeping existing UFW configuration..."
+        echo "New rules will be added to existing configuration."
+    fi
+fi
+
 # 2. Firewall Setup
 echo "Setting up firewall (UFW)..."
 echo -e "${YELLOW}This creates a basic firewall that:${NC}"
@@ -89,6 +105,16 @@ sudo ufw allow $GRAFANA_PORT/tcp comment 'Grafana'
 
 # Enable UFW
 sudo ufw --force enable
+
+# After setting up UFW
+echo "Testing SSH accessibility..."
+TEST_PORT=$(ssh -p 22 -o BatchMode=yes -o ConnectTimeout=5 localhost 2>&1 | grep -q "Permission denied" && echo "OK" || echo "FAIL")
+
+if [ "$TEST_PORT" = "FAIL" ]; then
+    echo -e "${RED}WARNING: SSH appears to be blocked. Adding SSH rule...${NC}"
+    sudo ufw allow ssh
+    sudo systemctl restart ssh
+fi
 
 # 3. Create service user
 echo "Creating service user..."
