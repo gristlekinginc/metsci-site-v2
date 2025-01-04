@@ -14,7 +14,7 @@ tags:
 
 The LDDS75 is a LoRaWAN ultrasonic distance/level detection sensor. It provides decent non-contact measurement of distance or liquid levels up to 7.5 meters (about 24', aka freedom units), with precision to a few inches.  Confusingly for a new deployer, there is an optional temperature sensor you can add.  If you don't add it, part of your payload will be "temperature = 0" or something similar.  These work well for tank level monitoring, bin fill measurement, or any application requiring generally accurate distance sensing.  
 
-It's not precisely accurate; if you're fine with a few inches of variance this is a great solution.  I've used 'em in the [Vernal Pools Project](https://gristleking.com/how-to-measure-endangered-vernal-pool-depth-using-the-helium-network/)
+It's not precisely accurate; if you're fine with a few inches of variance this is a great solution.  I've used 'em in the [Vernal Pools Project.](https://gristleking.com/how-to-measure-endangered-vernal-pool-depth-using-the-helium-network/)
 
 ## Features
 - Distance measurement range: 0-75cm
