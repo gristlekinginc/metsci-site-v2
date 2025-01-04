@@ -75,13 +75,14 @@ echo "- Opens only the ports we need for local access"
 # Install UFW if not present
 sudo apt-get install -y ufw
 
-# Set default policies
+# IMPORTANT: Allow SSH BEFORE setting default policies
+sudo ufw allow ssh comment 'SSH'
+
+# Set default policies AFTER allowing SSH
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 
-# Allow specific ports
-echo "Opening required ports..."
-sudo ufw allow $SSH_PORT/tcp comment 'SSH'
+# Allow other required ports
 sudo ufw allow $NODERED_PORT/tcp comment 'Node-RED'
 sudo ufw allow $INFLUXDB_PORT/tcp comment 'InfluxDB'
 sudo ufw allow $GRAFANA_PORT/tcp comment 'Grafana'
@@ -140,9 +141,8 @@ echo "3. Fail2ban status: sudo systemctl status fail2ban"
 echo "4. Auto-updates config: cat /etc/apt/apt.conf.d/20auto-upgrades"
 echo
 echo -e "${YELLOW}Important:${NC}"
-echo "1. Make sure you have SSH key access before logging out"
-echo "2. Your network firewall (router) provides additional security"
-echo "3. These are basic security measures - adjust based on your needs"
+echo "1. Your network firewall (router) provides additional security"
+echo "2. These are basic security measures - adjust based on your needs"
 echo
 echo -e "${GREEN}Done! Please reboot your Pi to apply all changes:${NC}"
 echo "sudo reboot"
