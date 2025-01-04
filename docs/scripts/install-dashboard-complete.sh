@@ -7,6 +7,21 @@
 LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
+# Add Netstat to check ports
+command -v netstat >/dev/null 2>&1 || {
+    echo "Installing net-tools..."
+    sudo apt-get update && sudo apt-get install -y net-tools
+
+# Add Curl to check repositories
+command -v curl >/dev/null 2>&1 || {
+    echo "Installing curl..."
+    sudo apt-get update && sudo apt-get install -y curl
+}
+}
+
+ # Add to install_nodejs()
+   sudo npm install -g npm@latest
+
 # Progress indicator function
 show_progress() {
     local step="$1"
@@ -265,12 +280,12 @@ manage_service() {
     
     # Wait for service to be ready and port to be listening
     echo "Waiting for $service to be ready..."
-    for i in {1..24}; do  # Increased to 2 minutes max wait
+    for i in {1..30}; do  # Increase from 24 to 30 cycles
         if systemctl is-active --quiet $service && netstat -tuln | grep -q ":$port "; then
             echo "✓ $service is running and listening on port $port"
             return 0
         fi
-        echo "Waiting... ($i/24)"
+        echo "Waiting... ($i/30)"
         sleep 5
     done
     
