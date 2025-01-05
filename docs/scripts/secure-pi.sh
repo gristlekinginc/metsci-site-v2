@@ -126,17 +126,41 @@ sudo usermod -aG sudo metsci-service
 echo "Installing fail2ban..."
 echo -e "${YELLOW}This helps prevent brute force attacks by temporarily blocking IPs that fail to log in${NC}"
 sudo apt-get install -y fail2ban
-sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-sudo tee /etc/fail2ban/jail.local > /dev/null << EOL
+
+# Configure fail2ban with safe settings
+echo "Configuring fail2ban with safe settings..."
+sudo tee /etc/fail2ban/jail.local > /dev/null << EOF
 [sshd]
 enabled = true
-port = $SSH_PORT
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 3
-findtime = 300
-bantime = 3600
-EOL
+bantime = 10m
+findtime = 10m
+maxretry = 5
+
+# Ignore the IP that's currently connected via SSH
+ignoreip = 127.0.0.1/8 ::1/128 $(who | grep -oP '(\d+\.){3}\d+' | sort -u | tr '\n' ' ')
+EOF
+
+# Restart fail2ban with new config
+sudo systemctl restart fail2ban
+
+# Double-check UFW SSH rule
+echo "Ensuring SSH access..."
+sudo ufw allow ssh
+sudo ufw reload
+
+# Test SSH access before finishing
+echo "Testing SSH access..."
+if ! nc -z localhost 22; then
+    echo "ERROR: SSH is not accessible! Reverting changes..."
+    sudo ufw disable
+    sudo systemctl stop fail2ban
+    exit 1
+fi
+
+echo "
+Your current IP ($(who | grep -oP '(\d+\.){3}\d+' | sort -u)) has been whitelisted in fail2ban.
+This means you won't get locked out when reconnecting after reboot.
+"
 
 # 5. System hardening
 echo "Setting up automatic updates..."
@@ -183,3 +207,76 @@ echo -e "${YELLOW}Important notes about access:${NC}"
 echo "1. Local network access is controlled by this firewall"
 echo "2. Public Grafana dashboards will still work through Cloudflare"
 echo "3. All other external access should go through Cloudflare tunnel"
+
+# After the security setup completes, enhance the final message:
+echo "Security setup complete!
+
+Your SSH access is protected:
+🔒 Current IP ($(who | grep -oP '(\d+\.){3}\d+' | sort -u)) is whitelisted
+🔒 Local access (127.0.0.1) is always allowed
+🔒 SSH port (22) is open in the firewall
+🔒 fail2ban will allow 5 attempts per 10 minutes from new IPs
+
+Your firewall is now configured to:
+1. Allow SSH access (port 22)
+2. Allow Node-RED (port 1880)
+3. Allow InfluxDB (port 8086)
+4. Allow Grafana (port 3000)
+
+To check your setup:
+1. SSH config: cat /etc/ssh/sshd_config.d/security.conf
+2. Firewall status: sudo ufw status
+3. fail2ban status: sudo systemctl status fail2ban
+4. fail2ban config: cat /etc/fail2ban/jail.local
+5. Auto-updates config: cat /etc/apt/apt.conf.d/20auto-upgrades
+
+Important:
+1. Your network firewall (router) provides additional security
+2. These are basic security measures - adjust based on your needs
+
+Done! Please reboot your Pi to apply all changes:
+sudo reboot
+
+After reboot:
+1. You can SSH back in from $(who | grep -oP '(\d+\.){3}\d+' | sort -u) without risk of being banned
+2. New IPs will have 5 attempts per 10 minutes before temporary ban
+3. All local network access is controlled by the firewall
+4. Public Grafana dashboards will still work through Cloudflare
+5. All other external access should go through Cloudflare tunnel"
+
+# At the start of the script, after initial message
+echo "Checking for existing SSH host keys..."
+PI_IP=$(hostname -I | awk '{print $1}')
+if ssh-keygen -F $PI_IP >/dev/null 2>&1; then
+    echo "
+⚠️  WARNING: Your computer has old SSH keys stored for this Pi ($PI_IP)
+If this is a fresh Pi install, you should remove these keys from your computer:
+
+For Mac/Linux:
+    ssh-keygen -R $PI_IP
+
+For Windows:
+    - Using Git Bash or WSL: ssh-keygen -R $PI_IP
+    - Using PowerShell: Remove-Item \"\$env:USERPROFILE/.ssh/known_hosts\" -Force
+    - Or manually delete the entries for $PI_IP in %UserProfile%\\.ssh\\known_hosts
+
+This will prevent SSH security warnings when you reconnect.
+"
+    # Give user a moment to read the warning
+    sleep 3
+fi
+
+# At start of script, after SSH key warning
+echo "Checking system update status..."
+last_update=$(stat -c %Y /var/cache/apt/pkgcache.bin 2>/dev/null || echo 0)
+now=$(date +%s)
+update_age=$((now - last_update))
+
+# If last update was more than 1 hour ago
+if [ $update_age -gt 3600 ]; then
+    echo "System updates needed..."
+    sudo apt update
+    sudo apt upgrade -y
+else
+    echo "✓ System recently updated, skipping..."
+fi
