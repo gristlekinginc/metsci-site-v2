@@ -1,10 +1,10 @@
 #!/bin/bash
-# Version 1.0.0
+# Version 1.0.1
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will install Node-RED, InfluxDB, and Grafana, and configure them to work together. 
 # Use at your own risk, and be ready to wipe your Pi and start over if it doesn't work.  Yeehaw!
 
-echo "MeteoScientific Dashboard Installer v1.0.0"
+echo "MeteoScientific Dashboard Installer v1.0.1"
 echo
 echo "Hardware Requirements:"
 echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
@@ -248,7 +248,7 @@ install_nodered() {
     sudo npm install -g --unsafe-perm node-red
 
     # Create Node-RED service
-    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
+    sudo tee /etc/systemd/system/nodered.service > /dev/null << 'EOL'
     [Unit]
     Description=Node-RED
     After=network.target
@@ -262,7 +262,7 @@ install_nodered() {
 
     [Install]
     WantedBy=multi-user.target
-    EOL
+EOL
 
     # Enable and start Node-RED
     sudo systemctl daemon-reload
