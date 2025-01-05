@@ -1,5 +1,4 @@
 #!/bin/bash
-# Version 1.1.3
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will install Node-RED, InfluxDB, and Grafana, and configure them to work together. 
 # Use at your own risk, and be ready to wipe your Pi and start over if it doesn't work.  Yeehaw!
@@ -10,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.3"
+VERSION="1.1.4"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -308,7 +307,25 @@ install_influxdb() {
     sudo apt-get update
     sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
     
+    # Start InfluxDB service first
+    sudo systemctl enable influxdb
+    sudo systemctl start influxdb
+    
+    # Wait for service to be ready
+    echo "Waiting for InfluxDB to start..."
+    for i in {1..30}; do
+        if curl -s http://localhost:8086/health > /dev/null; then
+            break
+        fi
+        echo "Waiting... ($i/30)"
+        sleep 2
+        if [ $i -eq 30 ]; then
+            error_exit "InfluxDB failed to start" "rollback"
+        fi
+    done
+    
     # Initialize InfluxDB
+    echo "Initializing InfluxDB..."
     influx setup \
         --username "$INFLUXDB_USERNAME" \
         --password "$INFLUXDB_PASSWORD" \
