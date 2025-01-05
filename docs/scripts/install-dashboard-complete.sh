@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.6"
+VERSION="1.1.7"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -327,6 +327,10 @@ install_influxdb() {
     sudo apt-get remove -y influxdb2 || true
     sudo apt-get autoremove -y
     
+    # Clean up existing data
+    sudo rm -rf /var/lib/influxdb
+    sudo rm -rf /etc/influxdb
+    
     # Install fresh
     curl -s https://repos.influxdata.com/influxdata-archive_compat.key | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.asc > /dev/null
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.asc] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdata.list
@@ -362,16 +366,20 @@ install_influxdb() {
         fi
     done
     
-    # Initialize InfluxDB
+    # Initialize InfluxDB (only if not already initialized)
     echo "Initializing InfluxDB..."
-    influx setup \
-        --username "$INFLUXDB_USERNAME" \
-        --password "$INFLUXDB_PASSWORD" \
-        --org "$INFLUXDB_ORG" \
-        --bucket "$INFLUXDB_BUCKET" \
-        --retention 0 \
-        --token "$INFLUXDB_TOKEN" \
-        --force || error_exit "Failed to initialize InfluxDB"
+    if ! influx ping &>/dev/null; then
+        influx setup \
+            --username "$INFLUXDB_USERNAME" \
+            --password "$INFLUXDB_PASSWORD" \
+            --org "$INFLUXDB_ORG" \
+            --bucket "$INFLUXDB_BUCKET" \
+            --retention 0 \
+            --token "$INFLUXDB_TOKEN" \
+            --force || error_exit "Failed to initialize InfluxDB"
+    else
+        echo "InfluxDB already initialized, skipping setup"
+    fi
         
     echo "✓ InfluxDB installed and configured"
 }
