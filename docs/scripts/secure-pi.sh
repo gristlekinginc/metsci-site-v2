@@ -1,8 +1,12 @@
 #!/bin/bash
-# Version 1.1.2
+# Version 1.1.4
+
+# Set up logging
+LOG_FILE="/home/$SUDO_USER/security-setup.log"
+exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Print version info
-echo "MeteoScientific Pi Security Setup v1.1.2"
+echo "MeteoScientific Pi Security Setup v1.1.4"
 
 # Check for tools, install required tools if not present
 echo "Checking for required tools..."
@@ -165,10 +169,8 @@ sudo tee /etc/fail2ban/jail.local > /dev/null << EOF
 enabled = true
 bantime = 10m
 findtime = 10m
-maxretry = 5
-
-# Ignore the IP that's currently connected via SSH
-ignoreip = 127.0.0.1/8 ::1/128 $(who | grep -oP '(\d+\.){3}\d+' | sort -u | tr '\n' ' ')
+maxretry = 3
+ignoreip = 127.0.0.1/8 ::1/128 192.168.0.0/16
 EOF
 
 # Restart fail2ban with new config
@@ -239,41 +241,38 @@ echo "1. Local network access is controlled by this firewall"
 echo "2. Public Grafana dashboards will still work through Cloudflare"
 echo "3. All other external access should go through Cloudflare tunnel"
 
-# After the security setup completes, enhance the final message:
-echo "Security setup complete!
+# Before the final clear and success message, add:
+echo "Verifying security settings..."
 
-Your SSH access is protected:
-🔒 Current IP ($(who | grep -oP '(\d+\.){3}\d+' | sort -u)) is whitelisted
-🔒 Local access (127.0.0.1) is always allowed
-🔒 SSH port (22) is open in the firewall
-🔒 fail2ban will allow 5 attempts per 10 minutes from new IPs
+# Verify fail2ban config
+if ! grep -q "192.168.0.0/16" /etc/fail2ban/jail.local; then
+    echo "⚠️  WARNING: fail2ban whitelist not properly saved!"
+    echo "Please check /etc/fail2ban/jail.local before rebooting"
+    exit 1
+fi
 
-Your firewall is now configured to:
-1. Allow SSH access (port 22)
-2. Allow Node-RED (port 1880)
-3. Allow InfluxDB (port 8086)
-4. Allow Grafana (port 3000)
+# Verify UFW is properly configured
+if ! sudo ufw status | grep -q "22/tcp.*ALLOW"; then
+    echo "⚠️  WARNING: SSH port not properly configured in firewall!"
+    echo "Please check 'sudo ufw status' before rebooting"
+    exit 1
+fi
 
-To check your setup:
-1. SSH config: cat /etc/ssh/sshd_config.d/security.conf
-2. Firewall status: sudo ufw status
-3. fail2ban status: sudo systemctl status fail2ban
-4. fail2ban config: cat /etc/fail2ban/jail.local
-5. Auto-updates config: cat /etc/apt/apt.conf.d/20auto-upgrades
-
-Important:
-1. Your network firewall (router) provides additional security
-2. These are basic security measures - adjust based on your needs
-
-Done! Please reboot your Pi to apply all changes:
-sudo reboot
-
-After reboot:
-1. You can SSH back in from $(who | grep -oP '(\d+\.){3}\d+' | sort -u) without risk of being banned
-2. New IPs will have 5 attempts per 10 minutes before temporary ban
-3. All local network access is controlled by the firewall
-4. Public Grafana dashboards will still work through Cloudflare
-5. All other external access should go through Cloudflare tunnel"
+# If all checks pass, clear screen and show success
+clear
+echo "✅ Security setup complete!"
+echo
+echo "Your Pi is now configured with:"
+echo "- Secure SSH settings"
+echo "- Basic firewall (UFW)"
+echo "- Brute force protection (fail2ban)"
+echo "- Automatic updates"
+echo
+echo "To see detailed setup information:"
+echo "    cat $LOG_FILE"
+echo
+echo "➡️  Please reboot your Pi to apply all changes:"
+echo "    sudo reboot"
 
 # At the start of the script, after initial message
 echo "Checking for existing SSH host keys..."
