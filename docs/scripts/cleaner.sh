@@ -25,6 +25,9 @@ sudo rm -f /etc/apt/sources.list.d/nodesource.list*
 sudo rm -f /etc/apt/sources.list.d/influxdb.list
 sudo rm -f /etc/apt/sources.list.d/grafana.list
 
+# Clean Keyrings
+sudo rm -f /usr/share/keyrings/grafana-archive-keyring.gpg
+
 # Update package lists
 sudo apt-get update
 

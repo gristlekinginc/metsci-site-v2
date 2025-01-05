@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.8"
+VERSION="1.1.9"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -39,7 +39,7 @@ command -v curl >/dev/null 2>&1 || {
 # Progress indicator function
 show_progress() {
     local step="$1"
-    local total="7"  # Updated to 7 steps
+    local total="7"  
     local message="$2"
     
     echo ""
@@ -472,22 +472,25 @@ verify_services() {
 }
 
 # Print next steps
-print_next_steps() {
-    echo "
-Installation completed successfully!
-
-Your services are available at:
-- Node-RED: http://localhost:1880
-- InfluxDB: http://localhost:8086
-- Grafana: http://localhost:3000
-
-Next Steps:
-1. Save your credentials from $CREDS_FILE
-2. Delete the credentials file: rm $CREDS_FILE
-3. Set up Cloudflare tunnel for remote access (optional)
-
-For troubleshooting, check the log at: $LOG_FILE
-"
+print_completion() {
+    echo
+    echo "Installation completed successfully!"
+    echo
+    echo "⚠️  IMPORTANT: SAVE YOUR CREDENTIALS NOW ⚠️"
+    echo "--------------------------------------------------------"
+    echo "1. Copy your credentials to a safe place:"
+    echo "   cat $CREDS_FILE"
+    echo
+    echo "2. After saving the credentials elsewhere, delete the file:"
+    echo "   rm $CREDS_FILE"
+    echo
+    echo "3. Your services are available at:"
+    echo "   - Node-RED: http://localhost:1880"
+    echo "   - InfluxDB: http://localhost:8086"
+    echo "   - Grafana: http://localhost:3000"
+    echo
+    echo "For troubleshooting, check the log at: $LOG_FILE"
+    echo "--------------------------------------------------------"
 }
 
 # Main installation process
