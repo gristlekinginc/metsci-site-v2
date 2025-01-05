@@ -1,4 +1,10 @@
 #!/bin/bash
+# Version 1.1.0
+# Changes in this version:
+# - Added SSH key management warnings
+# - Improved fail2ban configuration with IP whitelisting
+# - Added system update status check
+# - Enhanced port checking and warnings
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
