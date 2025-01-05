@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.7"
+VERSION="1.1.8"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -423,37 +423,52 @@ start_services() {
 
 # Verify services
 verify_services() {
+    echo "Waiting for services to initialize..."
+    # Give services more time to start
+    sleep 10  # Increase from current value
+    
     echo "Verifying services..."
     
-    # Define service ports and endpoints
-    declare -A service_config=(
-        ["nodered,port"]="1880"
-        ["nodered,endpoint"]="/"
-        ["influxdb,port"]="8086"
-        ["influxdb,endpoint"]="/ping"
-        ["grafana-server,port"]="3000"
-        ["grafana-server,endpoint"]="/"
-    )
-    
-    for service in nodered influxdb grafana-server; do
-        local port="${service_config[$service,port]}"
-        local endpoint="${service_config[$service,endpoint]}"
-        
-        echo "Checking $service (port $port)..."
-        
-        if ! systemctl is-active --quiet $service; then
-            journalctl -u $service --no-pager -n 50
-            error_exit "Service $service failed to start" "rollback"
+    # Check Node-RED
+    echo "Checking nodered (port 1880)..."
+    for i in {1..30}; do
+        if curl -s http://localhost:1880 > /dev/null; then
+            echo "✓ nodered verified"
+            break
         fi
-        
-        if ! curl -s "http://localhost:$port$endpoint" > /dev/null; then
-            error_exit "Service $service is not responding" "rollback"
+        sleep 2
+        if [ $i -eq 30 ]; then
+            error_exit "Service nodered is not responding" "rollback"
         fi
-        
-        echo "✓ $service verified"
     done
     
-    echo "All services verified and running!"
+    # Check InfluxDB
+    echo "Checking influxdb (port 8086)..."
+    for i in {1..30}; do
+        if curl -s http://localhost:8086/health > /dev/null; then
+            echo "✓ influxdb verified"
+            break
+        fi
+        sleep 2
+        if [ $i -eq 30 ]; then
+            error_exit "Service influxdb is not responding" "rollback"
+        fi
+    done
+    
+    # Check Grafana with longer timeout
+    echo "Checking grafana-server (port 3000)..."
+    for i in {1..45}; do  # Increased from 30 to 45 attempts
+        if curl -s http://localhost:3000/api/health > /dev/null; then
+            echo "✓ grafana-server verified"
+            break
+        fi
+        echo "Waiting for Grafana... ($i/45)"  # Added progress indicator
+        sleep 2
+        if [ $i -eq 45 ]; then
+            journalctl -u grafana-server --no-pager -n 50  # Show Grafana logs on failure
+            error_exit "Service grafana-server is not responding" "rollback"
+        fi
+    done
 }
 
 # Print next steps
