@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.9"
+VERSION="1.2.0"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -82,9 +82,94 @@ perform_rollback() {
     echo "Rollback complete. Please check the error message above and try again."
 }
 
+# Add these arrays near the top with other variables
+NODERED_NAMES=("vulcan" "klingon" "romulan" "ferengi" "cardassian" "bajoran")
+INFLUXDB_NAMES=("ewok" "wookiee" "jawa" "tusken" "gungan" "hutt")
+GRAFANA_NAMES=("drysine" "nexus" "matrix" "cipher" "neural" "quantum")
+
 # Generate credentials function
 generate_credentials() {
     echo "Generating secure credentials..."
+    
+    # Ask for organization name
+    DEFAULT_ORG="MeteoScientific"
+    echo "What is your organization name? This will be used to organize the database."
+    echo "The default is '${DEFAULT_ORG}'"
+    read -p "Do you need to change it? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        read -p "Enter your organization name (letters, numbers, and dashes only): " INFLUXDB_ORG
+        # Remove spaces and special characters, convert to lowercase
+        INFLUXDB_ORG=$(echo "$INFLUXDB_ORG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+        if [ -z "$INFLUXDB_ORG" ]; then
+            INFLUXDB_ORG=$DEFAULT_ORG
+            echo "Using default organization: $DEFAULT_ORG"
+        fi
+    else
+        INFLUXDB_ORG=$DEFAULT_ORG
+    fi
+    
+    # Function to get random name from array
+    get_random_name() {
+        local arr=("$@")
+        echo "${arr[RANDOM % ${#arr[@]}]}"
+    }
+    
+    # Generate default usernames
+    DEFAULT_NODERED_USER=$(get_random_name "${NODERED_NAMES[@]}")
+    DEFAULT_INFLUXDB_USER=$(get_random_name "${INFLUXDB_NAMES[@]}")
+    DEFAULT_GRAFANA_USER=$(get_random_name "${GRAFANA_NAMES[@]}")
+    
+    # Ask about Node-RED username
+    echo "The default username for Node-RED is '${DEFAULT_NODERED_USER}'"
+    read -p "Do you need to change it? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        while true; do
+            read -p "Enter new Node-RED username (anything but 'admin'): " NODERED_USERNAME
+            if [ "$NODERED_USERNAME" != "admin" ]; then
+                break
+            else
+                echo "Please choose a different username"
+            fi
+        done
+    else
+        NODERED_USERNAME=$DEFAULT_NODERED_USER
+    fi
+    
+    # Repeat for InfluxDB
+    echo "The default username for InfluxDB is '${DEFAULT_INFLUXDB_USER}'"
+    read -p "Do you need to change it? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        while true; do
+            read -p "Enter new InfluxDB username (anything but 'admin'): " INFLUXDB_USERNAME
+            if [ "$INFLUXDB_USERNAME" != "admin" ]; then
+                break
+            else
+                echo "Please choose a different username"
+            fi
+        done
+    else
+        INFLUXDB_USERNAME=$DEFAULT_INFLUXDB_USER
+    fi
+    
+    # And for Grafana
+    echo "The default username for Grafana is '${DEFAULT_GRAFANA_USER}'"
+    read -p "Do you need to change it? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        while true; do
+            read -p "Enter new Grafana username (anything but 'admin'): " GRAFANA_USERNAME
+            if [ "$GRAFANA_USERNAME" != "admin" ]; then
+                break
+            else
+                echo "Please choose a different username"
+            fi
+        done
+    else
+        GRAFANA_USERNAME=$DEFAULT_GRAFANA_USER
+    fi
     
     # Generate random passwords
     NODERED_PASSWORD=$(openssl rand -base64 24)
@@ -99,18 +184,26 @@ MeteoScientific Dashboard Credentials
 Generated on: $(date)
 
 Node-RED:
-Username: admin
+Username: $NODERED_USERNAME
 Password: $NODERED_PASSWORD
 
 InfluxDB:
-Username: admin
+Username: $INFLUXDB_USERNAME
 Password: $INFLUXDB_PASSWORD
-Organization: metsci
-Bucket: weather
+Organization: $INFLUXDB_ORG
+Bucket: sensors
 Token: $INFLUXDB_TOKEN
 
+# Data Organization Strategy:
+# - All sensor data goes into the 'sensors' bucket
+#   - Use tags to organize data:
+#     - application: "ldds75"
+#     - device_id: "your-device-id"
+#     - sensor_type: "distance"
+#     This makes it easier to query across devices and applications
+
 Grafana:
-Username: admin
+Username: $GRAFANA_USERNAME
 Password: $GRAFANA_PASSWORD
 
 Save these credentials and delete this file!
@@ -122,14 +215,14 @@ EOL
     
     sudo tee "$ENV_FILE" > /dev/null << EOL
 # MeteoScientific Dashboard Environment
-NODERED_USERNAME=admin
+NODERED_USERNAME=$NODERED_USERNAME
 NODERED_PASSWORD=$NODERED_PASSWORD
-INFLUXDB_USERNAME=admin
+INFLUXDB_USERNAME=$INFLUXDB_USERNAME
 INFLUXDB_PASSWORD=$INFLUXDB_PASSWORD
 INFLUXDB_TOKEN=$INFLUXDB_TOKEN
-INFLUXDB_ORG=metsci
-INFLUXDB_BUCKET=weather
-GRAFANA_USERNAME=admin
+INFLUXDB_ORG=$INFLUXDB_ORG
+INFLUXDB_BUCKET=sensors
+GRAFANA_USERNAME=$GRAFANA_USERNAME
 GRAFANA_PASSWORD=$GRAFANA_PASSWORD
 EOL
 
@@ -366,7 +459,7 @@ install_influxdb() {
         fi
     done
     
-    # Initialize InfluxDB (only if not already initialized)
+    # Initialize InfluxDB with custom org
     echo "Initializing InfluxDB..."
     if ! influx ping &>/dev/null; then
         influx setup \
@@ -377,11 +470,16 @@ install_influxdb() {
             --retention 0 \
             --token "$INFLUXDB_TOKEN" \
             --force || error_exit "Failed to initialize InfluxDB"
+        
+        echo "Setting up recommended retention policy..."
+        influx bucket update \
+            --id $(influx bucket list -n sensors --hide-headers | cut -f 1) \
+            --retention 90d || error_exit "Failed to set retention policy"
     else
         echo "InfluxDB already initialized, skipping setup"
     fi
         
-    echo "✓ InfluxDB installed and configured"
+    echo "✓ InfluxDB installed and configured with organization: $INFLUXDB_ORG"
 }
 
 # Install Grafana
@@ -486,7 +584,7 @@ print_completion() {
     echo
     echo "3. Your services are available at:"
     echo "   - Node-RED: http://localhost:1880"
-    echo "   - InfluxDB: http://localhost:8086"
+    echo "   - InfluxDB: http://localhost:8086 (Organization: $INFLUXDB_ORG)"
     echo "   - Grafana: http://localhost:3000"
     echo
     echo "For troubleshooting, check the log at: $LOG_FILE"
