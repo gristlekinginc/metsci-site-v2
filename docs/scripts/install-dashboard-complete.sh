@@ -1,10 +1,10 @@
 #!/bin/bash
-# Version 1.0.1
+# Version 1.1.2
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will install Node-RED, InfluxDB, and Grafana, and configure them to work together. 
 # Use at your own risk, and be ready to wipe your Pi and start over if it doesn't work.  Yeehaw!
 
-echo "MeteoScientific Dashboard Installer v1.0.1"
+echo "MeteoScientific Dashboard Installer v1.1.2"
 echo
 echo "Hardware Requirements:"
 echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
@@ -50,8 +50,48 @@ command -v curl >/dev/null 2>&1 || {
 }
 }
 
- # Add to install_nodejs()
-   sudo npm install -g npm@latest
+# Add this function near the top with other function definitions
+install_nodejs() {
+    echo "Installing Node.js..."
+    
+    # Check if Node.js is already installed
+    if command -v node > /dev/null 2>&1; then
+        echo "Node.js is already installed: $(node --version)"
+        return 0
+    fi
+    
+    # Clean up any failed installations
+    sudo apt-get remove -y nodejs npm || true
+    sudo apt-get autoremove -y
+    sudo rm -rf /etc/apt/sources.list.d/nodesource.list*
+    
+    # Add NodeSource repository
+    echo "Adding NodeSource repository..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || {
+        error_exit "Failed to add NodeSource repository" "rollback"
+    }
+    
+    # Install Node.js
+    echo "Installing Node.js packages..."
+    sudo apt-get install -y nodejs || {
+        error_exit "Failed to install Node.js" "rollback"
+    }
+    
+    # Verify installation
+    if ! command -v node > /dev/null 2>&1; then
+        error_exit "Node.js installation failed" "rollback"
+    fi
+    
+    # Update npm to latest version
+    echo "Updating npm to latest version..."
+    sudo npm install -g npm@latest || {
+        error_exit "Failed to update npm" "rollback"
+    }
+    
+    node_version=$(node --version)
+    npm_version=$(npm --version)
+    echo "✓ Node.js $node_version (npm $npm_version) installed successfully"
+}
 
 # Progress indicator function
 show_progress() {
@@ -223,51 +263,74 @@ clean_nodejs() {
 install_nodejs() {
     echo "Installing Node.js..."
     
-    # Clean up first
-    clean_nodejs
-    
-    # Install Node.js from NodeSource
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || error_exit "Failed to setup Node.js repository" "rollback"
-    sudo apt-get install -y nodejs || error_exit "Failed to install Node.js" "rollback"
-    
-    # Verify installation
-    node_version=$(node --version)
-    if [[ ! "$node_version" =~ ^v20 ]]; then
-        error_exit "Node.js installation failed or wrong version installed" "rollback"
+    # Check if Node.js is already installed
+    if command -v node > /dev/null 2>&1; then
+        echo "Node.js is already installed: $(node --version)"
+        return 0
     fi
     
-    echo "✓ Node.js $node_version installed successfully"
+    # Clean up any failed installations
+    sudo apt-get remove -y nodejs npm || true
+    sudo apt-get autoremove -y
+    sudo rm -rf /etc/apt/sources.list.d/nodesource.list*
+    
+    # Add NodeSource repository
+    echo "Adding NodeSource repository..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || {
+        error_exit "Failed to add NodeSource repository" "rollback"
+    }
+    
+    # Install Node.js
+    echo "Installing Node.js packages..."
+    sudo apt-get install -y nodejs || {
+        error_exit "Failed to install Node.js" "rollback"
+    }
+    
+    # Verify installation
+    if ! command -v node > /dev/null 2>&1; then
+        error_exit "Node.js installation failed" "rollback"
+    fi
+    
+    # Update npm to latest version
+    echo "Updating npm to latest version..."
+    sudo npm install -g npm@latest || {
+        error_exit "Failed to update npm" "rollback"
+    }
+    
+    node_version=$(node --version)
+    npm_version=$(npm --version)
+    echo "✓ Node.js $node_version (npm $npm_version) installed successfully"
 }
 
 # Install Node-RED with improved handling
 install_nodered() {
     echo "Installing Node-RED..."
+    source "$ENV_FILE"
     
     # Install Node-RED
-    echo "Installing Node-RED..."
-    sudo npm install -g --unsafe-perm node-red
-
-    # Create Node-RED service
-    sudo tee /etc/systemd/system/nodered.service > /dev/null << 'EOL'
-    [Unit]
-    Description=Node-RED
-    After=network.target
-
-    [Service]
-    ExecStart=/usr/bin/node-red --max-old-space-size=512
-    Restart=on-failure
-    User=$SUDO_USER
-    Group=$SUDO_USER
-    Environment=NODE_ENV=production
-
-    [Install]
-    WantedBy=multi-user.target
+    sudo npm install -g --unsafe-perm node-red || error_exit "Failed to install Node-RED"
+    
+    # Create settings file with authentication
+    sudo mkdir -p ~/.node-red
+    cd ~/.node-red || error_exit "Failed to access Node-RED directory"
+    
+    # Generate password hash
+    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
+    
+    # Update settings.js
+    cat > settings.js << EOL
+module.exports = {
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: "$NODERED_USERNAME",
+            password: "$NODERED_HASH",
+            permissions: "*"
+        }]
+    },
+    // ... other settings ...
+}
 EOL
-
-    # Enable and start Node-RED
-    sudo systemctl daemon-reload
-    sudo systemctl enable nodered
-    sudo systemctl start nodered
 }
 
 # Add status file to track progress
@@ -361,11 +424,10 @@ main() {
     show_progress 1 "Checking system requirements"
     check_requirements
     
-    show_progress 2 "Verifying repository access"
-    check_repositories
-    
-    show_progress 3 "Installing Node.js and Node-RED"
+    show_progress 2 "Installing Node.js"
     install_nodejs
+    
+    show_progress 3 "Installing Node-RED"
     install_nodered
     
     show_progress 4 "Installing InfluxDB"
@@ -474,36 +536,157 @@ sudo apt-get update
 
 # Add InfluxDB repository setup
 install_influxdb() {
-    echo "Setting up InfluxDB repository..."
+    source "$ENV_FILE"
+    
+    # Install InfluxDB
+    echo "Installing InfluxDB..."
     curl -s https://repos.influxdata.com/influxdata-archive_compat.key | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.asc > /dev/null
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.asc] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdata.list
-
+    
     sudo apt-get update
     sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
-
-    # After installation, verify version
-    influx_version=$(influx version 2>/dev/null || echo "FAIL")
-    if [[ "$influx_version" == "FAIL" ]]; then
-        error_exit "InfluxDB installation failed" "rollback"
-    fi
-    echo "✓ InfluxDB $influx_version installed successfully"
+    
+    # Initialize InfluxDB
+    influx setup \
+        --username "$INFLUXDB_USERNAME" \
+        --password "$INFLUXDB_PASSWORD" \
+        --org "$INFLUXDB_ORG" \
+        --bucket "$INFLUXDB_BUCKET" \
+        --retention 0 \
+        --force || error_exit "Failed to initialize InfluxDB"
 }
 
 # Add Grafana repository setup
 install_grafana() {
-    echo "Setting up Grafana repository..."
+    source "$ENV_FILE"
+    
+    echo "Installing Grafana..."
     wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
     echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
-
+    
     sudo apt-get update
     sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
+    
+    # Update Grafana config
+    sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
+[security]
+admin_user = $GRAFANA_USERNAME
+admin_password = $GRAFANA_PASSWORD
+EOL
+}
 
-    # After installation, verify version
-    grafana_version=$(grafana-server -v 2>/dev/null || echo "FAIL")
-    if [[ "$grafana_version" == "FAIL" ]]; then
-        error_exit "Grafana installation failed" "rollback"
-    fi
-    echo "✓ Grafana $grafana_version installed successfully"
+# Add this near the top of the script
+CREDS_FILE="/home/$SUDO_USER/metsci-credentials.txt"
+ENV_FILE="/etc/metsci-dashboard/.env"
+
+# Add this function for credential management
+generate_credentials() {
+    echo "Generating secure credentials..."
+    
+    # Generate random passwords
+    NODERED_PASSWORD=$(openssl rand -base64 24)
+    INFLUXDB_PASSWORD=$(openssl rand -base64 24)
+    GRAFANA_PASSWORD=$(openssl rand -base64 24)
+    
+    # Create credentials file
+    cat > "$CREDS_FILE" << EOL
+MeteoScientific Dashboard Credentials
+====================================
+Generated on: $(date)
+
+Node-RED:
+Username: admin
+Password: $NODERED_PASSWORD
+
+InfluxDB:
+Username: admin
+Password: $INFLUXDB_PASSWORD
+Organization: metsci
+Bucket: weather
+
+Grafana:
+Username: admin
+Password: $GRAFANA_PASSWORD
+
+Save these credentials and delete this file!
+EOL
+
+    # Create environment file
+    sudo mkdir -p /etc/metsci-dashboard
+    sudo chmod 700 /etc/metsci-dashboard
+    
+    sudo tee "$ENV_FILE" > /dev/null << EOL
+# MeteoScientific Dashboard Environment
+NODERED_USERNAME=admin
+NODERED_PASSWORD=$NODERED_PASSWORD
+INFLUXDB_USERNAME=admin
+INFLUXDB_PASSWORD=$INFLUXDB_PASSWORD
+INFLUXDB_ORG=metsci
+INFLUXDB_BUCKET=weather
+GRAFANA_USERNAME=admin
+GRAFANA_PASSWORD=$GRAFANA_PASSWORD
+EOL
+
+    sudo chmod 600 "$ENV_FILE"
+    sudo chown root:root "$ENV_FILE"
+    
+    echo "✓ Credentials generated and stored"
+}
+
+# Add this function for service integration
+integrate_services() {
+    echo "Integrating services..."
+    source "$ENV_FILE"
+    
+    # Wait for all services to be fully up
+    echo "Waiting for services to be ready..."
+    sleep 10
+    
+    # 1. Configure Node-RED with InfluxDB connection
+    echo "Configuring Node-RED with InfluxDB..."
+    cat > ~/.node-red/settings.js << EOL
+module.exports = {
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: "$NODERED_USERNAME",
+            password: "$NODERED_HASH",
+            permissions: "*"
+        }]
+    },
+    influxdb: {
+        url: "http://localhost:8086",
+        token: "$INFLUXDB_TOKEN",
+        org: "$INFLUXDB_ORG",
+        bucket: "$INFLUXDB_BUCKET"
+    }
+}
+EOL
+
+    # 2. Create Grafana datasource for InfluxDB
+    echo "Configuring Grafana datasource..."
+    curl -X POST "http://localhost:3000/api/datasources" \
+        -H "Content-Type: application/json" \
+        -u "$GRAFANA_USERNAME:$GRAFANA_PASSWORD" \
+        -d '{
+            "name": "InfluxDB",
+            "type": "influxdb",
+            "url": "http://localhost:8086",
+            "access": "proxy",
+            "basicAuth": false,
+            "isDefault": true,
+            "jsonData": {
+                "version": "Flux",
+                "organization": "'$INFLUXDB_ORG'",
+                "defaultBucket": "'$INFLUXDB_BUCKET'"
+            },
+            "secureJsonData": {
+                "token": "'$INFLUXDB_TOKEN'"
+            }
+        }'
+
+    echo "✓ Services integrated successfully"
+    echo "You can now create flows in Node-RED and visualize data in Grafana"
 }
 
 # Run the main installation
