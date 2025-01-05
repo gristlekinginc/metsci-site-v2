@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.5"
+VERSION="1.1.6"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -238,6 +238,23 @@ install_nodered() {
     # Install Node-RED and bcryptjs
     sudo npm install -g --unsafe-perm node-red bcryptjs || error_exit "Failed to install Node-RED"
     
+    # Create systemd service file
+    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
+[Unit]
+Description=Node-RED
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/bin/node-red
+Restart=on-failure
+KillSignal=SIGINT
+User=$SUDO_USER
+Environment=NODE_RED_OPTIONS=
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
     # Create settings file with authentication
     sudo mkdir -p ~/.node-red
     cd ~/.node-red || error_exit "Failed to access Node-RED directory"
@@ -364,8 +381,10 @@ install_grafana() {
     echo "Installing Grafana..."
     source "$ENV_FILE"
     
-    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
-    echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+    # Use keyring file instead of apt-key
+    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/grafana-archive-keyring.gpg
+    
+    echo "deb [signed-by=/usr/share/keyrings/grafana-archive-keyring.gpg] https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
 
     sudo apt-get update
     sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
