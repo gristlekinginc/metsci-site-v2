@@ -1,13 +1,48 @@
 #!/bin/bash
-# Version 1.1.0
+# Version 1.1.1
 
 # Print version info
 echo "MeteoScientific Pi Security Setup v1.1.0"
+
+# Check for tools, install required tools if not present
+echo "Checking for required tools..."
+command -v nc >/dev/null 2>&1 || {
+    echo "Installing netcat..."
+    sudo apt-get update && sudo apt-get install -y netcat-traditional
+}
+
+command -v netstat >/dev/null 2>&1 || {
+    echo "Installing net-tools..."
+    sudo apt-get update && sudo apt-get install -y net-tools
+}
+
+command -v curl >/dev/null 2>&1 || {
+    echo "Installing curl..."
+    sudo apt-get update && sudo apt-get install -y curl
+}
+
+command -v sudo >/dev/null 2>&1 || {
+    echo "ERROR: sudo is not installed. Please install sudo and try again."
+    exit 1
+}
+
+command -v python3 >/dev/null 2>&1 || {
+    echo "Installing Python3 (required for fail2ban)..."
+    sudo apt-get update && sudo apt-get install -y python3
+}
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
     echo "Please run as root (use sudo)"
     echo "Example: sudo ./secure-pi.sh"
+    exit 1
+fi
+
+# Check for weak default password
+if echo "raspberry" | sudo -S -l >/dev/null 2>&1; then
+    echo "⚠️  WARNING: Default password detected!"
+    echo "Please change your password before continuing:"
+    echo "    passwd"
     exit 1
 fi
 
