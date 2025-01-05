@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.1.4"
+VERSION="1.1.5"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -159,7 +159,11 @@ check_requirements() {
         error_exit "Insufficient memory. 2GB RAM minimum required"
     elif [ "$total_ram" -lt 4000 ]; then
         echo -e "${YELLOW}⚠️  Warning: This Pi has less than 4GB RAM ($total_ram MB)${NC}"
-        echo "The dashboard may run slowly or have stability issues."
+        echo "The dashboard will work great for most small IoT setups. You might see performance impacts if you're:
+- Collecting data from 50+ sensors every minute
+- Running complex real-time calculations
+- Supporting many simultaneous dashboard users
+- Storing and querying years of historical data"
         read -p "Continue anyway? (y/n) " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -301,26 +305,43 @@ install_influxdb() {
     echo "Installing InfluxDB..."
     source "$ENV_FILE"
     
+    # Remove any existing installation
+    sudo systemctl stop influxdb || true
+    sudo apt-get remove -y influxdb2 || true
+    sudo apt-get autoremove -y
+    
+    # Install fresh
     curl -s https://repos.influxdata.com/influxdata-archive_compat.key | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.asc > /dev/null
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.asc] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdata.list
 
     sudo apt-get update
     sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
     
-    # Start InfluxDB service first
+    # Start service
+    echo "Starting InfluxDB service..."
+    sudo systemctl daemon-reload
     sudo systemctl enable influxdb
     sudo systemctl start influxdb
     
+    # Verify service is running
+    if ! systemctl is-active --quiet influxdb; then
+        echo "InfluxDB service failed to start. Checking logs..."
+        journalctl -u influxdb --no-pager -n 50
+        error_exit "InfluxDB service failed to start" "rollback"
+    fi
+    
     # Wait for service to be ready
-    echo "Waiting for InfluxDB to start..."
+    echo "Waiting for InfluxDB to be ready..."
     for i in {1..30}; do
         if curl -s http://localhost:8086/health > /dev/null; then
+            echo "InfluxDB is responding to health checks"
             break
         fi
-        echo "Waiting... ($i/30)"
+        echo "Waiting for InfluxDB to be ready... ($i/30)"
         sleep 2
         if [ $i -eq 30 ]; then
-            error_exit "InfluxDB failed to start" "rollback"
+            journalctl -u influxdb --no-pager -n 50
+            error_exit "InfluxDB failed to respond to health checks" "rollback"
         fi
     done
     
@@ -334,6 +355,8 @@ install_influxdb() {
         --retention 0 \
         --token "$INFLUXDB_TOKEN" \
         --force || error_exit "Failed to initialize InfluxDB"
+        
+    echo "✓ InfluxDB installed and configured"
 }
 
 # Install Grafana
