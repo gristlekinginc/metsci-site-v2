@@ -1,8 +1,8 @@
 #!/bin/bash
-# Version 1.1.1
+# Version 1.1.2
 
 # Print version info
-echo "MeteoScientific Pi Security Setup v1.1.0"
+echo "MeteoScientific Pi Security Setup v1.1.2"
 
 # Check for tools, install required tools if not present
 echo "Checking for required tools..."
@@ -35,14 +35,6 @@ command -v python3 >/dev/null 2>&1 || {
 if [ "$EUID" -ne 0 ]; then 
     echo "Please run as root (use sudo)"
     echo "Example: sudo ./secure-pi.sh"
-    exit 1
-fi
-
-# Check for weak default password
-if echo "raspberry" | sudo -S -l >/dev/null 2>&1; then
-    echo "⚠️  WARNING: Default password detected!"
-    echo "Please change your password before continuing:"
-    echo "    passwd"
     exit 1
 fi
 
