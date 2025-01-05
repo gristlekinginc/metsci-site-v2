@@ -1,7 +1,38 @@
 #!/bin/bash
+# Version 1.0.0
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will install Node-RED, InfluxDB, and Grafana, and configure them to work together. 
 # Use at your own risk, and be ready to wipe your Pi and start over if it doesn't work.  Yeehaw!
+
+echo "MeteoScientific Dashboard Installer v1.0.0"
+echo
+echo "Hardware Requirements:"
+echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
+echo "- 32GB+ SD card recommended"
+
+# Check RAM
+total_ram=$(free -m | awk '/^Mem:/{print $2}')
+if [ "$total_ram" -lt 4000 ]; then
+    echo "⚠️  Warning: This Pi has less than 4GB RAM ($total_ram MB)"
+    echo "The dashboard may run slowly or have stability issues."
+    read -p "Continue anyway? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+# Check disk space
+available_space=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+if [ "$available_space" -lt 16 ]; then
+    echo "⚠️  Warning: Less than 16GB free space available ($available_space GB)"
+    echo "You may run out of space when collecting data."
+    read -p "Continue anyway? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
 
 # Set up logging
 LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
@@ -212,30 +243,31 @@ install_nodejs() {
 install_nodered() {
     echo "Installing Node-RED..."
     
-    # Install Node-RED globally first
-    sudo npm install -g --unsafe-perm node-red || error_exit "Failed to install Node-RED globally" "rollback"
-    
-    # Create systemd service
-    sudo systemctl disable nodered || true
-    sudo systemctl stop nodered || true
+    # Install Node-RED
+    echo "Installing Node-RED..."
+    sudo npm install -g --unsafe-perm node-red
+
+    # Create Node-RED service
+    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
+    [Unit]
+    Description=Node-RED
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/bin/node-red --max-old-space-size=512
+    Restart=on-failure
+    User=$SUDO_USER
+    Group=$SUDO_USER
+    Environment=NODE_ENV=production
+
+    [Install]
+    WantedBy=multi-user.target
+    EOL
+
+    # Enable and start Node-RED
+    sudo systemctl daemon-reload
     sudo systemctl enable nodered
-    sudo systemctl start nodered || error_exit "Failed to start Node-RED service" "rollback"
-    
-    # Wait for service to be fully up (max 60 seconds)
-    echo "Waiting for Node-RED to start..."
-    for i in {1..12}; do
-        if curl -s http://localhost:1880 > /dev/null; then
-            echo "✓ Node-RED is running"
-            break
-        fi
-        echo "Waiting... ($i/12)"
-        sleep 5
-    done
-    
-    # Install required Node-RED packages
-    echo "Installing Node-RED packages..."
-    cd ~/.node-red || error_exit "Node-RED directory not found" "rollback"
-    npm install node-red-contrib-influxdb || error_exit "Failed to install InfluxDB nodes" "rollback"
+    sudo systemctl start nodered
 }
 
 # Add status file to track progress
@@ -428,6 +460,17 @@ Next Steps:
 For troubleshooting, check the log at: $LOG_FILE
 "
 }
+
+# Add InfluxDB repository
+curl -s https://repos.influxdata.com/influxdata-archive_compat.key | sudo apt-key add -
+echo "deb https://repos.influxdata.com/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
+# Add Grafana repository
+curl -s https://apt.grafana.com/gpg.key | sudo apt-key add -
+echo "deb https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+# Update package lists
+sudo apt-get update
 
 # Add InfluxDB repository setup
 install_influxdb() {

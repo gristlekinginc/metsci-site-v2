@@ -1,12 +1,12 @@
 #!/bin/bash
-# Version 1.1.4
+# Version 1.1.5
 
 # Set up logging
 LOG_FILE="/home/$SUDO_USER/security-setup.log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Print version info
-echo "MeteoScientific Pi Security Setup v1.1.4"
+echo "MeteoScientific Pi Security Setup v1.1.5"
 
 # Check for tools, install required tools if not present
 echo "Checking for required tools..."
@@ -93,7 +93,7 @@ PasswordAuthentication yes
 PermitEmptyPasswords no
 PermitRootLogin no
 Protocol 2
-MaxAuthTries 3
+MaxAuthTries 10
 LoginGraceTime 60
 EOL
 
@@ -165,12 +165,18 @@ sudo apt-get install -y fail2ban
 # Configure fail2ban with safe settings
 echo "Configuring fail2ban with safe settings..."
 sudo tee /etc/fail2ban/jail.local > /dev/null << EOF
-[sshd]
-enabled = true
+[DEFAULT]
 bantime = 10m
 findtime = 10m
-maxretry = 3
+maxretry = 5
 ignoreip = 127.0.0.1/8 ::1/128 192.168.0.0/16
+
+[sshd]
+enabled = true
+mode = normal
+port = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
 EOF
 
 # Restart fail2ban with new config
@@ -214,21 +220,19 @@ EOL
 # 6. Verify changes
 echo -e "${GREEN}Security setup complete!${NC}"
 echo
-echo "Your firewall is now configured to:"
-sudo ufw status numbered | grep -E "^\\[[0-9]+"
+echo "Your Pi is now configured with:"
+echo "- Secure SSH settings"
+echo "- Basic firewall (UFW)"
+echo "- Automatic updates"
+echo "- Local network protection"
 echo
-echo "To check your setup:"
-echo "1. SSH config: cat /etc/ssh/sshd_config.d/security.conf"
-echo "2. Firewall status: sudo ufw status"
-echo "3. Fail2ban status: sudo systemctl status fail2ban"
-echo "4. Auto-updates config: cat /etc/apt/apt.conf.d/20auto-upgrades"
+echo "External access is handled by Cloudflare tunnel"
 echo
-echo -e "${YELLOW}Important:${NC}"
-echo "1. Your network firewall (router) provides additional security"
-echo "2. These are basic security measures - adjust based on your needs"
+echo "To see detailed setup information:"
+echo "    cat $LOG_FILE"
 echo
-echo -e "${GREEN}Done! Please reboot your Pi to apply all changes:${NC}"
-echo "sudo reboot"
+echo "➡️  Please reboot your Pi to apply all changes:"
+echo "    sudo reboot"
 
 # Restart services
 sudo systemctl restart ssh
@@ -265,8 +269,10 @@ echo
 echo "Your Pi is now configured with:"
 echo "- Secure SSH settings"
 echo "- Basic firewall (UFW)"
-echo "- Brute force protection (fail2ban)"
 echo "- Automatic updates"
+echo "- Local network protection"
+echo
+echo "External access is handled by Cloudflare tunnel"
 echo
 echo "To see detailed setup information:"
 echo "    cat $LOG_FILE"
@@ -310,3 +316,10 @@ if [ $update_age -gt 3600 ]; then
 else
     echo "✓ System recently updated, skipping..."
 fi
+
+# At the end of the script, before the reboot message:
+echo
+echo "Note for Mac users:"
+echo "If you get 'too many authentication failures' when connecting,"
+echo "use: ssh -o IdentitiesOnly=yes demo@<PI-IP>"
+echo
