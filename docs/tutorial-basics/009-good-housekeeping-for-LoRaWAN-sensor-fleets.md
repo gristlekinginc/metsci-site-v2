@@ -228,7 +228,7 @@ For large deployments with very different sensor types, you might consider split
 {
     "measurement": "sensor_data",
     "tags": {
-        "device_id": "am319_001",
+        "devEui": "a84041d00000001",
         "location": "office",
         "sensor_type": "AM319"
     },
@@ -256,7 +256,7 @@ For large deployments with very different sensor types, you might consider split
     "fields": {
         "temperature": 22.5,
         "humidity": 65,
-        "device_id": "am319_001"  // Moved to field to reduce tag cardinality
+        "devEui": "a84041d00000001"  // Moved to field to reduce tag cardinality
     }
 }
 ```
@@ -276,7 +276,7 @@ For large deployments with very different sensor types, you might consider split
     },
     "fields": {
         "value": 22.5,
-        "device_id": "am319_001",
+        "devEui": "a84041d00000001",
         "metadata_version": "2024.1"
     }
 }
@@ -285,7 +285,7 @@ For large deployments with very different sensor types, you might consider split
 {
     "measurement": "device_metadata",
     "tags": {
-        "device_id": "am319_001",
+        "devEui": "a84041d00000001",
         "sensor_type": "AM319"
     },
     "fields": {

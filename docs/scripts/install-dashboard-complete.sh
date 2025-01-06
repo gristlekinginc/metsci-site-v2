@@ -347,8 +347,8 @@ EOL
     sudo mkdir -p ~/.node-red
     cd ~/.node-red || error_exit "Failed to access Node-RED directory"
     
-    # Install bcryptjs locally for password hashing
-    npm install bcryptjs || error_exit "Failed to install bcryptjs"
+    # Install required nodes
+    npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required nodes"
     
     # Generate password hash
     NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
@@ -381,6 +381,7 @@ module.exports = {
     
     // InfluxDB connection
     influxdb: {
+        version: 2,
         url: "http://localhost:8086",
         token: "$INFLUXDB_TOKEN",
         org: "$INFLUXDB_ORG",
