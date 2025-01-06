@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.2.0"
+VERSION="1.2.1"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -200,7 +200,6 @@ Token: $INFLUXDB_TOKEN
 #     - application: "ldds75"
 #     - device_id: "your-device-id"
 #     - sensor_type: "distance"
-#     This makes it easier to query across devices and applications
 
 Grafana:
 Username: $GRAFANA_USERNAME
@@ -230,6 +229,9 @@ EOL
     sudo chown root:root "$ENV_FILE"
     
     echo "✓ Credentials generated and stored"
+
+    # After generating all credentials, show summary
+    print_install_summary
 }
 
 # Check system requirements
@@ -437,13 +439,6 @@ install_influxdb() {
     sudo systemctl enable influxdb
     sudo systemctl start influxdb
     
-    # Verify service is running
-    if ! systemctl is-active --quiet influxdb; then
-        echo "InfluxDB service failed to start. Checking logs..."
-        journalctl -u influxdb --no-pager -n 50
-        error_exit "InfluxDB service failed to start" "rollback"
-    fi
-    
     # Wait for service to be ready
     echo "Waiting for InfluxDB to be ready..."
     for i in {1..30}; do
@@ -459,48 +454,83 @@ install_influxdb() {
         fi
     done
     
-    # Initialize InfluxDB with custom org
-    echo "Initializing InfluxDB..."
-    if ! influx ping &>/dev/null; then
-        influx setup \
-            --username "$INFLUXDB_USERNAME" \
-            --password "$INFLUXDB_PASSWORD" \
-            --org "$INFLUXDB_ORG" \
-            --bucket "$INFLUXDB_BUCKET" \
-            --retention 0 \
-            --token "$INFLUXDB_TOKEN" \
-            --force || error_exit "Failed to initialize InfluxDB"
-        
-        echo "Setting up recommended retention policy..."
-        influx bucket update \
-            --id $(influx bucket list -n sensors --hide-headers | cut -f 1) \
-            --retention 90d || error_exit "Failed to set retention policy"
-    else
-        echo "InfluxDB already initialized, skipping setup"
+    # Initialize InfluxDB using the CLI with 1-year retention
+    echo "Setting up InfluxDB..."
+    influx setup \
+        --username "$INFLUXDB_USERNAME" \
+        --password "$INFLUXDB_PASSWORD" \
+        --org "$INFLUXDB_ORG" \
+        --bucket "sensors" \
+        --retention 365d \
+        --token "$INFLUXDB_TOKEN" \
+        --force 2>/dev/null || error_exit "Failed to initialize InfluxDB"
+    
+    # Create an all-access token for Node-RED
+    echo "Creating Node-RED access token..."
+    NODERED_TOKEN=$(influx auth create \
+        --org "$INFLUXDB_ORG" \
+        --all-access \
+        --description "Node-RED Integration" \
+        --json | jq -r '.token')
+    
+    # Update environment file with Node-RED token
+    sudo sed -i "s/INFLUXDB_TOKEN=.*/INFLUXDB_TOKEN=$NODERED_TOKEN/" "$ENV_FILE"
+    
+    # Verify the setup worked
+    if ! influx auth ls --user "$INFLUXDB_USERNAME" &>/dev/null; then
+        error_exit "Failed to verify InfluxDB setup"
     fi
-        
-    echo "✓ InfluxDB installed and configured with organization: $INFLUXDB_ORG"
+    
+    echo "✓ InfluxDB installed and configured with user: $INFLUXDB_USERNAME"
 }
 
 # Install Grafana
 install_grafana() {
     echo "Installing Grafana..."
-    source "$ENV_FILE"
     
-    # Use keyring file instead of apt-key
-    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/grafana-archive-keyring.gpg
+    # Add Grafana repository and key
+    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/grafana.gpg
+    echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
     
-    echo "deb [signed-by=/usr/share/keyrings/grafana-archive-keyring.gpg] https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
-
     sudo apt-get update
     sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
     
-    # Update Grafana config
+    # Create Grafana config directory if it doesn't exist
+    sudo mkdir -p /etc/grafana
+    
+    # Update Grafana configuration
     sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
 [security]
-admin_user = $GRAFANA_USERNAME
-admin_password = $GRAFANA_PASSWORD
+admin_user = ${GRAFANA_USERNAME}
+admin_password = ${GRAFANA_PASSWORD}
+[auth.anonymous]
+enabled = false
 EOL
+    
+    # Set permissions
+    sudo chown -R grafana:grafana /etc/grafana
+    
+    # Enable and start Grafana
+    sudo systemctl daemon-reload
+    sudo systemctl enable grafana-server
+    sudo systemctl restart grafana-server
+    
+    # Wait for Grafana to be ready
+    echo "Waiting for Grafana to start..."
+    for i in {1..30}; do
+        if curl -s http://localhost:3000/api/health > /dev/null; then
+            echo "Grafana is responding to health checks"
+            break
+        fi
+        echo "Waiting for Grafana to be ready... ($i/30)"
+        sleep 2
+        if [ $i -eq 30 ]; then
+            journalctl -u grafana-server --no-pager -n 50
+            error_exit "Grafana failed to respond to health checks" "rollback"
+        fi
+    done
+    
+    echo "✓ Grafana installed and configured with user: $GRAFANA_USERNAME"
 }
 
 # Start services
@@ -593,12 +623,20 @@ print_completion() {
 
 # Main installation process
 main() {
+    # First, check basic requirements before asking any questions
     show_progress 1 "Checking system requirements"
     check_requirements
     
-    show_progress 2 "Generating secure credentials"
+    # Then gather all user inputs at once
+    show_progress 2 "Gathering user preferences"
     generate_credentials
     
+    echo
+    echo "All required information collected. Beginning installation..."
+    echo "This may take several minutes. You can monitor detailed progress in: $LOG_FILE"
+    echo
+    
+    # Now run all installation steps without requiring user input
     show_progress 3 "Installing Node.js"
     install_nodejs
     
@@ -615,7 +653,34 @@ main() {
     start_services
     verify_services
     
-    print_next_steps
+    print_completion
+}
+
+# Add a summary of what will be installed
+print_install_summary() {
+    echo
+    echo "Installation Summary"
+    echo "-------------------"
+    echo "Organization: $INFLUXDB_ORG"
+    echo
+    echo "Services to be installed:"
+    echo "1. Node-RED"
+    echo "   - Username: $NODERED_USERNAME"
+    echo "2. InfluxDB"
+    echo "   - Username: $INFLUXDB_USERNAME"
+    echo "   - Organization: $INFLUXDB_ORG"
+    echo "   - Bucket: sensors"
+    echo "3. Grafana"
+    echo "   - Username: $GRAFANA_USERNAME"
+    echo
+    echo "A complete credentials file will be saved to: $CREDS_FILE"
+    echo
+    read -p "Continue with installation? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Installation cancelled"
+        exit 1
+    fi
 }
 
 # Run the main installation
