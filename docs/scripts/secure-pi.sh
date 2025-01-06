@@ -79,6 +79,13 @@ check_port $NODERED_PORT "NODERED"
 check_port $INFLUXDB_PORT "INFLUXDB"
 check_port $GRAFANA_PORT "GRAFANA"
 
+# Check required ports (excluding 22 since we need SSH)
+for port in 1880 3000 8086; do
+    if netstat -tuln | grep -q ":$port "; then
+        error_exit "Port $port is already in use. Please free this port before continuing."
+    fi
+done
+
 # 1. SSH Hardening
 echo "Configuring SSH..."
 echo -e "${YELLOW}This makes SSH more secure by:${NC}"

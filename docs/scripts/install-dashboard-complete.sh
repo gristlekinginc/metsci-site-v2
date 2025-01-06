@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.2.1"
+VERSION="1.2.2"
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -193,13 +193,6 @@ Password: $INFLUXDB_PASSWORD
 Organization: $INFLUXDB_ORG
 Bucket: sensors
 Token: $INFLUXDB_TOKEN
-
-# Data Organization Strategy:
-# - All sensor data goes into the 'sensors' bucket
-#   - Use tags to organize data:
-#     - application: "ldds75"
-#     - device_id: "your-device-id"
-#     - sensor_type: "distance"
 
 Grafana:
 Username: $GRAFANA_USERNAME
@@ -415,22 +408,20 @@ EOL
 # Install InfluxDB
 install_influxdb() {
     echo "Installing InfluxDB..."
-    source "$ENV_FILE"
     
-    # Remove any existing installation
-    sudo systemctl stop influxdb || true
-    sudo apt-get remove -y influxdb2 || true
-    sudo apt-get autoremove -y
+    # Stop and remove any existing installation
+    if systemctl is-active --quiet influxdb; then
+        sudo systemctl stop influxdb
+    fi
     
-    # Clean up existing data
-    sudo rm -rf /var/lib/influxdb
-    sudo rm -rf /etc/influxdb
-    
-    # Install fresh
+    # Add InfluxDB repository and key
     curl -s https://repos.influxdata.com/influxdata-archive_compat.key | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.asc > /dev/null
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.asc] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdata.list
-
-    sudo apt-get update
+    
+    # Update package list after adding repo
+    sudo apt-get update || error_exit "Failed to update package list"
+    
+    # Install InfluxDB
     sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
     
     # Start service
@@ -627,8 +618,12 @@ main() {
     show_progress 1 "Checking system requirements"
     check_requirements
     
-    # Then gather all user inputs at once
-    show_progress 2 "Gathering user preferences"
+    # Install prerequisites
+    show_progress 2 "Installing prerequisites"
+    install_prerequisites
+    
+    # Then gather all user inputs
+    show_progress 3 "Gathering user preferences"
     generate_credentials
     
     echo
@@ -637,19 +632,19 @@ main() {
     echo
     
     # Now run all installation steps without requiring user input
-    show_progress 3 "Installing Node.js"
+    show_progress 4 "Installing Node.js"
     install_nodejs
     
-    show_progress 4 "Installing Node-RED"
+    show_progress 5 "Installing Node-RED"
     install_nodered
     
-    show_progress 5 "Installing InfluxDB"
+    show_progress 6 "Installing InfluxDB"
     install_influxdb
     
-    show_progress 6 "Installing Grafana"
+    show_progress 7 "Installing Grafana"
     install_grafana
     
-    show_progress 7 "Starting and verifying services"
+    show_progress 8 "Starting and verifying services"
     start_services
     verify_services
     
