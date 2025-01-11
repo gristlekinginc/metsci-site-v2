@@ -1,0 +1,70 @@
+This is a tutorial walking non-technical users through the process of integrating a custom Chirpstack LNS called MeteoScientific or MetSci with Node-RED, InfluxDB and Grafana using Cloudflare tunneles and display the collected sensor information in a public dashboard.
+
+The tutorial is written for a Raspberry Pi 4B running Raspberry Pi OS.
+
+This tutorial is published using Docusaurus, Github Actions and Vercel.
+
+File Structure:
+.github/
+blog/
+build/
+docs/
+├── codecs
+│   ├── _category_.json
+│   ├── codec-template.md
+│   ├── overview.md
+│   ├── codecs/
+│   │   ├── _category_.json
+│   │   ├── dragino-ldds75.md
+|── scripts
+│   ├── cleaner.sh
+│   ├── install-dashboard-complete.sh
+│   ├── secure-pi.sh
+├── tutorial-basics
+│   ├── _category_.json
+│   ├── 001-LoRaWAN-Big-Picture.md
+│   ├── 002-intro-to-console.md
+│   ├── 003-device-profiles.md
+│   ├── 004-set-up-applications.md
+│   ├── 005-adding-a-device.md
+│   └── 007-metrics-on-chirpstack.md
+│   └── 008-configure-a-device.md
+│   └── 009-good-housekeeping-for-LoRaWAN-sensor-fleets.md
+├── tutorial-extras
+│   ├── _category_.json
+│   ├── 001-documentation.md
+│   ├── 002-class-C-kuando-busylight.md
+│   ├── 003-Google_Sheets.md
+│   ├── 004-metsci-demo-dash.md
+├── intro.md
+drafts/
+extra_admin/
+node_modules/
+src/
+static/
+├── flows/
+├── images/
+│   ├── cloudflare/
+│   ├── codecs/
+│   ├── tutorial-basics/
+│       ├── 002-images/
+│       ├── 008-images/
+│   ├── tutorial-extras/
+│       ├── 001-images/
+│       ├── 002-images/
+│       ├── 003-images/
+│       ├── 004-images/
+│   
+├── draft-warning.png
+.gitignore
+babel.config.js
+CNAME
+docusaurus.config.js
+LICENSE
+package.json
+package-lock.json
+README.md
+sidebars.js
+vercel.json
+
+
