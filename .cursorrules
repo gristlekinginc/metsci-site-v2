@@ -6,6 +6,8 @@ This tutorial is published using Docusaurus, Github Actions and Vercel.
 
 Most of the time I'm working from a Mac, but obviously all the Pi commands are run on the Pi.
 
+The Git repo is here: https://github.com/gristlekinginc/metsci-site-v2
+
 File Structure:
 .github/
 blog/
