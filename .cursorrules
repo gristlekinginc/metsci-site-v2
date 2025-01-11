@@ -4,6 +4,8 @@ The tutorial is written for a Raspberry Pi 4B running Raspberry Pi OS.
 
 This tutorial is published using Docusaurus, Github Actions and Vercel.
 
+Most of the time I'm working from a Mac, but obviously all the Pi commands are run on the Pi.
+
 File Structure:
 .github/
 blog/

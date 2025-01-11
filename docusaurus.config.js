@@ -38,8 +38,7 @@ const config = {
           routeBasePath: 'blog',
           showReadingTime: true,
           feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
+            type: 'all',
           },
           editUrl: 'https://github.com/gristlekinginc/metsci-site-v2/tree/main/', 
           blogSidebarCount: 'ALL',
