@@ -665,15 +665,16 @@ print_install_summary() {
     echo
     echo "Installation Summary"
     echo "-------------------"
-    echo "Organization: $INFLUXDB_ORG"
     echo
     echo "Services to be installed:"
     echo "1. Node-RED"
     echo "   - Username: $NODERED_USERNAME"
+    echo
     echo "2. InfluxDB"
     echo "   - Username: $INFLUXDB_USERNAME"
     echo "   - Organization: $INFLUXDB_ORG"
     echo "   - Bucket: sensors"
+    echo
     echo "3. Grafana"
     echo "   - Username: $GRAFANA_USERNAME"
     echo
