@@ -1,0 +1,953 @@
+---
+sidebar_position: 4
+title: MetSci Demo Dashboard - Draft
+---
+
+# Build a Custom Dashboard
+
+Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor, something you can share with your friends to let them know when the rain barrel is full (or if you're Joey's friends, when the sauna is hot)!  I know, I know, you can use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
+
+Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but then...you probably wouldn't need this tutorial if you can do that.
+
+My goal here is to enable you to build your own "no-subscription" public or private dashboards for under US$150 (not including the sensors).    
+
+You'll need hardware for this, make sure you have the following on hand:
+
+### Hardware
+ - [Rasbperry Pi 4 with 4 or 8 GB RAM](https://amzn.to/3DAVCnO), about $60. 
+ - [SD Card for Pi](https://amzn.to/40ha8K5), about $10 
+ - Dragino LDDS 75 sensor.  You can buy one at [RobotShop](https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz) for $60-80.
+ - External SSD for the Pi, about $30.  IoT data sets can get pretty big and you'll want plenty of space beyond the SD card on the Pi.  SD cards can also wear out if you write to 'em a bunch. Something like [this](https://amzn.to/3PbhbNY) is fine.
+ - Some kind of USB-TTL adapter (the thing that allows you to communicate directly over-the-wire with the sensor)
+    - [BusPirate](https://buspirate.com/) I used the v5 for this, but the v6 is already out!  $40-80
+    - Cheapie [Amazon Kit](https://www.amazon.com/dp/B07VNVVXW6?ref=ppx_pop_mob_ap_share) (thanks to GreyHat for the rec) $14
+    - [Segger J-Link EDU Mini](https://www.sparkfun.com/products/24078) - $60 on Sparkfun
+
+* The Pi & SD & SSD are Amazon affiliate links, so I'll probably be able to pay my domain name bill with the commissions.
+
+### Not-Hardware
+    - Custom domain.  For this tutorial I'll be using mine, `gristleking.dev`.  If you don't already have a domain, I'd **strongly** recommend buying one at [Cloudflare](https://cloudflare.com).  They're about $12/year and buying it there makes everything else a little bit easier.
+    - If you have a domain already, you'll need to set up your domain's name servers to point to Cloudflare.
+
+### Notes on what you "Need"
+You don't actually NEED a USB-TTL adapter if you're not going to make any changes to the sensor (like how often it reports), but it's generally good practice to have one hanging around the work bench if you're any kind of aspiring nerd.
+
+You *could* do this without a custom domain by hosting in the cloud and managing tunnels with Cloudflare, but then you're on the hook for cloud hosting, which is probably $6/month at the cheapest.  A domain is something like $70/year for an expensive `.ai` one and $12/year for a cheap one. Trust me, just buy a domain. 
+
+Having your own domain makes part of this workflow way simpler, plus it's just cool to have your own domain.  Ask Larry at Google or Steve at Apple.  Having a custom domain is cool. 
+
+## Set Up Overview
+
+1. **Set Up Your Rasbperry Pi:** Basic setup anad security
+
+2. **Install Services:** Node-RED, InfluxDB, Grafana, and external SSD.
+
+3. **Cloudflare:** Set up tunnels, tokens, routes, and policies.
+
+4. **Sensor:** Get the sensor sending data through MetSci
+
+5. **Local Integration Testing:** Node-RED flows, integrate InfluxDB, create Grafana dashboards.
+
+7. **Final Security Review:** Audit, test, and verify.
+
+
+
+---
+## 1. **Setting Up Your Rasbperry Pi**
+### A. Basic Setup
+Rather than re-writing (and constantly updating) this part, I'm going to suggest you [follow the official docs](https://www.raspberrypi.com/software/) for the first part of this and load **Raspberry Pi OS Lite (64-bit)**.  The basic flow is to write (or "flash") the OS onto an SD card using your computer, then plug the SD card into your Pi.  
+
+:::tip
+Starting with a fresh OS install is recommended to avoid conflicts with existing packages.
+:::
+
+Connect your Pi (Ethernet/LAN cable strongly preferred over WiFi) and search for the Pi on your local network.  SSH in, then update/upgrade with 
+```bash
+sudo apt update && sudo apt dist-upgrade -y && sudo apt autoremove -y
+```
+
+### B. Securing Your Pi
+
+Your Pi can be made a bit more secure with a few commands.  We're going to wrap them all up into one.  This is going to get the latest security patches, make sure everything is up to date, then set some basic firewall rules. 
+
+There's nothing ultra fancy in here, just generally good Pi housekeeping.
+
+```bash 
+curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/secure-pi.sh -o secure-pi.sh && chmod +x secure-pi.sh && sudo ./secure-pi.sh
+```
+
+Once you've run it to the end, you'll see a bunch of info confirming what it did. Go ahead and reboot the Pi now.
+```bash
+sudo reboot
+```
+
+
+## 2. **Install Services (Node-RED, InfluxDB, Grafana)**
+
+### A. Service Install Script
+
+Create the script and run it with this:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/install-dashboard-complete.sh -o install-dashboard-packages.sh && chmod +x install-dashboard-packages.sh && sudo ./install-dashboard-packages.sh
+``` 
+
+During the installation you'll get a few questions and warnings. 
+
+If you have a 4GB RAM Pi, you'll see a warning message about performance.  This is just to clarify that if you want to run a shitload of sensors frequently you'll probablly be better with an 8GB RAM Pi.  For most people, 8GB is overkill.
+
+This install also does a bunch of stuff on the backend, like setting up your "Organization" name (used in the database) and users for the various services.  You can accept all the defaults and be fine, or feel free to change them if you want different user names.  Don't get too twisted up with it; again, the defaults are fine. 
+
+
+:::tip Check Your Work
+After installation, visit your shiny new setups:
+   - Node-RED: http://your-pi:1880
+   - InfluxDB: http://your-pi:8086
+   - Grafana: http://your-pi:3000
+:::
+
+**DON'T skip copying down your credentials** (instructions are at the end of the script) and then deleting that file.  
+
+```bash
+cat /home/demo/metsci-credentials.txt
+```
+That will print out your credentials, which you'll need to use later.  Save those somewhere safe, then delete the file with:
+```bash
+rm -rf /home/demo/metsci-credentials.txt
+```
+
+### B. Integrate External SSD 
+Now that your services are installed, let's make sure InfluxDB is using the SSD.
+
+Using a USB cable, connect your external SSD to one of the USB 3.0 ports on your Pi. Here I'm using PoE to power and connect the Pi, and the SSD is just laid on top.  The case is a 3D print so I can mount the Pi on the wall in my server (and clothes) closet.
+
+![Raspberry Pi mounted on closet wall with SSD](/images/tutorial-extras/004-images/raspberry-pi-with-ssd-closet.png)
+
+Then, in your Terminal:
+
+1. Verify the SSD is detected:
+   ```bash
+   lsblk
+   ```
+   You should see something like this:
+   ```bash
+   core@myrmytron:~ $ lsblk
+    NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+    sda           8:0    0 111.8G  0 disk 
+    └─sda1        8:1    0 111.8G  0 part 
+    mmcblk0     179:0    0 116.2G  0 disk 
+    ├─mmcblk0p1 179:1    0   512M  0 part /boot/firmware
+    └─mmcblk0p2 179:2    0 115.7G  0 part /
+   ```
+See how my sda lists `sda1`?  We'll use that `sda1` in this next command; yours may be named differently.
+
+2. Mount the SSD to a permanent location, e.g., `/mnt/ssd`:
+   ```bash
+   sudo mkdir -p /mnt/ssd
+   sudo mount /dev/sda1 /mnt/ssd
+   ```
+3. Set the ownership for your user.  In my case, that's `core`.  You may have named yours different.  Replace **core:core** with your user name.
+   ```bash
+   sudo chown -R core:core /mnt/ssd
+   ```
+4. Open up `/etc/fstab` so we can set this up for persistence.
+   ```bash
+   sudo nano /etc/fstab
+   ```
+   In your `/etc/fstab`, add a line like this, replacing `sda1` with the correct partition identifier from `lsblk` above.
+   ```bash
+   /dev/sda1 /mnt/ssd ext4 defaults 0 2
+   ```
+   Save and exit with `CTRL-X`, then `y`, then `Enter`.
+
+Nice work!
+
+:::tip Verify SSD
+After mounting:
+1. Check mount: `lsblk`
+   ```bash
+   # You should see your SSD mounted at /mnt/ssd
+   NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+   sda           8:0    0 111.8G  0 disk 
+   └─sda1        8:1    0 111.8G  0 part /mnt/ssd
+   ```
+
+2. Verify permissions: `ls -l /mnt/ssd`
+   ```bash
+   # You should see something like this:
+   total 16
+   drwx------ 2 core core 16384 Nov 30 14:41 lost+found
+   ```
+   The `lost+found` directory is normal for a fresh ext4 filesystem.
+
+3. Test write access:
+   ```bash
+   # Create a test file
+   touch /mnt/ssd/test.txt
+   
+   # Verify it was created
+   ls -l /mnt/ssd/test.txt
+   
+   # You should see something like:
+   -rw-r--r-- 1 core core 0 Jan 4 22:45 test.txt
+   
+   # Clean up
+   rm /mnt/ssd/test.txt
+   ```
+   If any of these commands fail with "permission denied", your ownership isn't set correctly.
+:::
+
+Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel and routes to securely move data between your Pi and the internet.
+
+
+## 3. **Cloudflare:** Tunnels, Routes, and Tokens
+
+Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different "routes" for different services, like a route for Node-RED to send data there from the MetSci LNS, and a route for Grafana to display data from your Pi onto a public dashboard.
+
+Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a "route" in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
+
+Within a route, each sensor type you set up in MetSci will need its own token to keep the http integration secure.  
+
+To start this off, login to [Cloudflare](https://www.cloudflare.com/). I'm assuming you've already set up your domain with Cloudflare, so when you log in you'll see something like this:
+
+![Cloudflare Dashboard](/images/tutorial-extras/004-images/cloudflare-dashboard.png)
+
+### A. Set Up Zero Trust
+
+You'll need to set up your Zero Trust account in Cloudflare (yes, you can use the free option.)  
+
+If you haven't set up Zero Trust yet, you may not see "Zero Trust" in your menu.  If that's the case, navigate to your domain name, look for `Access` in the left menu, then hit the `Launch Zero Trust` blue button on the right, then click it and set up ZT.
+
+![Cloudflare Zero Trust](/images/tutorial-extras/004-images/set-up-zero-trust.png)
+
+Once you have it, you'll see it in your **main** (not your domain) Cloudflare menu, like this.
+
+![Cloudflare Zero Trust](/images/tutorial-extras/004-images/go-to-zero-trust.png)
+
+With Zero Trust on and ready to go, let's set up the Pi.
+
+### B. Prepare Your Pi for Cloudflare
+
+In the Pi terminal, install Cloudflare Tunnel. As always, kick things off with a system update:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+Next, download the Cloudflare binary to the Pi.  I'm running a Pi 4B with 64-bit ARM architecture (use `uname -m` to check yours if you're unsure)
+```bash
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared
+```
+That may take a few minutes depending on your connection speed.
+
+When it's done, let's do a few nerdy things (making the binary executable, moving it to a system path, then verifying the installation).
+Make it executable:
+```bash
+chmod +x cloudflared
+```
+Move it to a system directory:
+```bash
+sudo mv cloudflared /usr/local/bin/cloudflared
+```
+Verify the installation:
+```bash
+cloudflared --version
+```
+
+That should get you here on your Pi:
+
+![Cloudflare tunnel installed and ready to set up](/images/tutorial-extras/004-images/set-up-cloudflare-tunnel.png)
+
+### C. Create a Tunnel In Cloudflare Zero Trust
+
+With Cloudflare's Zero Trust on and our Pi set up, we're going to set up the actual tunnel. 
+
+Back in your Cloudflare account, in Zero Trust, go to `Networks --> Tunnels --> Add a tunnel`.
+
+![Zero Trust Network Tunnels](/images/tutorial-extras/004-images/zero-trust-networks-tunnels.png)
+
+On the next page (not shown here), select `Cloudflared`, **NOT** `WARP Connector`, then choose a tunnel name.
+
+![Name your Cloudflare tunnel](/images/tutorial-extras/004-images/choose-tunnel-name.png)
+
+Save it and you'll be taken to the Configure page.  Go down to `Install and Run Connector` and copy the one on the right.
+
+![Install and run connector](/images/tutorial-extras/004-images/install-and-run-connector.png)
+
+### D. Add The Tunnel To Your Raspberry Pi
+We've already installed Cloudflare on our Pi, so on your Pi just run the command they gave us:
+
+`sudo cloudflared service install super-duper-alpha-numeric-string`
+
+You should see a success message, like this. 
+
+![Tunnel successfully installed](/images/tutorial-extras/004-images/tunnel-success.png)
+
+Double check that on your Pi with a status request: 
+
+`sudo systemctl status cloudflared`
+
+That should give you something like this:
+
+![Cloudflare tunnel running on Pi](/images/tutorial-extras/004-images/cloudflare-tunnel-running.png)
+
+### E. Setting Up Routes
+
+Head back to Cloudflare in `Zero Trust` --> `Networks` --> `Tunnels` and hit the 3 little stacked dots (the vertical ellipses) on the right side of the row for your tunnel, then click `Configure`.
+
+![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
+
+#### 1. Node-RED Route
+
+Add a new `Public Hostname` (a route) by clicking on the Public Hostname tab at the top, then `Add a public hostname`.
+
+![Add a new public hostname](/images/tutorial-extras/004-images/add-new-public-hostname.png)
+
+Set it up as follows:
+
+```
+-Subdomain: node-red
+-Domain: <YOUR-DOMAIN>.com
+-Type: HTTP
+-URL: localhost:1880
+```
+Hit the blue `Save hostname` button at the bottom right. 
+
+![Configure your public hostname](/images/tutorial-extras/004-images/cloudflare-configure-public-hostname-node-red.png)
+
+
+Follow the same steps as before to set up a route for your Grafana dashboard.  I'll call mine `grafana.gristleking.dev` but you can use whatever you want.
+
+```
+-Subdomain: grafana
+-Domain: <YOUR-DOMAIN>.com
+-Type: HTTP
+-URL: localhost:3000
+```
+
+Add the hostname for grafana (keep it simple, yo), then `Save tunnel`.
+![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/add-hostname-for-grafana.png)
+
+You can now see both your public hostnames for your tunnel.  Cool, right?
+
+![Confirm both your public hostnames](/images/tutorial-extras/004-images/public-hostnames-are-set-up.png)
+
+
+### F. Check Your Subdomain in Cloudflare
+Head back to the Cloudflare main menu and choose your domain, then `DNS`, then look for the subdomain you just set up.  I usually add a note to mine, something like `this is for Node-RED for the MetSci Demo Dash project`, just so future me has a clue as to what's going on. 
+
+![Add notes to your DNS records](/images/tutorial-extras/004-images/cloudflare-dns-route-note.png)
+
+:::important
+We're going to focus solely on our `node-red.<YOUR-DOMAIN>` for the next steps in the tutorial.
+  
+The Grafana dashboard route we just set up doesn't need any of the following done to it.
+:::
+
+Now that we have our route/sub-domain of `node-red.gristleking.dev` set up, we'll need to create three things specific for our LDDS75 MetSci LNS Application:
+
+```
+1. A Service Token
+2. A Zero Trust Application
+3. An HTTP Integration in MetSci
+```
+
+Remember, a MetSci Application is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one Cloudflare Application.  
+
+Each Cloudflare Application will need a Service Token and a Cloudflare Zero Trust Application to secure the data flow between the MetSci LNS and the Pi.  If we quickly zoom out, one way to visualize it is like this:
+
+```
+\ sensor -- sensor -- sensor -- sensor /
+ \ ------- MetSci Application ------- /
+  \ ------- HTTP Integration ------- /
+   \ ------- Cloudflare Tunnel ---- /
+    \ ------ Cloudflare Route ---- /
+     \ ------- Service Token ---- / <--We are here
+      \  Zero Trust Application  /
+       \ ----- Raspberry Pi --- /
+```
+
+
+### G. Create A Service Token
+
+In Cloudflare, back in Zero Trust, go to `Access-->Service Auth` and click `Create Service Token`.  
+
+Name your token something descriptive (I'm using `ldds75`) and set the duration to `Non-expiring`.
+
+![Add a Service Token in Zero Trust](/images/tutorial-extras/004-images/cloudflare-configure-service-auth-token-ldds75.png)
+
+That will give you an `Access ID` and an `Access secret`.  Save **both the headers and the access codes** in a secure place.  We'll need them when we set up the HTTP integration in MetSci.
+
+
+### H. Add A Zero Trust Application
+
+With our Service Token set up, go to `Access-->Applications` and add a new Cloudflare Application.  
+
+![Add a Zero Trust Application](/images/tutorial-extras/004-images/zero-trust-applications.png)
+
+Select `Self Hosted`
+
+#### - Application Details 
+
+We're going to set up 2 Applications to start.  One is a "global" applications that references all tokens for Node-RED. 
+
+The other is a specific application that references the `ldds75` token and restricts access to the `node-red/metsci-ldds75-data` route.
+
+Let's start with the global application. 
+
+Set the Application name to `Node-RED` and set the `Session Duration` to `24 hours`.  Then set the subdomain to `node-red`, the `domain` to `<YOUR-DOMAIN>.com`, and the `path` to `*`.
+
+![Add a global application](/images/tutorial-extras/004-images/cloudflare-global-application.png)
+
+Click `Next` to proceed to the `Policies` section.  Here we'll set up a Policy rule that requires anything using this Application to have a valid token.
+
+Set the policy name to `Node-RED` and set the Action to `Service Auth`, leave the duration as is.
+
+Scroll down a bit until you see `Configure rules`.  On the Selector choose `Any Access Service Token`.  It will automatically fill in a value of `Any non expired Service Token will be matched`.
+
+![Add a policy rule](/images/tutorial-extras/004-images/cloudflare-global-application-policy.png)
+
+Hit `Next` and scroll down to the bottom, then click `Add Application`.
+
+#### - LDDS75 Application
+
+Now you'll create the LDDS75 Application.  Give  it a descriptive name like `ldds75`, leave the session duration at `24 hours` then enter the subdomain, domain, and path it'll use.
+
+In this case, use `node-red.gristleking.dev/metsci-ldds75-data`.  We'll use that path later when we set up our Node-RED flow.
+
+![Configure Zero Trust Appication](/images/tutorial-extras/004-images/cloudflare-configure-application-details.png)
+
+Scroll down past `Application Appearances` and `Tags` etc to the bottom and click `Next` to proceed to the `Policies` section.  
+
+#### - Policy Rule
+
+We'll use the same `Service Auth` policy as the global application, but this time we'll restrict it to the `ldds75` token.
+
+Set the policy name to `ldds75` and set the Action to `Allow`, leave the duration as is.
+
+![Set up your policy](/images/tutorial-extras/004-images/cloudflare-policy-configure.png)
+
+Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then select the Service Token you just created. 
+
+![Configure rules for your Zero Trust policy](/images/tutorial-extras/004-images/cloudflare-set-service-token-rule.png)
+
+Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
+
+Nice work!  I know it's hard to see it, but we're making progress here.  
+
+---
+## 3. **Setting Up Your LDDS 75 Sensor**
+
+Whether this is your first device ever or your 100th, now is a good time to think about how you're going to structure your data.  I've written a [separate tutorial just on structuring data](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md). If you've never thought about this before, it's a good idea to read through that.  You can also just YOLO and follow along, trusting that my data structure is good enough for you.  
+
+I'm not going to tell you what to do, but I will tell you that if you're going to be doing anything with your data, you're going to want to think about it.
+
+### A. Provision That Sucker!
+
+Use the [Add A Device](/docs/tutorial-basics/adding-a-device) tutorial on this site to walk you through it.  A working codec for the device is in MetSci already. When you're done, it should look like this:
+
+![LDDS 75 reporting in the MetSci Chirpstack](/images/tutorial-extras/004-images/LDDS75-working-on-MetSci.png)
+
+### B. Check Link Metrics
+
+Ok, assuming you've got your data structure set up, after a while (for me this is about 3 weeks) your Link Metrics for the device will be pretty boring flat lines, like this:
+
+![LDDS 75 Link Metrics](/images/tutorial-extras/004-images/link-metrics-ldds75.png)
+
+Quick note:  You *can't* see the **Device Metrics** properly in Chirpstack, which is what we're using for an LNS, as both the Battery Voltage and the Distance will be off the chart, which is 0 - 1.0, and unless you have the optional extra temp sensor you won't see that either.  Don't worry about seeing anything here; that's why we're setting up a dashboard.  🔧 
+
+![LDDS 75 Link Metrics](/images/tutorial-extras/004-images/device-metrics-dont-worry.png)
+
+### C. Configure For Fast Firing
+We're going to need some data coming through the tunnel in a bit, so let's set up the LDDS75 to fire every minute for now, then we'll pull the power until we're ready to test.
+
+Use this guide to set up the LDDS75 to fire every minute: https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/tutorial-basics/008-configure-a-device.md
+
+Once you've got it set up and seen a few packets come through, pull the power on your LDDS75 using the yellow jumper; we'll use it again in a bit.
+
+### C. Set Up The HTTP Integration In MetSci
+
+In the MetSci LDDS75 `Application`, look for the `Integrations` tab.  Find 'HTTP Integrations" and hit the `+`.  Leave the payload encoding set to JSON. Change the event endpoint to `https://node-red.<YOUR-DOMAIN>/metsci-ldds75-data/` then add two headers:
+
+```
+CF-Access-Client-ID <your-access-id>
+CF-Access-Client-Secret <your-access-secret>
+```
+
+Use the `Access ID` and `Access Secret` from the Service Token you set up for the LDDS75 in Cloudflare. 
+
+![Set up your http integration in MetSci Chirpstack](/images/tutorial-extras/004-images/metsci-http-integration.png)
+
+Now you've set it up so the MetSci LNS can securely send data through a Zero Trust Cloudflare tunnel to Node-RED on your Raspberry Pi.  Cool, right?
+
+Nice work!  The NSA can prolly still get in, but the rest of the screaming hordes should be kept at bay for now.
+
+:::tip Future Integrations
+For each new sensor type you add:
+1. Create a new Service Token in Cloudflare named for that sensor
+2. Configure the HTTP integration with the new token's credentials
+
+This maintains consistent security across all your sensor data routes.
+:::
+
+---
+## 5. **Local Integration Setup**
+
+At the beginning of the tutorial we ran a script to set up all the services we'll need.  Now we'll go through and configure 'em.
+
+### A. Node-RED Flows
+
+Node-RED is a flow-based programming tool that allows you to create data flows between nodes. In this case, our nodes represent the data flow between MetSci, the InfluxDB database on our Pi, and Grafana.  
+
+Visit Node-RED at `http://<YOUR-PI-IP>:1880` in a browser.  
+
+If you haven't already logged in (back when we set up the services), you'll see a login screen.  Use the user & pass that was setup during the service setup.  You DID save those credentials, right?
+
+Let me show you the whole "flow" first.  You could import this if you want (links down at the bottom of this page), but I **strongly** recommend you follow along and build it yourself.  It'll help you understand how it works.
+
+![Node-RED flow](/images/tutorial-extras/004-images/node-red-full-flow.png)
+
+1. We'll start with an **HTTP In** node; think of it as the greeter at Wal-Mart.  "Hey, how you doing, are you decent and sober? Come on in!"
+
+To add a node, you find it in the left menu bar, or just start typing in the name of the node at the top.  Once you see it, drag it onto the workspace. 
+
+![Adding an HTTP In node](/images/tutorial-extras/004-images/node-red-drag-in-node.png)
+
+Once you've dragged a node in, double click it to configure it.  For the HTTP In node:
+
+- Method: `POST`
+- URL: `/metsci-ldds75-data`
+- Name: `MetSci LDDS75 Input`
+
+![Configuring the HTTP In node](/images/tutorial-extras/004-images/node-red-configure-http-in-ldds75.png)
+
+2. Next we'll add in a **https response** node.  This node will let the tunnel know everything is working and follow the best practices of always responding to http requests.  It's like when someone says "Hi" to you in the street; just say "Hi" back.
+
+![Adding an https response node](/images/tutorial-extras/004-images/node-red-http-response-node.png)
+
+Just make sure you name it; leave everything else blank.
+
+With two nodes in the workspace, you can start connecting 'em.  Drag a "wire" from the grey dot on the right side of the HTTP In node to the grey dot on the left side of the HTTPS Response node.
+
+3. Now we'll add and configure a **JSON** node.  JSON nodes standardize the incoming data, parse errors, and make sure the next node in the flow gets the right data.
+
+   - Search for `json` and add it to your workspace
+   - Double-click to configure:
+     - Action: `Always Conver to JavaScript Object`
+     - Property: `msg.payload`
+     - Name: `Parse JSON`
+   - Click Done to save
+
+This ensures our data is in the right format for processing, whether it comes from our test Inject node or the HTTP In node.
+
+Configureation:
+Action: `Always Convert to JavaScript Object`
+Property: `msg.payload`
+Name: `Parse JSON`
+
+Now drag a wire from the **HTTP IN** node to the **Parse JSON** node. At this point, you'll have a wire from the HTTP In node to the Parse JSON node, and a wire from the Parse JSON node to the HTTPS Response node.
+
+3. Next we'll add a **Switch** node to route the data to the correct sensor function.
+   - Search for `switch` and add it to your workspace
+   - Double-click to configure:
+     - Name: `Route by Device Type`
+     - Property: `msg.` `payload.deviceInfo.deviceProfileName`
+     - Rules:
+       1. First rule:
+          - Operator: `contains`
+          - Value: `LDDS75`
+       2. Click `+` to add second rule:
+          - Operator: `contains`
+          - Value: `AM319` (just a demo for this tutorial)
+     - Check "otherwise" to catch unknown devices
+   - Click Done to save
+
+This node examines the device profile name in the incoming message and routes it to the appropriate function node. 
+
+If the incoming message contains "LDDS75", it goes to output 1, if it contains "AM319" (which we haven't set up yet), it goes to output 2, and any unknown devices go to the "otherwise" output where you can handle them (e.g., with a debug node to see what arrived).
+
+![Configuring the switch node](/images/tutorial-extras/004-images/node-red-switch-node-config.png)
+
+Make sure you drag the wire from the right connector on the Switch node to the next node in the flow.  In this case, that'll be our LDDS75 Function node.
+
+4. Add a **Function** node for the LDDS75.  Function nodes are what allow us to correctly setup the data for insertion into InfluxDB.  A JSON node cleans up the data, the Switch node routes it to the correct sensor function, and a Function node formats it for InfluxDB.
+
+Search for a `function` node and add it to your workspace.  
+    - Double-click to configure:
+        - Name it `LDDS75 Function`  
+        - Paste the following code into the `Message` tab of the Function node:
+
+```javascript
+try {
+    // Log receipt of message
+    node.warn("LDDS75 function processing message");
+    
+    const originalPayload = msg.payload;
+    const gateway = originalPayload.rxInfo?.[0] || {};
+    
+    // Create payload array with fields and tags objects
+    msg.payload = [
+        // Fields object (numeric measurements)
+        {
+            distance: parseInt(originalPayload.object?.distance || 0),
+            battery: parseFloat(originalPayload.object?.battery_voltage || 0),
+            temperature: parseFloat(originalPayload.object?.temperature || 0),
+            rssi: parseInt(gateway.rssi || 0),
+            snr: parseFloat(gateway.snr || 0),
+            frequency: parseInt(originalPayload.txInfo?.frequency || 0),
+            spreading_factor: parseInt(originalPayload.dr || 0), // Using DR instead of SF
+            sensor_status: Boolean(originalPayload.object?.sensor_status),
+            interrupt_status: Boolean(originalPayload.object?.interrupt_status)
+        },
+        // Tags object (metadata for filtering and grouping)
+        {
+            device: String(originalPayload.deviceInfo?.deviceName || ""),
+            device_eui: String(originalPayload.deviceInfo?.devEui || ""),
+            application: String(originalPayload.deviceInfo?.applicationName || ""),
+            gateway: String(gateway.metadata?.gateway_id || ""),
+            gateway_id: String(gateway.gatewayId || ""),
+            region: String(gateway.metadata?.region_common_name || ""),
+            network: String(gateway.metadata?.network || "")
+        }
+    ];
+    
+    // Set measurement name for MetSci LDDS75 sensors
+    msg.measurement = "ldds75_metsci";
+    
+    // Add timestamp if not present
+    if (!msg.payload[0].timestamp) {
+        msg.payload[0].timestamp = new Date(originalPayload.time).getTime() * 1000000; // Convert to nanoseconds for InfluxDB
+    }
+    
+    // Log the attempt for debugging
+    node.warn("Preparing InfluxDB write for device: " + msg.payload[1].device);
+    node.warn("Distance reading: " + msg.payload[0].distance + " mm");
+    
+    return msg;
+} catch(err) {
+    node.error("LDDS75 Processing Error: " + err.message);
+    node.error("Failed payload: " + JSON.stringify(msg.payload, null, 2));
+    // Add status node indication
+    node.status({fill:"red", shape:"dot", text:"Processing Error"});
+    return null;
+}
+```
+5. Add an **InfluxDB out** node to the Function node to store the data in InfluxDB..
+    - Double-click the node to configure it
+    - Click the `+` icon next to the "Server" field to create a new InfluxDB server configuration
+    - Fill in the configuration:
+   ```
+   Name: Local InfluxDB
+   Version: 2.0
+   URL: http://localhost:8086
+   Token: [paste in your InfluxDB token from your credentials file]
+   ```
+    - Click "Add" to save the server configuration
+    - Now, in the InfluxDB Out node configuration:
+    ```
+    Organization: [your org name, copy this from your credentials file]
+    Bucket: sensors [also in the credentials file]
+    Measurement: [leave blank]
+    Time precision: `Nanoseconds` 
+     ```
+
+![Configuring the InfluxDB out node](/images/tutorial-extras/004-images/node-red-influxdb-out-node-configure.png)
+ 
+
+7. Connect the nodes by dragging a wire from one node to the other.
+   - MetSci LDDS75 Input → Parse JSON → Switch → LDDS75 Function → InfluxDB out
+
+8. Now, the pro move here is to add in Debug nodes.  For now, you can add a Debug node to every one our regular nodes; that's what I've done in the image below. That way we'll see what's going through the whole flow the next time we have a packet come through.
+
+For all of those:
+```
+- Set Output to `msg.payload`
+- Name it something descriptive
+```
+9. Deploy and test:
+With your flow set up, click `Deploy` in the top-right. 
+
+![Connecting the nodes](/images/tutorial-extras/004-images/node-red-first-flow.png)
+
+You should see a green checkmark and the word "Deployed" in the top-right.  If you see an error, check the Debug panel for more information.  It'll tell you what went wrong and where.  For this first "copy/paste" flow, it's mostly likely a typo in the code where you missed a `.` or a `,` etc.
+
+Now go back to your LDDS75 and power it back on.  It shoudl be firing on a one minute interval, so you'll know quickly if everything is working or not as you'll see the data start flowing through in the debug panel on the right side. 
+
+:::note
+This modular structure makes it easy to add more sensors later. You can see I've added an AM319 sensor to the flow above in the image.  Each sensor follows the same basic pattern:
+- HTTP In (receives data)
+- JSON parser
+- Switch (routes data to the correct sensor function)
+    - Sensor Function (formats data for your needs)
+- InfluxDB out (stores data)
+:::
+
+### B. InfluxDB Check
+
+Let's check our InfluxDB to see if the data made it there.  Go to `http://your-pi:8086` and sign in with the credentials from your installation.  Then go to `Data Explorer` and run a query for `ldds75` by pasting in the query below and hitting "Submit".  Hit the `View Raw Data` button (not circled in the image).  You should see your data there.
+
+![InfluxDB query](/images/tutorial-extras/004-images/influxdb-data-explorer.png)
+
+Here are two script queries you can run to see the data.  First, let's check distance readings from a specific device:
+
+```sql
+from(bucket: "sensors")
+  |> range(start: -24h)
+  |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
+  |> filter(fn: (r) => r["device"] == "LDDS 2")
+  |> filter(fn: (r) => r["_field"] == "distance")
+```
+
+Here's a more complex query to see specific data from our device, including the gateway and region as well as the distance and RSSI fields.
+```sql
+from(bucket: "sensors")
+  |> range(start: -24h)
+  |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
+  |> filter(fn: (r) => r["gateway"] == "sweet-sage-pike")
+  |> filter(fn: (r) => r["region"] == "US915")
+  |> filter(fn: (r) => r["_field"] == "distance" or r["_field"] == "rssi")
+```
+:::tip
+This is a fairly simple setup, but you may still have problems.  We're nerds, things never work right the first time, and that's OK.  By far the fastest way to debug on your own is to feed in messages from InfluxDB, Node-RED debug, and drop screenshots into ChatGPT.  
+:::
+
+### C. Grafana Dashboards
+
+Now let's head over to Grafana and set up a dashboard, woohoo!
+
+Go to the local Grafana at `http://your-pi:3000` and sign in with the credentials from your installation.  You'll see something like this after you sign in:
+
+![Grafana dashboard](/images/tutorial-extras/004-images/grafana-home.png)
+
+Now that we have data flowing into InfluxDB, let's visualize it in Grafana! First, we'll connect Grafana to our InfluxDB data source.
+
+1. Click **Connections** in the left-side menu
+2. Click **Add new connection**
+3. Search for `InfluxDB` and select it
+
+![Adding a new InfluxDB connection](/images/tutorial-extras/004-images/grafana-connections-influxdb.png)
+
+4. Click **Add new data source**
+5. Configure the settings:
+   
+   **Basic Settings:**
+   - Name: `Local InfluxDB`
+   - Default: ✓ (checked)
+
+   **Query Language:**
+   - Select: `Flux`
+   (You'll see a note that Flux support is in beta - that's okay!)
+
+   **HTTP Settings:**
+   - URL: `http://<YOUR-PI-IP>:8086`
+
+   **Auth:**
+   - Basic auth: Toggle ON
+   - With Credentials: Toggle ON
+   - User: [your InfluxDB username]
+   - Password: [your InfluxDB password]
+
+   **InfluxDB Details:**
+   - Organization: [your org name from credentials file]
+   - Token: [paste your token from credentials file]
+   - Default Bucket: `sensors`
+   - Min time interval: `10s`
+   - Max series: `1000`
+
+6. Click **Save & test** at the bottom
+   You should see "Data source is working" if everything is configured correctly
+
+![Grafana InfluxDB connection setup](/images/tutorial-extras/004-images/grafana-influxdb-settings.png)
+
+Now let's create a dashboard to visualize our LDDS75 data.
+
+![Grafana add new dashboard](/images/tutorial-extras/004-images/grafana-build-new-dashboard.png)
+
+1. Click the **+** icon up at the top right
+2. Select **New Dashboard**
+3. Click **Add visualization**
+4. Select your `Local InfluxDB` data source
+5. In the Flux Query editor, paste:
+
+```flux
+from(bucket: "sensors")
+  |> range(start: -24h)
+  |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
+  |> filter(fn: (r) => r["device"] == "LDDS 2")
+  |> filter(fn: (r) => r["_field"] == "distance")
+``` 
+Now, over on the right, we're going to configure the visualization settings.
+
+The type of visualization we're going to use is a `Time Series` graph.  This is ideal for showing changes over time.
+
+6. `Panel Options`
+   - Panel Type: Select "Time series" (this is ideal for showing changes over time)
+   - Title: "Water Level"
+   - Description: "Distance measurement from LDDS75 sensor"
+
+
+7. `Graph Styles`
+   - Style: Line (shows continuous changes)
+   - Line width: 2
+   - Fill opacity: 20 (adds a subtle fill below the line)
+   - Connect null values: Always (smooths over any gaps in data)
+
+8. `Standard Options`
+   - Unit: Length → millimeter (mm)
+   - Min: 0
+   - Max: 8000 
+   - Decimals: 0 (distance in mm doesn't need decimals)
+   - Display Name: `${__field.name}`
+
+9. `Thresholds`
+   - Add threshold at 80% of your maximum expected water level
+   - Base color: Green
+   - Above 80%: Red (indicates barrel is getting full)
+
+10. Save your dashboard, then leave the edit window and go `Back to dashboard`.
+
+Now let's do a little admin work, then set up the sharing aspect.  Grafana makes this dead easy.
+
+First, in your Pi Terminal:
+```
+sudo nano /etc/grafana/grafana.ini
+```
+
+Then, add in a Server block like this, **replace the domain and subdomain with your own**:
+
+```[server]
+domain = grafana.gristleking.dev
+root_url = https://grafana.gristleking.dev
+```
+
+Now restart Grafana:
+```
+sudo systemctl restart grafana-server
+```   
+
+Back in Grafana, refresh the page, then click the Share button in the top right.  Go to the `Public Dashboard` tab
+
+![Grafana Share Dashboard](/images/tutorial-extras/004-images/grafana-share-dashboard.png)
+
+Check all the boxes, then click `Generate Public URL`.  It should generate a URL like `https://grafana.gristleking.dev/d/000000002/ldds75-metsci-dashboard?orgId=1&var-device=LDDS%202`, pulling from the `[server]` block we just set up.  
+
+Copy the URL and paste it into your browser.  You should see your dashboard.
+--- 
+
+
+### D. AM319 Teaser
+
+By now you'll have at least a couple of packets coming through the tunnel, so you should see the data in your dashboard.  If you don't, you can always check the debug panel in Node-RED to see what's gone wrong.
+
+Liquid level sensing is simple, but generally not that exciting, so...
+
+Using the steps above, I've added in a Milesight AM319, including a route, policy, and application in Cloudflare and a second dashboard.  This is what it looks like with some live data:
+
+![Grafana AM319 Dashboard](/images/tutorial-extras/004-images/grafana-am319-burpees.png)
+
+Just so you could see some real change,I closed up all the windows & doors in my office and did burpees until the CO2 went up.  You can also see where we dropped a couple of packets.  The AM319 fires a huge packet every minute, so it's easy to see where the packets are dropped.
+
+So...YOU can see this data on your local network, but how do you share it with Mom so she can worry about the rising CO2 levels in your office? 
+
+---
+
+## 6. **Final Security Review**
+   - Audit configurations
+   - Test authentication
+   - Verify secure access
+
+
+## 7. System Maintenance & Troubleshooting
+
+### A. Credentials Management
+Your credentials are stored in several locations:
+1. Node-RED: `~/.node-red/settings.js`
+2. InfluxDB: `/etc/influxdb/config.toml`
+3. Grafana: `/etc/grafana/grafana.ini`
+4. Installation credentials: Generated in `~/metsci-credentials.txt`
+
+:::warning
+After setting up your services, securely store the contents of `~/metsci-credentials.txt` somewhere safe, then delete it from your Pi:
+```bash
+rm ~/metsci-credentials.txt
+```
+:::
+
+### B. Backing Up Configurations
+Create a backup script for your configurations:
+```bash
+#!/bin/bash
+BACKUP_DIR="/mnt/ssd/backups/$(date +%Y%m%d)"
+mkdir -p $BACKUP_DIR
+
+# Backup Node-RED flows and settings
+cp -r ~/.node-red/* $BACKUP_DIR/node-red/
+
+# Backup service configs
+sudo cp /etc/influxdb/config.toml $BACKUP_DIR/
+sudo cp /etc/grafana/grafana.ini $BACKUP_DIR/
+
+# Set permissions
+sudo chown -R $USER:$USER $BACKUP_DIR
+```
+
+### C. System Updates
+Regular maintenance tasks:
+```bash
+# Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Restart services after updates
+sudo systemctl restart nodered influxdb grafana-server
+```
+
+### D. Troubleshooting Guide
+
+#### 1. Service Not Starting
+Check service status:
+```bash
+sudo systemctl status [service-name]  # nodered, influxdb, or grafana-server
+```
+
+View logs:
+```bash
+sudo journalctl -u [service-name] -n 50 --no-pager
+```
+
+#### 2. Lost Connection to Pi
+1. Check if Pi is powered on
+2. Verify network connection
+3. Try direct connection via ethernet
+4. Check Cloudflare tunnel status:
+```bash
+sudo systemctl status cloudflared
+```
+
+#### 3. Data Not Flowing
+Check each step:
+1. MetSci LNS → View device events in console
+2. Cloudflare → Check tunnel logs
+3. Node-RED → Check debug tab
+4. InfluxDB → Query recent data
+5. Grafana → Check data source connection
+
+#### 4. Disk Space Issues
+Monitor disk usage:
+```bash
+df -h
+```
+
+Check service logs taking up space:
+```bash
+sudo du -h /var/log | sort -rh | head -n 10
+```
+
+:::tip Recovery Steps
+If something goes wrong:
+1. Check the relevant service status
+2. Review the logs
+3. Restore from backup if needed
+4. If all else fails, you can always reinstall the affected service
+:::
+
+
+Last step?  Tell your friends what you did!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
+
