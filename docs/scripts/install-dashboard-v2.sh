@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Add version info at top
-VERSION="1.2.2"
+VERSION="1.2.3"  # Updated version
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -25,21 +25,13 @@ LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
 # Set up logging
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
-# Add required packages
-command -v netstat >/dev/null 2>&1 || {
-    echo "Installing net-tools..."
-    sudo apt-get update && sudo apt-get install -y net-tools
-}
-
-command -v curl >/dev/null 2>&1 || {
-    echo "Installing curl..."
-    sudo apt-get update && sudo apt-get install -y curl
-}
-
-# Progress indicator function
+##############################################################################
+# Function: show_progress
+# Shows a "step X of Y" progress banner.
+##############################################################################
 show_progress() {
     local step="$1"
-    local total="7"  
+    local total="8"  # Adjust total steps as needed
     local message="$2"
     
     echo ""
@@ -51,7 +43,10 @@ show_progress() {
     echo ""
 }
 
-# Function for error handling
+##############################################################################
+# Function: error_exit
+# Prints an error, optionally calls rollback, and exits.
+##############################################################################
 error_exit() {
     echo -e "${RED}Error: $1${NC}" >&2
     echo "Check $LOG_FILE for details"
@@ -61,7 +56,10 @@ error_exit() {
     exit 1
 }
 
-# Rollback function
+##############################################################################
+# Function: perform_rollback
+# Attempts to remove all installed packages/files if the script fails mid-way.
+##############################################################################
 perform_rollback() {
     echo "Installation failed. Rolling back changes..."
     
@@ -75,19 +73,46 @@ perform_rollback() {
     sudo apt-get remove -y nodejs npm influxdb2 grafana
     sudo apt-get autoremove -y
     sudo rm -rf /etc/metsci-dashboard
-    sudo rm -rf ~/.node-red
+    sudo rm -rf /home/$SUDO_USER/.node-red
     sudo rm -f "$ENV_FILE"
     sudo rm -f "$CREDS_FILE"
 
     echo "Rollback complete. Please check the error message above and try again."
 }
 
-# Add these arrays near the top with other variables
+##############################################################################
+# Function: install_prerequisites
+# Ensures required packages (net-tools, curl, jq) are installed.
+##############################################################################
+install_prerequisites() {
+    command -v netstat >/dev/null 2>&1 || {
+        echo "Installing net-tools..."
+        sudo apt-get update && sudo apt-get install -y net-tools
+    }
+
+    command -v curl >/dev/null 2>&1 || {
+        echo "Installing curl..."
+        sudo apt-get update && sudo apt-get install -y curl
+    }
+
+    command -v jq >/dev/null 2>&1 || {
+        echo "Installing jq..."
+        sudo apt-get update && sudo apt-get install -y jq
+    }
+}
+
+##############################################################################
+# Arrays for random username generation
+##############################################################################
 NODERED_NAMES=("vulcan" "klingon" "romulan" "ferengi" "cardassian" "bajoran")
 INFLUXDB_NAMES=("ewok" "wookiee" "jawa" "tusken" "gungan" "hutt")
 GRAFANA_NAMES=("drysine" "nexus" "matrix" "cipher" "neural" "quantum")
 
-# Generate credentials function
+##############################################################################
+# Function: generate_credentials
+# Asks the user for org/usernames, generates random passwords, and writes them
+# to both the credentials file and the .env file.
+##############################################################################
 generate_credentials() {
     echo "Generating secure credentials..."
     
@@ -227,7 +252,35 @@ EOL
     print_install_summary
 }
 
-# Check system requirements
+##############################################################################
+# Function: print_install_summary
+# Quick summary of what's going to be installed, then user can confirm/abort.
+##############################################################################
+print_install_summary() {
+    echo
+    echo "Installation Summary"
+    echo "-------------------"
+    echo
+    echo "The following services will be installed:"
+    echo "1. Node-RED"
+    echo "2. InfluxDB"
+    echo "3. Grafana"
+    echo
+    echo "Credentials will be displayed after successful installation."
+    echo
+    read -p "Continue with installation? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Installation cancelled"
+        exit 1
+    fi
+}
+
+##############################################################################
+# Function: check_requirements
+# Check if we are on a Raspberry Pi (64-bit), memory, disk space, free ports,
+# and internet connectivity.
+##############################################################################
 check_requirements() {
     echo "Performing system checks..."
 
@@ -286,7 +339,10 @@ check_requirements() {
     echo "✓ System requirements met"
 }
 
-# Install Node.js and verify
+##############################################################################
+# Function: install_nodejs
+# Installs Node.js from NodeSource, cleans up any partial installs first.
+##############################################################################
 install_nodejs() {
     echo "Installing Node.js..."
     
@@ -318,7 +374,10 @@ install_nodejs() {
     echo "✓ Node.js $node_version (npm $npm_version) installed successfully"
 }
 
-# Install Node-RED with improved handling
+##############################################################################
+# Function: install_nodered
+# Installs Node-RED globally and sets up a systemd service under $SUDO_USER.
+##############################################################################
 install_nodered() {
     echo "Installing Node-RED..."
     source "$ENV_FILE"
@@ -343,17 +402,17 @@ Environment=NODE_RED_OPTIONS=
 WantedBy=multi-user.target
 EOL
 
-    # Create settings file with authentication
-    sudo mkdir -p ~/.node-red
-    cd ~/.node-red || error_exit "Failed to access Node-RED directory"
+    # Create the ~/.node-red folder under $SUDO_USER’s home
+    sudo -u "$SUDO_USER" mkdir -p /home/"$SUDO_USER"/.node-red
+    cd /home/"$SUDO_USER"/.node-red || error_exit "Failed to access Node-RED directory"
     
-    # Install required nodes
-    npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required nodes"
+    # Install required nodes in that .node-red folder
+    sudo -u "$SUDO_USER" npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required nodes"
     
     # Generate password hash
     NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
     
-    # Update settings.js
+    # Create a settings.js file with authentication
     cat > settings.js << EOL
 module.exports = {
     uiPort: process.env.PORT || 1880,
@@ -404,11 +463,17 @@ module.exports = {
     }
 }
 EOL
+    # Fix permissions so that $SUDO_USER can own and run Node-RED
+    sudo chown -R "$SUDO_USER":"$SUDO_USER" /home/"$SUDO_USER"/.node-red
 }
 
-# Install InfluxDB
+##############################################################################
+# Function: install_influxdb
+# Installs InfluxDB 2.x, initializes a user/org/bucket, and sets up a token.
+##############################################################################
 install_influxdb() {
     echo "Installing InfluxDB..."
+    source "$ENV_FILE"
     
     # Stop and remove any existing installation
     if systemctl is-active --quiet influxdb; then
@@ -476,9 +541,59 @@ install_influxdb() {
     echo "✓ InfluxDB installed and configured with user: $INFLUXDB_USERNAME"
 }
 
-# Install Grafana
+##############################################################################
+# Function: configure_grafana
+# Called from install_grafana to set admin credentials, etc.
+##############################################################################
+configure_grafana() {
+    source "$ENV_FILE"
+    echo "Configuring Grafana security..."
+    
+    # Update Grafana configuration file first
+    sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
+[security]
+admin_user = ${GRAFANA_USERNAME}
+admin_password = ${GRAFANA_PASSWORD}
+
+[auth]
+disable_login_form = false
+
+[auth.anonymous]
+enabled = true
+org_role = Viewer
+
+[feature_toggles]
+publicDashboards = true
+EOL
+
+    sudo chown grafana:grafana /etc/grafana/grafana.ini
+    sudo chmod 640 /etc/grafana/grafana.ini
+    
+    # Restart Grafana to apply changes
+    sudo systemctl restart grafana-server
+    sleep 10  # Give Grafana time to restart
+    
+    # Verify configuration took effect
+    for i in {1..30}; do
+        if curl -s -u "${GRAFANA_USERNAME}:${GRAFANA_PASSWORD}" http://localhost:3000/api/health > /dev/null; then
+            echo "✓ Grafana security configured"
+            return 0
+        fi
+        echo "Waiting for Grafana... ($i/30)"
+        sleep 2
+    done
+    
+    echo "Grafana failed to start with new configuration. Check logs with: journalctl -u grafana-server"
+    return 1
+}
+
+##############################################################################
+# Function: install_grafana
+# Installs Grafana OSS from the official repo, updates config, calls configure_grafana.
+##############################################################################
 install_grafana() {
     echo "Installing Grafana..."
+    source "$ENV_FILE"
     
     # Add Grafana repository and key
     curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/grafana.gpg
@@ -527,13 +642,19 @@ EOL
         fi
     done
     
-    # Configure security
-    configure_grafana
+    # Configure security before starting service
+    configure_grafana || error_exit "Failed to configure Grafana security" "rollback"
+    
+    # Start service after configuration
+    sudo systemctl restart grafana-server
     
     echo "✓ Grafana installed and configured with user: $GRAFANA_USERNAME"
 }
 
-# Start services
+##############################################################################
+# Function: start_services
+# Enables and starts the systemd services, then waits a bit for them to come up.
+##############################################################################
 start_services() {
     echo "Starting services..."
     
@@ -549,10 +670,12 @@ start_services() {
     sleep 10
 }
 
-# Verify services
+##############################################################################
+# Function: verify_services
+# Double-check that each service is actually responding on its port.
+##############################################################################
 verify_services() {
     echo "Waiting for services to initialize..."
-    # Give services more time to start
     sleep 10  # Increase from current value
     
     echo "Verifying services..."
@@ -583,32 +706,30 @@ verify_services() {
         fi
     done
     
-    # Check Grafana with longer timeout
+    # Check Grafana (port 3000)
     echo "Checking grafana-server (port 3000)..."
-    for i in {1..45}; do  # Increased from 30 to 45 attempts
+    for i in {1..45}; do
         if curl -s http://localhost:3000/api/health > /dev/null; then
             echo "✓ grafana-server verified"
             break
         fi
-        echo "Waiting for Grafana... ($i/45)"  # Added progress indicator
+        echo "Waiting for Grafana... ($i/45)"
         sleep 2
         if [ $i -eq 45 ]; then
-            journalctl -u grafana-server --no-pager -n 50  # Show Grafana logs on failure
+            journalctl -u grafana-server --no-pager -n 50
             error_exit "Service grafana-server is not responding" "rollback"
-        fi
-    done
-    
-    # Final verification of all services
-    for service in nodered influxdb grafana-server; do
-        if ! systemctl is-active --quiet $service; then
-            error_exit "Service $service failed final verification" "rollback"
         fi
     done
 }
 
-# Print next steps
+##############################################################################
+# Function: print_completion
+# Displays the credentials and endpoints at the end of the install.
+##############################################################################
 print_completion() {
     clear
+    source "$ENV_FILE"
+    
     echo "======= MeteoScientific Demo Dashboard ========"
     echo
     echo "Installation completed successfully!"
@@ -644,17 +765,17 @@ print_completion() {
     echo "=============================================="
 }
 
-# Main installation process
+##############################################################################
+# Function: main
+# Orchestrates the entire install process in step-by-step order.
+##############################################################################
 main() {
-    # First, check basic requirements before asking any questions
     show_progress 1 "Checking system requirements"
     check_requirements
     
-    # Install prerequisites
     show_progress 2 "Installing prerequisites"
     install_prerequisites
     
-    # Then gather all user inputs
     show_progress 3 "Gathering user preferences"
     generate_credentials
     
@@ -663,7 +784,6 @@ main() {
     echo "This may take several minutes. You can monitor detailed progress in: $LOG_FILE"
     echo
     
-    # Now run all installation steps without requiring user input
     show_progress 4 "Installing Node.js"
     install_nodejs
     
@@ -683,56 +803,7 @@ main() {
     print_completion
 }
 
-# Add a summary of what will be installed
-print_install_summary() {
-    echo
-    echo "Installation Summary"
-    echo "-------------------"
-    echo
-    echo "The following services will be installed:"
-    echo "1. Node-RED"
-    echo "2. InfluxDB"
-    echo "3. Grafana"
-    echo
-    echo "Credentials will be displayed after successful installation."
-    echo
-    read -p "Continue with installation? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Installation cancelled"
-        exit 1
-    fi
-}
-
+##############################################################################
 # Run the main installation
+##############################################################################
 main
-
-configure_grafana() {
-    echo "Configuring Grafana security..."
-    
-    # Update Grafana configuration file
-    sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
-[security]
-admin_user = ${GRAFANA_USERNAME}
-admin_password = ${GRAFANA_PASSWORD}
-
-[auth]
-disable_login_form = false
-
-[auth.anonymous]
-enabled = true
-org_role = Viewer
-
-[feature_toggles]
-publicDashboards = true
-EOL
-
-    sudo chown grafana:grafana /etc/grafana/grafana.ini
-    sudo chmod 640 /etc/grafana/grafana.ini
-    
-    # Restart Grafana to apply changes
-    sudo systemctl restart grafana-server
-    sleep 10  # Give Grafana time to restart
-    
-    echo "✓ Grafana security configured"
-}

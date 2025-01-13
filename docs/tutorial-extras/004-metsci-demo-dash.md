@@ -74,7 +74,7 @@ sudo apt update && sudo apt dist-upgrade -y && sudo apt autoremove -y
 
 Your Pi can be made a bit more secure with a few commands.  We're going to wrap them all up into one.  This is going to get the latest security patches, make sure everything is up to date, then set some basic firewall rules. 
 
-There's nothing ultra fancy in here, just generally good Pi housekeeping.
+There's nothing ultra fancy in here, just generally good Pi housekeeping.  Answer `y` when it asks you about the SSH port. 
 
 ```bash 
 curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/secure-pi.sh -o secure-pi.sh && chmod +x secure-pi.sh && sudo ./secure-pi.sh
@@ -90,17 +90,34 @@ sudo reboot
 
 ### A. Service Install Script
 
-Create the script and run it with this:
+You can use either the stable or latest version of the installation script:
 
+#### Stable Version (v1.2.2)
 ```bash
 curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/install-dashboard-complete.sh -o install-dashboard-packages.sh && chmod +x install-dashboard-packages.sh && sudo ./install-dashboard-packages.sh
-``` 
+```
+
+#### Latest Version (v1.2.4)
+This version includes improved memory management and more robust error handling:
+```bash
+curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/install-dashboard-v3.sh -o install-dashboard-packages.sh && chmod +x install-dashboard-packages.sh && sudo ./install-dashboard-packages.sh
+```
+
+:::tip
+The latest version (v1.2.4) is recommended for most users as it includes better memory management and more robust error handling.
+:::
 
 During the installation you'll get a few questions and warnings. 
 
-If you have a 4GB RAM Pi, you'll see a warning message about performance.  This is just to clarify that if you want to run a shitload of sensors frequently you'll probablly be better with an 8GB RAM Pi.  For most people, 8GB is overkill.
+:::note
+If you have a 4GB RAM Pi, you'll see a warning message about performance.  This is just to clarify that if you want to run a shitload of sensors frequently you'll probablly be better with an 8GB RAM Pi.  For most people, 4GB is fine and 8GB is overkill.
+:::
 
-This install also does a bunch of stuff on the backend, like setting up your "Organization" name (used in the database) and users for the various services.  You can accept all the defaults and be fine, or feel free to change them if you want different user names.  Don't get too twisted up with it; again, the defaults are fine. 
+About halfway through it'll set up your "Organization" name (used in the database) and a bunch of random sci-fi usernames for the various services.  You can answer `n` to all of those ("No, I don't need to change).
+
+You can accept all the defaults and be fine, or feel free to change them if you want different user names.  Don't get too twisted up with it; again, the defaults are fine.
+
+Make sure you copy down your credentials when you see 'em at the end.  They'll be saved to a file in your home directory just in case, but you really should copy them down and then delete that file before you move on.
 
 
 :::tip Check Your Work
