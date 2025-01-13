@@ -1,12 +1,12 @@
 #!/bin/bash
-# Version 1.1.5
+# Version 1.1.6
 
 # Set up logging
 LOG_FILE="/home/$SUDO_USER/security-setup.log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Print version info
-echo "MeteoScientific Pi Security Setup v1.1.5"
+echo "MeteoScientific Pi Security Setup v1.1.6"
 
 # Check for tools, install required tools if not present
 echo "Checking for required tools..."
