@@ -92,8 +92,8 @@ generate_credentials() {
     echo "Generating secure credentials..."
     
     # Ask for organization name
-    DEFAULT_ORG="MeteoScientific"
-    echo "What is your organization name? This will be used to organize the database."
+    DEFAULT_ORG="Your Org"
+    echo "What is your organization name? This will be used in Grafana and InfluxDB."
     echo "The default is '${DEFAULT_ORG}'"
     read -p "Do you need to change it? (y/n) " -n 1 -r
     echo
@@ -492,11 +492,16 @@ install_grafana() {
     
     # Update Grafana configuration
     sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
-[security]
-admin_user = ${GRAFANA_USERNAME}
-admin_password = ${GRAFANA_PASSWORD}
+[auth]
+disable_login_form = false
+
 [auth.anonymous]
-enabled = false
+enabled = true
+org_name = ${INFLUXDB_ORG}
+org_role = Viewer
+
+[feature_toggles]
+publicDashboards = true
 EOL
     
     # Set permissions
@@ -521,6 +526,9 @@ EOL
             error_exit "Grafana failed to respond to health checks" "rollback"
         fi
     done
+    
+    # Configure security
+    configure_grafana
     
     echo "✓ Grafana installed and configured with user: $GRAFANA_USERNAME"
 }
@@ -681,3 +689,28 @@ print_install_summary() {
 
 # Run the main installation
 main
+
+configure_grafana() {
+    echo "Configuring Grafana security..."
+    
+    # Wait for Grafana to be ready
+    for i in {1..30}; do
+        if curl -s http://localhost:3000/api/health > /dev/null; then
+            # Change admin password via API
+            curl -X PUT -H "Content-Type: application/json" \
+                -d "{\"oldPassword\":\"admin\",\"newPassword\":\"${GRAFANA_PASSWORD}\"}" \
+                http://admin:admin@localhost:3000/api/user/password
+            
+            # Update admin username if different from 'admin'
+            if [ "$GRAFANA_USERNAME" != "admin" ]; then
+                curl -X PUT -H "Content-Type: application/json" \
+                    -d "{\"login\":\"${GRAFANA_USERNAME}\"}" \
+                    http://admin:${GRAFANA_PASSWORD}@localhost:3000/api/admin/users/1
+            fi
+            
+            echo "✓ Grafana security configured"
+            break
+        fi
+        sleep 2
+    done
+}
