@@ -3,6 +3,8 @@ sidebar_position: 4
 title: MetSci Demo Dashboard - Draft
 ---
 
+![Draft warning](/images/draft-warning.png)
+
 # Build a Custom Dashboard
 
 Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor, something you can share with your friends to let them know when the rain barrel is full (or if you're Joey's friends, when the sauna is hot)!  I know, I know, you can use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
