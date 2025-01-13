@@ -1,12 +1,12 @@
 #!/bin/bash
-# Version 1.1.6
+# Version 1.1.7
 
 # Set up logging
 LOG_FILE="/home/$SUDO_USER/security-setup.log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Print version info
-echo "MeteoScientific Pi Security Setup v1.1.6"
+echo "MeteoScientific Pi Security Setup v1.1.7"
 
 # Check for tools, install required tools if not present
 echo "Checking for required tools..."
@@ -58,6 +58,12 @@ GRAFANA_PORT=3000
 check_port() {
     local port=$1
     local service=$2
+    
+    # Skip SSH port check since we're using it
+    if [ "$service" = "SSH" ]; then
+        return 0
+    }
+    
     if netstat -tuln | grep -q ":$port "; then
         echo -e "${YELLOW}Warning: Port $port is already in use. This might be okay if $service is already running.${NC}"
         read -p "Continue with this port? (y/n) " -n 1 -r
@@ -269,8 +275,38 @@ if ! sudo ufw status | grep -q "22/tcp.*ALLOW"; then
     exit 1
 fi
 
-# If all checks pass, clear screen and show success
-clear
+# Log the completion details to a separate summary file
+SUMMARY_FILE="/home/$SUDO_USER/security-setup-summary.txt"
+
+# Create the summary
+cat > "$SUMMARY_FILE" << EOL
+=== MeteoScientific Pi Security Setup Summary ===
+Date: $(date)
+Hostname: $(hostname)
+IP: $(hostname -I | awk '{print $1}')
+
+Completed Security Measures:
+- Secure SSH settings (no root login, strong passwords)
+- Basic firewall (UFW) with allowed ports:
+  * SSH: $SSH_PORT
+  * Node-RED: $NODERED_PORT
+  * InfluxDB: $INFLUXDB_PORT
+  * Grafana: $GRAFANA_PORT
+- Automatic updates enabled
+- fail2ban installed and configured
+- Local network protection
+- System user 'metsci-service' created
+
+Configuration Files Modified:
+- /etc/ssh/sshd_config.d/security.conf
+- /etc/fail2ban/jail.local
+- /etc/ufw/user.rules
+
+For detailed logs: $LOG_FILE
+EOL
+
+# Show completion without clearing screen
+echo
 echo "✅ Security setup complete!"
 echo
 echo "Your Pi is now configured with:"
@@ -282,6 +318,9 @@ echo
 echo "External access is handled by Cloudflare tunnel"
 echo
 echo "To see detailed setup information:"
+echo "    cat $SUMMARY_FILE"
+echo
+echo "Full logs available at:"
 echo "    cat $LOG_FILE"
 echo
 echo "➡️  Please reboot your Pi to apply all changes:"

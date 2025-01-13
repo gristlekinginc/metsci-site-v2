@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: MetSci Demo Dashboard - Draft
+title: DRAFT - MetSci Demo Dashboard 
 ---
 
 ![Draft warning](/images/draft-warning.png)
@@ -90,42 +90,33 @@ sudo reboot
 
 ### A. Service Install Script
 
-You can use either the stable or latest version of the installation script:
+Copy & paste the following command into your Pi's Terminal:
 
-#### Stable Version (v1.2.2)
-```bash
-curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/install-dashboard-complete.sh -o install-dashboard-packages.sh && chmod +x install-dashboard-packages.sh && sudo ./install-dashboard-packages.sh
-```
-
-#### Latest Version (v1.2.4)
-This version includes improved memory management and more robust error handling:
 ```bash
 curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/install-dashboard-v3.sh -o install-dashboard-packages.sh && chmod +x install-dashboard-packages.sh && sudo ./install-dashboard-packages.sh
 ```
 
-:::tip
-The latest version (v1.2.4) is recommended for most users as it includes better memory management and more robust error handling.
-:::
-
 During the installation you'll get a few questions and warnings. 
 
 :::note
-If you have a 4GB RAM Pi, you'll see a warning message about performance.  This is just to clarify that if you want to run a shitload of sensors frequently you'll probablly be better with an 8GB RAM Pi.  For most people, 4GB is fine and 8GB is overkill.
+If you have a 4GB RAM Pi, you'll see a warning message about performance.  This is just to clarify that if you want to run a shitload of sensors frequently you'll probablly be better with an 8GB RAM Pi.  For most people, **4GB is fine** and **8GB is overkill**.
 :::
 
-About halfway through it'll set up your "Organization" name (used in the database) and a bunch of random sci-fi usernames for the various services.  You can answer `n` to all of those ("No, I don't need to change).
+The script will set up your "Organization" name (used in the database).  The default is `Your Org`, which is kind of boring, so I recommend you change it to something more exciting.  This is mostly a structural thing, so just use something descriptive.
+
+It'll also set up a bunch of random sci-fi usernames for the various services.  
 
 You can accept all the defaults and be fine, or feel free to change them if you want different user names.  Don't get too twisted up with it; again, the defaults are fine.
 
+:::warning
 Make sure you copy down your credentials when you see 'em at the end.  They'll be saved to a file in your home directory just in case, but you really should copy them down and then delete that file before you move on.
+:::
 
-
-:::tip Check Your Work
 After installation, visit your shiny new setups:
    - Node-RED: http://your-pi:1880
    - InfluxDB: http://your-pi:8086
    - Grafana: http://your-pi:3000
-:::
+
 
 **DON'T skip copying down your credentials** (instructions are at the end of the script) and then deleting that file.  
 

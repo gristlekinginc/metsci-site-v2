@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.2.5"  # Bump the version for this "fixed" version
+VERSION="1.2.6"  # Bump the version for this "fixed" version
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -32,9 +32,9 @@ LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Arrays used for random username generation
-NODERED_NAMES=("vulcan" "klingon" "romulan" "ferengi" "cardassian" "bajoran")
+NODERED_NAMES=("vulcan" "klingon" "romulan" "cardassian" "bajoran" "ender" "philotes")
 INFLUXDB_NAMES=("ewok" "wookiee" "jawa" "tusken" "gungan" "hutt")
-GRAFANA_NAMES=("drysine" "nexus" "matrix" "cipher" "neural" "quantum")
+GRAFANA_NAMES=("drysine" "nexus" "matrix" "cipher" "neural" "quantum" "serrin" "neo")
 
 #----------------------------------------------------------------------
 # Functions
@@ -273,9 +273,9 @@ generate_credentials() {
     
     # Node-RED username
     echo "The default username for Node-RED is '${DEFAULT_NODERED_USER}'"
-    read -p "Do you need to change it? (y/n) " -n 1 -r
+    read -p "Is this username OK? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         while true; do
             read -p "Enter new Node-RED username (anything but 'admin'): " NODERED_USERNAME
             if [ "$NODERED_USERNAME" != "admin" ]; then
@@ -290,9 +290,9 @@ generate_credentials() {
     
     # InfluxDB username
     echo "The default username for InfluxDB is '${DEFAULT_INFLUXDB_USER}'"
-    read -p "Do you need to change it? (y/n) " -n 1 -r
+    read -p "Is this username OK? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         while true; do
             read -p "Enter new InfluxDB username (anything but 'admin'): " INFLUXDB_USERNAME
             if [ "$INFLUXDB_USERNAME" != "admin" ]; then
@@ -307,9 +307,9 @@ generate_credentials() {
     
     # Grafana username
     echo "The default username for Grafana is '${DEFAULT_GRAFANA_USER}'"
-    read -p "Do you need to change it? (y/n) " -n 1 -r
+    read -p "Is this username OK? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         while true; do
             read -p "Enter new Grafana username (anything but 'admin'): " GRAFANA_USERNAME
             if [ "$GRAFANA_USERNAME" != "admin" ]; then
@@ -769,6 +769,20 @@ verify_services() {
 }
 
 ##############################################################################
+# show_install_log
+# Displays the full installation log.
+##############################################################################
+show_install_log() {
+    echo
+    echo "Would you like to see the full installation log? (y/n) "
+    read -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        less "$LOG_FILE"
+    fi
+}
+
+##############################################################################
 # print_completion
 # Displays final info about credentials and endpoints.
 ##############################################################################
@@ -806,6 +820,8 @@ print_completion() {
     echo
     echo "For troubleshooting, check the log at: $LOG_FILE"
     echo "=============================================="
+    
+    show_install_log
 }
 
 ##############################################################################
