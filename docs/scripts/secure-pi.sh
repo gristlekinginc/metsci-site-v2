@@ -330,3 +330,21 @@ echo "Note for Mac users:"
 echo "If you get 'too many authentication failures' when connecting,"
 echo "use: ssh -o IdentitiesOnly=yes demo@<PI-IP>"
 echo
+
+# Add version check for dashboard script
+check_dashboard_version() {
+    if [ -f "/etc/metsci-dashboard/.env" ]; then
+        echo -e "${YELLOW}Warning: Dashboard installation detected. Some security settings may be overwritten.${NC}"
+        read -p "Continue? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    fi
+}
+
+# Add after initial checks
+main() {
+    check_dashboard_version
+    # ... rest of main function ...
+}

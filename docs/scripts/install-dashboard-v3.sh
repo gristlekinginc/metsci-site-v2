@@ -187,12 +187,7 @@ enabled = false
 versions_to_keep = 5
 EOL
 
-    # Set proper permissions
-    sudo chmod 755 /etc/systemd/system/*.service.d
-    sudo chmod 644 /etc/systemd/system/*.service.d/*.conf
-    
     sudo systemctl daemon-reload
-    echo "✓ Memory limits configured"
 }
 
 ##############################################################################
@@ -814,10 +809,31 @@ print_completion() {
 }
 
 ##############################################################################
+# check_security_setup
+# Checks if secure-pi.sh has been run
+##############################################################################
+check_security_setup() {
+    # Check if secure-pi.sh has been run
+    if ! id metsci-service >/dev/null 2>&1; then
+        echo -e "${YELLOW}Warning: Security setup not detected. It's recommended to run secure-pi.sh first.${NC}"
+        echo "Get it from: https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/scripts/secure-pi.sh"
+        read -p "Continue anyway? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    else
+        # Use metsci-service user if it exists
+        SUDO_USER="metsci-service"
+    fi
+}
+
+##############################################################################
 # main
 # Orchestrates the entire install in a step-by-step fashion.
 ##############################################################################
 main() {
+    check_security_setup
     show_progress 1 "Checking system requirements"
     check_requirements
     
