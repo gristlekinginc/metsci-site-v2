@@ -27,7 +27,7 @@ You'll need hardware for this, make sure you have the following on hand:
     - Cheapie [Amazon Kit](https://www.amazon.com/dp/B07VNVVXW6?ref=ppx_pop_mob_ap_share) (thanks to GreyHat for the rec) $14
     - [Segger J-Link EDU Mini](https://www.sparkfun.com/products/24078) - $60 on Sparkfun
 
-* The Pi & SD & SSD are Amazon affiliate links, so I'll probably be able to pay my domain name bill with the commissions.
+* The Pi & SD & SSD are Amazon affiliate links, so I'll probably be able to pay my annual $12 domain name bill with the commissions.
 
 ### Not-Hardware
     - Custom domain.  For this tutorial I'll be using mine, `gristleking.dev`.  If you don't already have a domain, I'd **strongly** recommend buying one at [Cloudflare](https://cloudflare.com).  They're about $12/year and buying it there makes everything else a little bit easier.
@@ -42,7 +42,7 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 
 ## Set Up Overview
 
-1. **Set Up Your Rasbperry Pi:** Basic setup anad security
+1. **Set Up Your Rasbperry Pi:** Basic setup and security
 
 2. **Install Services:** Node-RED, InfluxDB, Grafana, and external SSD.
 
@@ -53,8 +53,6 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 5. **Local Integration Testing:** Node-RED flows, integrate InfluxDB, create Grafana dashboards.
 
 7. **Final Security Review:** Audit, test, and verify.
-
-
 
 ---
 ## 1. **Setting Up Your Rasbperry Pi**
@@ -174,8 +172,10 @@ See how my sda lists `sda1`?  We'll use that `sda1` in this next command; yours 
 
 Nice work!
 
-:::tip Verify SSD
+Now make sure you did that right. Verify SSD with the following commands:
+
 After mounting:
+
 1. Check mount: `lsblk`
    ```bash
    # You should see your SSD mounted at /mnt/ssd
@@ -206,8 +206,8 @@ After mounting:
    # Clean up
    rm /mnt/ssd/test.txt
    ```
-   If any of these commands fail with "permission denied", your ownership isn't set correctly.
-:::
+If any of these commands fail with "permission denied", your ownership isn't set correctly.
+
 
 Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel and routes to securely move data between your Pi and the internet.
 
