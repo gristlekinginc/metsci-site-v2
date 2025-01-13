@@ -666,19 +666,23 @@ print_install_summary() {
     echo "Installation Summary"
     echo "-------------------"
     echo
-    echo "Services to be installed:"
-    echo "1. Node-RED"
+    echo "1. Node-RED Credentials"
     echo "   - Username: $NODERED_USERNAME"
+    echo "   - Password: $NODERED_PASSWORD"
     echo
-    echo "2. InfluxDB"
+    echo "2. InfluxDB Credentials"
     echo "   - Username: $INFLUXDB_USERNAME"
+    echo "   - Password: $INFLUXDB_PASSWORD"
     echo "   - Organization: $INFLUXDB_ORG"
     echo "   - Bucket: sensors"
+    echo "   - Token: $INFLUXDB_TOKEN"
     echo
-    echo "3. Grafana"
+    echo "3. Grafana Credentials"
     echo "   - Username: $GRAFANA_USERNAME"
+    echo "   - Password: $GRAFANA_PASSWORD"
     echo
-    echo "A complete credentials file will be saved to: $CREDS_FILE"
+    echo "IMPORTANT: Save these credentials now!"
+    echo "A complete credentials file will also be saved to: $CREDS_FILE"
     echo
     read -p "Continue with installation? (y/n) " -n 1 -r
     echo
