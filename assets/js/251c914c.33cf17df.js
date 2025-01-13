@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[5973],{1884:e=>{e.exports=JSON.parse('{"label":"framing","permalink":"/blog/tags/framing","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

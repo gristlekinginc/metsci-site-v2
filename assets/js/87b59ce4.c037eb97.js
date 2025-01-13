@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[2e3],{8841:e=>{e.exports=JSON.parse('{"label":"air pollution","permalink":"/blog/tags/air-pollution","allTagsPath":"/blog/tags","count":3,"unlisted":false}')}}]);

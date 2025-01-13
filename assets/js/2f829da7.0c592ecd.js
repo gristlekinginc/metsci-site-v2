@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[1178],{2215:e=>{e.exports=JSON.parse('{"label":"soil temperature","permalink":"/blog/tags/soil-temperature","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

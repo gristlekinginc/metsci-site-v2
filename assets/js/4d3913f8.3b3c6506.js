@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[1309],{84:e=>{e.exports=JSON.parse('{"label":"LoRaWAN","permalink":"/blog/tags/lo-ra-wan","allTagsPath":"/blog/tags","count":2,"unlisted":false}')}}]);

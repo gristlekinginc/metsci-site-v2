@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[9668],{8558:e=>{e.exports=JSON.parse('{"label":"plumbing","permalink":"/blog/tags/plumbing","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[6950],{2308:e=>{e.exports=JSON.parse('{"label":"particulates","permalink":"/blog/tags/particulates","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

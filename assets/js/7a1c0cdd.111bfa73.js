@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[4412],{6592:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/weather/page/2","page":2,"postsPerPage":10,"totalPages":2,"totalCount":11,"previousPage":"/blog/tags/weather","blogDescription":"Blog","blogTitle":"Blog"}')}}]);
