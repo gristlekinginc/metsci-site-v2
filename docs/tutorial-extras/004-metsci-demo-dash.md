@@ -327,9 +327,9 @@ Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
 #### 1. Node-RED Route
 
-Add a new `Public Hostname` (a route) by clicking on the Public Hostname tab at the top, then `Add a public hostname`.
+Add a new `Public Hostname` (a route) by clicking on the `Public Hostname` tab at the top, then `Add a public hostname`.
 
-![Add a new public hostname](/images/tutorial-extras/004-images/add-new-public-hostname.png)
+![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-select-add-public-hostname-for-new-route.png)
 
 Set it up as follows:
 
@@ -362,12 +362,13 @@ Set it up as follows:
 -URL: localhost:3000
 ```
 
-Add the hostname for grafana (keep it simple, yo), then `Save tunnel`.
-![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/add-hostname-for-grafana.png)
+It should look like this when you're done, then `Save hostname`.
+
+![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/cloudflare-add-new-public-hostname.png)
 
 You can now see both your public hostnames for your tunnel.  Cool, right?
 
-![Confirm both your public hostnames](/images/tutorial-extras/004-images/public-hostnames-are-set-up.png)
+![Confirm both your public hostnames](/images/tutorial-extras/004-images/cloudflare-public-hostnames-are-set-up.png)
 
 
 ### F. Check Your Subdomain in Cloudflare
