@@ -327,29 +327,17 @@ Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
 #### 1. Node-RED Route
 
-Add a new `Public Hostname` (a route) by clicking on the `Public Hostname` tab at the top, then `Add a public hostname`.
+Add `node-red` in the Subdomain field, choose your domain (I'm using `gristleking.dev`)
 
-![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-select-add-public-hostname-for-new-route.png)
-
-Set it up as follows:
-
-```
--Subdomain: node-red
--Domain: <YOUR-DOMAIN>.com
--Type: HTTP
--URL: localhost:1880
-```
+For Type choose `HTTP`, then set the URL to `localhost:1880`.
 
 Then the blue `Save tunnel` button at the bottom right. 
 
-![Configure your public hostname](/images/tutorial-extras/004-images/cloudflare-configure-public-hostname-node-red.png)
+![Configure your initial public hostname](/images/tutorial-extras/004-images/cloudflare-initial-tunnel-setup-route-setup.png)
 
+You'll be taken back to the Tunnels page.  Click on the three stacked dots on the right side of the row for your tunnel, then click `Configure`.
 
-Now we'll set up a route for your Grafana dashboard.  I'll call mine `grafana.gristleking.dev` but you can use whatever you want.
-
-Click on the three stacked dots on the right side of the row for your tunnel, then click `Configure`.
-
-![Configure another Tunnel route](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
+![Adding a new route to a Cloudflare Tunnel](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
 
 Now select `Public Hostname` and click `Add a public hostname`.
 
@@ -362,9 +350,11 @@ Set it up as follows:
 -URL: localhost:3000
 ```
 
-It should look like this when you're done, then `Save hostname`.
+It should look like this when you're done.  
 
 ![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/cloudflare-add-new-public-hostname.png)
+
+Click `Save hostname`.
 
 You can now see both your public hostnames for your tunnel.  Cool, right?
 
