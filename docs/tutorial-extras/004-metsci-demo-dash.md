@@ -7,7 +7,9 @@ title: MetSci Demo Dashboard - Draft
 
 # Build a Custom Dashboard
 
-Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor, something you can share with your friends to let them know when the rain barrel is full (or if you're Joey's friends, when the sauna is hot)!  I know, I know, you can use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
+Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor.
+
+This'll be something you can share with your friends to let them know when the rain barrel is full (or if you're Joey's friends, when the sauna is hot)!  I know, I know, you can use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
 
 Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but then...you probably wouldn't need this tutorial if you can do that.
 
