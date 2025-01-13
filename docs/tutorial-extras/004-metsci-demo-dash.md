@@ -184,39 +184,53 @@ After mounting:
    └─sda1        8:1    0 111.8G  0 part /mnt/ssd
    ```
 
-2. Verify permissions: `ls -l /mnt/ssd`
+2. Verify permissions:
+```bash
+ls -l /mnt/ssd`
+```
+You should see something like this:
    ```bash
-   # You should see something like this:
    total 16
    drwx------ 2 core core 16384 Nov 30 14:41 lost+found
    ```
-   The `lost+found` directory is normal for a fresh ext4 filesystem.
+The `lost+found` directory is normal for a fresh ext4 filesystem.
 
 3. Test write access:
-   ```bash
-   # Create a test file
+```bash
    touch /mnt/ssd/test.txt
-   
-   # Verify it was created
-   ls -l /mnt/ssd/test.txt
-   
-   # You should see something like:
-   -rw-r--r-- 1 core core 0 Jan 4 22:45 test.txt
-   
-   # Clean up
-   rm /mnt/ssd/test.txt
-   ```
-If any of these commands fail with "permission denied", your ownership isn't set correctly.
+```
+ 
+Verify it was created
+```bash
+ls -l /mnt/ssd/test.txt
+```
 
+You should see something like:
+```bash
+-rw-r--r-- 1 core core 0 Jan 4 22:45 test.txt
+```
+   
+Clean up
+```bash
+rm /mnt/ssd/test.txt
+   ```
+
+If any of these commands fail with "permission denied", your ownership isn't set correctly.
 
 Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel and routes to securely move data between your Pi and the internet.
 
 
 ## 3. **Cloudflare:** Tunnels, Routes, and Tokens
 
-Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different "routes" for different services, like a route for Node-RED to send data there from the MetSci LNS, and a route for Grafana to display data from your Pi onto a public dashboard.
+Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different "routes" for different services, like a route for Node-RED to send data there from the MetSci LNS.  You could also setup a route for Grafana to display data from your Pi onto a public dashboard, or something directly to InfluxDB.
 
-Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a "route" in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
+For this tutorial, we're only going to set one route in all its glory.  It'll go from your MetSci Console to Node-RED using an http integration.  
+
+We'll also use a much simpler route to display data on a publicly shared Grafana dashboard.  
+
+We're not going to setup a route for InfluxDB (because it's not needed), but the point here is to expose you a bit to what you can do with Cloudflare and routes.
+
+Ok, back to tunnels.  Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a "route" in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
 
 Within a route, each sensor type you set up in MetSci will need its own token to keep the http integration secure.  
 
