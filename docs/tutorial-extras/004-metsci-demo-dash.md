@@ -380,9 +380,9 @@ Now that we have our route/sub-domain of `node-red.gristleking.dev` set up, we'l
 3. An HTTP Integration in MetSci
 ```
 
-Remember, a MetSci Application is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one Cloudflare Application.  
+Remember, a `MetSci Application` is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one `Cloudflare Application`.  
 
-Each Cloudflare Application will need a Service Token and a Cloudflare Zero Trust Application to secure the data flow between the MetSci LNS and the Pi.  If we quickly zoom out, one way to visualize it is like this:
+Each Cloudflare Application will need a `Service Token` and a `Cloudflare Zero Trust Application` to secure the data flow between the MetSci LNS and the Pi.  If we quickly zoom out, one way to visualize it is like this:
 
 ```
 \ sensor -- sensor -- sensor -- sensor /
