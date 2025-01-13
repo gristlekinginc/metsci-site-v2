@@ -309,17 +309,21 @@ You should see a success message, like this.
 
 Double check that on your Pi with a status request: 
 
-`sudo systemctl status cloudflared`
+```bash
+sudo systemctl status cloudflared
+```
 
 That should give you something like this:
 
 ![Cloudflare tunnel running on Pi](/images/tutorial-extras/004-images/cloudflare-tunnel-running.png)
 
+You can use `CTRL-C` on a Mac to stop the output; it won't stop the tunnel.
+
 ### E. Setting Up Routes
 
-Head back to Cloudflare in `Zero Trust` --> `Networks` --> `Tunnels` and hit the 3 little stacked dots (the vertical ellipses) on the right side of the row for your tunnel, then click `Configure`.
+Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
-![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
+![Cloudflare tunnel configured](/images/tutorial-extras/004-images/cloudflare-next-after-installing-connector.png)
 
 #### 1. Node-RED Route
 
@@ -335,13 +339,22 @@ Set it up as follows:
 -Type: HTTP
 -URL: localhost:1880
 ```
-Hit the blue `Save hostname` button at the bottom right. 
+
+Then the blue `Save tunnel` button at the bottom right. 
 
 ![Configure your public hostname](/images/tutorial-extras/004-images/cloudflare-configure-public-hostname-node-red.png)
 
 
-Follow the same steps as before to set up a route for your Grafana dashboard.  I'll call mine `grafana.gristleking.dev` but you can use whatever you want.
+Now we'll set up a route for your Grafana dashboard.  I'll call mine `grafana.gristleking.dev` but you can use whatever you want.
 
+Click on the three stacked dots on the right side of the row for your tunnel, then click `Configure`.
+
+![Configure another Tunnel route](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
+
+Now select `Public Hostname` and click `Add a public hostname`.
+
+![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-select-add-public-hostname-for-new-route.png)
+Set it up as follows:
 ```
 -Subdomain: grafana
 -Domain: <YOUR-DOMAIN>.com
