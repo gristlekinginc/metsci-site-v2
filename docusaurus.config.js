@@ -37,10 +37,6 @@ const config = {
           path: './blog', 
           routeBasePath: 'blog',
           showReadingTime: true,
-          feedOptions: {
-            type: 'all',
-          },
-          editUrl: 'https://github.com/gristlekinginc/metsci-site-v2/tree/main/', 
           blogSidebarCount: 'ALL',
           blogSidebarTitle: 'All Blog Posts',
         },
