@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.2.8"  
+VERSION="1.2.9"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -26,7 +26,7 @@ echo "- 32GB+ SD card recommended"
 CREDS_FILE="/home/$SUDO_USER/metsci-credentials.txt"
 ENV_FILE="/etc/metsci-dashboard/.env"
 STATUS_FILE="/tmp/dashboard-install-status"
-LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
+LOG_FILE="/var/log/metsci-dashboard-install-$(date +%Y%m%d-%H%M%S).log"
 
 # Set up logging (capture both stdout and stderr)
 exec 1> >(tee -a "$LOG_FILE") 2>&1
@@ -812,6 +812,14 @@ print_completion() {
     echo "=============================================="
     
     show_install_log
+    echo
+    echo "Installation log has been saved to: $LOG_FILE"
+    echo "You can view it anytime with: less $LOG_FILE"
+    echo
+    
+    # Optionally create a symlink to latest log
+    sudo ln -sf "$LOG_FILE" /var/log/metsci-dashboard-latest.log
+    echo "Quick access: less /var/log/metsci-dashboard-latest.log"
 }
 
 ##############################################################################
