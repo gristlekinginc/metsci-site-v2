@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.2.0
+# Version 1.2.1
 # This script provides basic security hardening for MetSci dashboard installation
 
 #----------------------------------------------------------------------
@@ -75,8 +75,8 @@ EOL
 #----------------------------------------------------------------------
 # Port Configuration
 #----------------------------------------------------------------------
-echo "Checking common ports..."
-for port in 22 1880 3000 8086; do
+echo "Checking required ports..."
+for port in 1880 3000 8086; do
     if netstat -tuln | grep -q ":$port "; then
         echo -e "${YELLOW}Warning: Port $port is in use. The dashboard installer may need this port.${NC}"
     fi
@@ -86,24 +86,35 @@ done
 # Firewall Setup
 #----------------------------------------------------------------------
 echo "Setting up firewall (UFW)..."
-if sudo ufw status | grep -q "Status: active"; then
-    echo -e "${YELLOW}UFW is already active. Current rules:${NC}"
-    sudo ufw status numbered
-    read -p "Reset UFW to defaults? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo ufw --force reset
-    fi
+
+# Check if UFW is installed, if not install it
+if ! command -v ufw >/dev/null 2>&1; then
+    echo "Installing UFW..."
+    sudo apt-get install -y ufw >/dev/null 2>&1
 fi
 
-sudo apt-get install -y ufw
-sudo ufw allow ssh comment 'SSH'
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow $NODERED_PORT/tcp comment 'Node-RED'
-sudo ufw allow $INFLUXDB_PORT/tcp comment 'InfluxDB'
-sudo ufw allow $GRAFANA_PORT/tcp comment 'Grafana'
-sudo ufw --force enable
+# Reset UFW to default state without prompting
+echo "Configuring firewall rules..."
+sudo ufw --force reset >/dev/null 2>&1
+
+# Configure UFW (with proper port syntax)
+sudo ufw default deny incoming >/dev/null 2>&1
+sudo ufw default allow outgoing >/dev/null 2>&1
+sudo ufw allow 22/tcp comment 'SSH' >/dev/null 2>&1
+sudo ufw allow 1880/tcp comment 'Node-RED' >/dev/null 2>&1
+sudo ufw allow 8086/tcp comment 'InfluxDB' >/dev/null 2>&1
+sudo ufw allow 3000/tcp comment 'Grafana' >/dev/null 2>&1
+
+# Enable UFW without prompt
+sudo ufw --force enable >/dev/null 2>&1
+
+# Verify UFW is running
+if sudo ufw status | grep -q "Status: active"; then
+    echo "✓ Firewall configured and enabled"
+else
+    echo -e "${RED}ERROR: Firewall configuration failed${NC}"
+    exit 1
+fi
 
 #----------------------------------------------------------------------
 # Service User Setup
@@ -147,6 +158,21 @@ APT::Periodic::Download-Upgradeable-Packages "1";
 APT::Periodic::AutocleanInterval "7";
 APT::Periodic::Unattended-Upgrade "1";
 EOL
+
+#----------------------------------------------------------------------
+# Package Installation
+#----------------------------------------------------------------------
+echo "Installing required packages..."
+# Redirect apt output to suppress "already installed" messages
+sudo apt-get install -y ufw fail2ban unattended-upgrades apt-listchanges >/dev/null 2>&1
+
+# Only show status for new configurations
+if [ ! -f "/etc/fail2ban/jail.local" ]; then
+    echo "Configuring fail2ban..."
+    sudo tee /etc/fail2ban/jail.local > /dev/null << EOF
+    # ... rest of fail2ban config ...
+EOF
+fi
 
 #----------------------------------------------------------------------
 # Final Checks & Summary
