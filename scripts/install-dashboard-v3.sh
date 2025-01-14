@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.8"  
+VERSION="1.3.9"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -479,7 +479,7 @@ install_nodered() {
     # Generate hashed password for Node-RED
     NODERED_HASH=$(node -e "const bcrypt = require('/home/$SUDO_USER/.node-red/node_modules/bcryptjs'); console.log(bcrypt.hashSync('${NODERED_PASSWORD}', 8))")
     
-    # Create settings.js
+    # Create settings.js with debug logging enabled
     cat > /home/$SUDO_USER/.node-red/settings.js << EOL
 module.exports = {
     credentialSecret: "${CREDENTIAL_SECRET}",
@@ -499,25 +499,35 @@ module.exports = {
     flowFile: 'flows.json',
     flowFilePretty: true,
     userDir: '/home/${SUDO_USER}/.node-red',
-    functionGlobalContext: {}
+    functionGlobalContext: {},
+    logging: {
+        console: {
+            level: "debug",
+            metrics: false,
+            audit: false
+        }
+    }
 }
 EOL
 
     # Set correct ownership
     chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
     
-    # Install InfluxDB nodes with specific version
+    # Install InfluxDB nodes
     npm install node-red-contrib-influxdb@0.7.0 || error_exit "Failed to install InfluxDB nodes"
     
-    # Create systemd service
+    # Create systemd service with increased timeout
     cat > /etc/systemd/system/nodered.service << EOL
 [Unit]
 Description=Node-RED
 After=network.target
 
 [Service]
+Type=simple
 ExecStart=/usr/bin/node-red
 Restart=on-failure
+RestartSec=10
+TimeoutStartSec=180
 User=$SUDO_USER
 Group=$SUDO_USER
 Environment=NODE_ENV=production
@@ -532,16 +542,24 @@ EOL
     systemctl enable nodered
     systemctl start nodered
     
-    # Wait for Node-RED to start
+    # Wait for Node-RED with better logging
     echo "Waiting for Node-RED to start..."
-    sleep 5
+    for i in {1..60}; do
+        if curl -s http://localhost:${NODERED_PORT} >/dev/null; then
+            echo "✓ Node-RED is responding"
+            return 0
+        fi
+        echo "Waiting for Node-RED... ($i/60)"
+        # Check service status
+        if ! systemctl is-active --quiet nodered; then
+            echo "Node-RED service failed. Checking logs..."
+            journalctl -u nodered -n 50 --no-pager
+            error_exit "Node-RED failed to start. See logs above."
+        fi
+        sleep 2
+    done
     
-    # Verify service is running
-    if ! systemctl is-active --quiet nodered; then
-        error_exit "Node-RED failed to start. Check logs with: journalctl -u nodered"
-    fi
-    
-    echo "✓ Node-RED installed and configured"
+    error_exit "Node-RED did not respond within timeout period"
 }
 
 ##############################################################################
