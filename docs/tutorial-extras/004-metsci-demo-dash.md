@@ -91,7 +91,7 @@ sudo reboot
 Copy & paste the following command into your Pi's Terminal:
 
 ```bash
--sSL meteoscientific.com/scripts/install-dashboard-v3.sh -o dashboard.sh && chmod +x dashboard.sh && sudo ./dashboard.sh
+curl -sSL meteoscientific.com/scripts/install-dashboard-v3.sh -o dashboard.sh && chmod +x dashboard.sh && sudo ./dashboard.sh
 ```
 
 During the installation you'll get a few questions and warnings. 
