@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.3"  
+VERSION="1.3.5"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -484,7 +484,10 @@ EOL
     cd ~/.node-red || error_exit "Failed to access Node-RED directory"
     
     # Install required nodes
-    npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required nodes"
+    echo "Installing Node-RED nodes..."
+    npm install @node-red/nodes-registry
+    npm install node-red-contrib-influxdb@2.3.3 || error_exit "Failed to install InfluxDB nodes"
+    npm install bcryptjs || error_exit "Failed to install bcryptjs"
     
     # Generate password hash
     NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
@@ -616,18 +619,23 @@ install_influxdb() {
 ##############################################################################
 install_grafana() {
     echo "Installing Grafana..."
-    source "$ENV_FILE"
     
-    # Add Grafana repository and key
-    curl -fsSL https://packages.grafana.com/gpg.key \
-        | sudo gpg --dearmor -o /usr/share/keyrings/grafana.gpg
-    echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" \
-        | sudo tee /etc/apt/sources.list.d/grafana.list
+    # Add repository and key
+    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/grafana.gpg
+    
+    echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | \
+        sudo tee /etc/apt/sources.list.d/grafana.list > /dev/null
     
     sudo apt-get update
-    sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
+    sudo apt-get install -y grafana
     
-    # Enable and start Grafana
+    # Create config directory if it doesn't exist
+    sudo mkdir -p /etc/grafana
+    
+    # Configure Grafana before starting
+    configure_grafana
+    
+    # Start Grafana
     sudo systemctl daemon-reload
     sudo systemctl enable grafana-server
     sudo systemctl start grafana-server
@@ -636,21 +644,15 @@ install_grafana() {
     echo "Waiting for Grafana to start..."
     for i in {1..30}; do
         if curl -s http://localhost:3000/api/health >/dev/null; then
-            echo "Grafana is responding to health checks."
+            echo "✓ Grafana is responding"
             break
         fi
-        echo "Waiting for Grafana... ($i/30)"
+        echo -n "."
         sleep 2
         if [ $i -eq 30 ]; then
-            journalctl -u grafana-server --no-pager -n 50
-            error_exit "Grafana failed to respond to health checks" "rollback"
+            error_exit "Grafana failed to start" rollback
         fi
     done
-    
-    # Call configure_grafana after installation
-    configure_grafana || error_exit "Failed to configure Grafana" "rollback"
-    
-    echo "✓ Grafana installed and configured with user: $GRAFANA_USERNAME"
 }
 
 ##############################################################################
