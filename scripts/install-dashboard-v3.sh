@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.5"  
+VERSION="1.3.6"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -456,8 +456,15 @@ install_nodejs() {
 # Installs Node-RED globally and sets up a systemd service under $SUDO_USER.
 ##############################################################################
 install_nodered() {
+    show_progress "5" "Installing Node-RED"
     echo "Installing Node-RED..."
-    source "$ENV_FILE"
+    
+    # Source environment variables
+    if [ -f "$ENV_FILE" ]; then
+        source "$ENV_FILE"
+    else
+        error_exit "Environment file not found. Has generate_credentials been run?"
+    fi
     
     # Install Node-RED and bcryptjs
     sudo npm install -g --unsafe-perm node-red bcryptjs || error_exit "Failed to install Node-RED"
