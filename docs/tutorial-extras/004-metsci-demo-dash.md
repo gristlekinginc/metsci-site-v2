@@ -556,11 +556,11 @@ Visit Node-RED at `http://<YOUR-PI-IP>:1880` in a browser.
 
 If you haven't already logged in (back when we set up the services), you'll see a login screen.  Use the user & pass that was setup during the service setup.  You DID save those credentials, right?
 
-Let me show you the whole "flow" first.  You could import this if you want (links down at the bottom of this page), but I **strongly** recommend you follow along and build it yourself.  It'll help you understand how it works.
+Let me show you the whole "flow" first, it'll help you understand how it works.
 
 ![Node-RED flow](/images/tutorial-extras/004-images/node-red-full-flow.png)
 
-1. We'll start with an **HTTP In** node; think of it as the greeter at Wal-Mart.  "Hey, how you doing, are you decent and sober? Come on in!"
+1. We'll start with an **HTTP In** node, labeled on the image above as `MetSci LDDS75 Input`.  Think of it as the greeter at Wal-Mart.  "Hey, how you doing, are you decent and sober? Come on in!" 
 
 To add a node, you find it in the left menu bar, or just start typing in the name of the node at the top.  Once you see it, drag it onto the workspace. 
 
@@ -593,12 +593,7 @@ With two nodes in the workspace, you can start connecting 'em.  Drag a "wire" fr
 
 This ensures our data is in the right format for processing, whether it comes from our test Inject node or the HTTP In node.
 
-Configureation:
-Action: `Always Convert to JavaScript Object`
-Property: `msg.payload`
-Name: `Parse JSON`
-
-Now drag a wire from the **HTTP IN** node to the **Parse JSON** node. At this point, you'll have a wire from the HTTP In node to the Parse JSON node, and a wire from the Parse JSON node to the HTTPS Response node.
+Now drag a wire from the **HTTP IN** node to the **Parse JSON** node. At this point, you'll have a wire from the `HTTP In` node to the `Parse JSON` node, and a wire from the `Parse JSON` node to the `HTTPS Response` node.
 
 3. Next we'll add a **Switch** node to route the data to the correct sensor function.
    - Search for `switch` and add it to your workspace
@@ -621,7 +616,7 @@ If the incoming message contains "LDDS75", it goes to output 1, if it contains "
 
 ![Configuring the switch node](/images/tutorial-extras/004-images/node-red-switch-node-config.png)
 
-Make sure you drag the wire from the right connector on the Switch node to the next node in the flow.  In this case, that'll be our LDDS75 Function node.
+Wire the `Parse JSON` node to the `Switch` node.  
 
 4. Add a **Function** node for the LDDS75.  Function nodes are what allow us to correctly setup the data for insertion into InfluxDB.  A JSON node cleans up the data, the Switch node routes it to the correct sensor function, and a Function node formats it for InfluxDB.
 
@@ -685,8 +680,12 @@ try {
     return null;
 }
 ```
-5. Add an **InfluxDB out** node to the Function node to store the data in InfluxDB..
-    - Double-click the node to configure it
+
+Make sure you drag the wire from the correct connector on the Switch node (the top one, but you can hover over the node to see which connector is which) to the next node in the flow.  In this case, that'll be our LDDS75 Function node.
+
+5. Add an **InfluxDB out** node to the Function node to store the data in InfluxDB.
+    - Double-click the node to configure it.
+    - Name the node `Local InfluxDB`
     - Click the `+` icon next to the "Server" field to create a new InfluxDB server configuration
     - Fill in the configuration:
    ```
@@ -695,7 +694,7 @@ try {
    URL: http://localhost:8086
    Token: [paste in your InfluxDB token from your credentials file]
    ```
-    - Click "Add" to save the server configuration
+    - `Add` to save the server configuration
     - Now, in the InfluxDB Out node configuration:
     ```
     Organization: [your org name, copy this from your credentials file]
@@ -706,11 +705,14 @@ try {
 
 ![Configuring the InfluxDB out node](/images/tutorial-extras/004-images/node-red-influxdb-out-node-configure.png)
  
+ Click `Done` to save the node.
 
-7. Connect the nodes by dragging a wire from one node to the other.
+7. If you haven't already, connect the nodes by dragging a wire from one node to the other.
    - MetSci LDDS75 Input → Parse JSON → Switch → LDDS75 Function → InfluxDB out
 
-8. Now, the pro move here is to add in Debug nodes.  For now, you can add a Debug node to every one our regular nodes; that's what I've done in the image below. That way we'll see what's going through the whole flow the next time we have a packet come through.
+![Connecting the nodes](/images/tutorial-extras/004-images/node-red-ldds-basic-flow-no-debug.png)
+
+8. Now, the pro move here is to add in Debug nodes.  It's not required, but it's what I've done.  Add a Debug node to every one our regular nodes. That way we'll see what's going through the whole flow the next time we have a packet come through.
 
 For all of those:
 ```
@@ -720,11 +722,13 @@ For all of those:
 9. Deploy and test:
 With your flow set up, click `Deploy` in the top-right. 
 
+![Deploying the flow](/images/tutorial-extras/004-images/node-red-flow-with-debug-deploy.png)
+
+You should see a green bar and the word "Deployed" at the top of the screen.  
+
+Now go back to your LDDS75 and power it back on.  Since you set it to fire on a one minute interval, you'll know quickly if everything is working or not as you'll see the data start flowing through in the debug panel on the right side.  Remember, it might take a minute or two for the first join to complete and the data to start flowing.
+
 ![Connecting the nodes](/images/tutorial-extras/004-images/node-red-first-flow.png)
-
-You should see a green checkmark and the word "Deployed" in the top-right.  If you see an error, check the Debug panel for more information.  It'll tell you what went wrong and where.  For this first "copy/paste" flow, it's mostly likely a typo in the code where you missed a `.` or a `,` etc.
-
-Now go back to your LDDS75 and power it back on.  It shoudl be firing on a one minute interval, so you'll know quickly if everything is working or not as you'll see the data start flowing through in the debug panel on the right side. 
 
 :::note
 This modular structure makes it easy to add more sensors later. You can see I've added an AM319 sensor to the flow above in the image.  Each sensor follows the same basic pattern:
