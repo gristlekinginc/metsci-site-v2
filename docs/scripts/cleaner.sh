@@ -1,12 +1,11 @@
 #!/bin/bash
-# Version 1.0.4
+# Version 1.0.8
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will remove Node-RED, InfluxDB, and Grafana completely.
-# Use at your own risk, and be ready to wipe your Pi and start over if it doesn't work.  Yeehaw!
 
 echo "Starting cleanup process..."
 
-# Stop any running services
+# 1. Stop services first
 echo "Stopping services..."
 for service in nodered influxdb grafana-server; do
     sudo systemctl stop $service 2>/dev/null || true
@@ -14,62 +13,66 @@ for service in nodered influxdb grafana-server; do
     echo "✓ $service stopped"
 done
 
-# Remove Node.js and npm
-echo "Removing Node.js and npm..."
-sudo apt-get remove -y nodejs npm
-sudo apt-get autoremove -y
+# 2. Remove repository sources early
+echo "Removing repository sources..."
+sudo rm -f /etc/apt/sources.list.d/nodesource.list*
+sudo rm -f /etc/apt/sources.list.d/influxdata.list
+sudo rm -f /etc/apt/sources.list.d/grafana.list
+sudo rm -f /usr/share/keyrings/grafana-archive-keyring.gpg
+sudo rm -f /usr/share/keyrings/grafana.gpg
+sudo apt-get update
 
-# Properly remove InfluxDB
-echo "Removing InfluxDB..."
-sudo apt-get remove --purge -y influxdb2
-sudo rm -rf /var/lib/influxdb*
+# 3. Remove packages
+echo "Removing packages..."
+for package in nodejs npm influxdb2 grafana grafana-enterprise; do
+    if dpkg -l | grep -q "^ii.*$package"; then
+        echo "Removing $package..."
+        sudo apt-get remove --purge -y $package
+    else
+        echo "Package $package not installed, skipping..."
+    fi
+done
+sudo apt-get autoremove --purge -y
+
+# 4. Clean up configuration directories
+echo "Removing configuration directories..."
 sudo rm -rf /etc/influxdb*
+sudo rm -rf /etc/grafana
+sudo rm -rf ~/.node-red
+sudo rm -rf /etc/metsci-dashboard
+sudo rm -rf /var/lib/influxdb*
 sudo rm -rf /var/log/influxdb*
 sudo rm -rf ~/.influxdbv2
 sudo rm -rf /etc/default/influxdb*
-sudo rm -f /etc/apt/sources.list.d/influxdata.list
-sudo rm -f /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg
-sudo rm -f /etc/systemd/system/influxd.service
-sudo rm -f /etc/systemd/system/influxdb.service
 
-# Remove service files and configs
-echo "Removing service files and configs..."
-sudo rm -f /etc/systemd/system/nodered.service
-sudo rm -rf ~/.node-red
-sudo rm -f /etc/apt/sources.list.d/nodesource.list*
-sudo rm -f /etc/apt/sources.list.d/grafana.list
-sudo rm -rf /etc/grafana
-sudo rm -f /usr/share/keyrings/grafana-archive-keyring.gpg
-
-# Clean npm directories
-echo "Cleaning npm directories..."
+# 5. Clean up Node.js files
+echo "Cleaning Node.js files..."
 sudo rm -rf /usr/lib/node_modules
+sudo rm -rf /usr/local/lib/node_modules
 sudo rm -rf ~/.npm
-sudo rm -rf ~/.node-red
-
-# Remove Node.js files
-echo "Removing Node.js files..."
-sudo rm -rf /usr/local/lib/node*
-sudo rm -rf /usr/local/include/node*
 sudo rm -rf /usr/local/bin/node*
 sudo rm -rf /usr/local/bin/npm*
 
-# Remove MetSci specific files
-echo "Removing MetSci files..."
-sudo rm -rf /etc/metsci-dashboard
-sudo rm -f ~/metsci-credentials.txt
-
-# Clean apt cache
-echo "Cleaning apt cache..."
-sudo apt clean
-sudo apt autoclean
-sudo apt autoremove -y
-
-# Reload systemd
+# 6. Clean up service files
+echo "Cleaning service files..."
+for service in nodered influxdb influxd grafana-server; do
+    sudo rm -f /etc/systemd/system/$service.service
+    sudo rm -f /lib/systemd/system/$service.service
+done
 sudo systemctl daemon-reload
 
-# Verify removals
+# 7. Now perform verification checks
 echo "Performing verification checks..."
+
+# Check for remaining packages
+echo "Checking for remaining packages..."
+for pkg in nodejs npm influxdb2 grafana grafana-enterprise; do
+    if dpkg -l | grep -q "^ii.*$pkg"; then
+        echo "⚠️  Warning: Package still installed: $pkg"
+    else
+        echo "✓ Package removed: $pkg"
+    fi
+done
 
 # Check for remaining service files
 echo "Checking service files..."
@@ -84,33 +87,6 @@ for file in "${service_files[@]}"; do
         echo "⚠️  Warning: Service file still exists: $file"
     else
         echo "✓ Service file removed: $file"
-    fi
-done
-
-# Check for remaining config directories
-echo "Checking config directories..."
-config_dirs=(
-    "/etc/influxdb"
-    "/etc/grafana"
-    "~/.node-red"
-    "/etc/metsci-dashboard"
-)
-for dir in "${config_dirs[@]}"; do
-    if [ -d "$dir" ]; then
-        echo "⚠️  Warning: Config directory still exists: $dir"
-    else
-        echo "✓ Config directory removed: $dir"
-    fi
-done
-
-# Check for remaining packages
-echo "Checking for remaining packages..."
-packages=("nodejs" "npm" "influxdb2" "grafana")
-for pkg in "${packages[@]}"; do
-    if dpkg -l | grep -q "^ii.*$pkg"; then
-        echo "⚠️  Warning: Package still installed: $pkg"
-    else
-        echo "✓ Package removed: $pkg"
     fi
 done
 
@@ -135,24 +111,6 @@ for port in "${ports[@]}"; do
         echo "✓ Port $port is free"
     fi
 done
-
-# Remove Grafana files and keys
-echo "Removing Grafana files..."
-sudo rm -f /usr/share/keyrings/grafana.gpg
-sudo rm -f /usr/share/keyrings/grafana-archive-keyring.gpg
-sudo rm -f /etc/apt/sources.list.d/grafana.list
-sudo rm -rf /etc/grafana
-
-# Clean Node-RED more thoroughly
-echo "Cleaning Node-RED files..."
-sudo rm -rf ~/.node-red
-sudo rm -f /etc/systemd/system/nodered.service
-sudo rm -rf /home/$SUDO_USER/.node-red/settings.js
-
-# Clean Grafana configs thoroughly
-echo "Cleaning Grafana configs..."
-sudo rm -rf /etc/grafana/*
-sudo rm -f /var/lib/grafana/grafana.db
 
 echo "Cleanup complete!"
 

@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.2.9"  
+VERSION="1.3.0"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
