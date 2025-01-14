@@ -22,13 +22,20 @@ sudo rm -f /usr/share/keyrings/grafana-archive-keyring.gpg
 sudo rm -f /usr/share/keyrings/grafana.gpg
 sudo apt-get update
 
+# Add to the repository cleanup section
+echo "Cleaning up repository keys..."
+sudo rm -f /home/$SUDO_USER/influxdata-archive_compat.key*
+sudo rm -f /etc/apt/keyrings/influxdata-archive-keyring.gpg
+
 # 3. Remove packages
 echo "Removing packages..."
 for package in nodejs npm influxdb2 grafana grafana-enterprise; do
     if dpkg -l | grep -q "^ii.*$package"; then
         echo "Removing $package..."
-        # Redirect stderr to suppress dpkg warnings about non-empty directories
-        sudo apt-get remove --purge -y $package 2>/dev/null || true
+        sudo apt-get remove --purge -y $package 2>/dev/null || {
+            # If normal remove fails, try force remove
+            sudo dpkg --force-all -P $package 2>/dev/null || true
+        }
     else
         echo "Package $package not installed, skipping..."
     fi
@@ -53,17 +60,28 @@ sudo userdel -r metsci-service 2>/dev/null || true
 
 # 5. Clean up Node.js files
 echo "Cleaning Node.js files..."
-sudo rm -rf /usr/lib/node_modules
-sudo rm -rf /usr/local/lib/node_modules
-sudo rm -rf ~/.npm
-sudo rm -rf /usr/local/bin/node*
-sudo rm -rf /usr/local/bin/npm*
+npm_dirs=(
+    "/usr/lib/node_modules"
+    "/usr/local/lib/node_modules"
+    "~/.npm"
+    "/usr/local/bin/node*"
+    "/usr/local/bin/npm*"
+)
 
-# Add before the Node.js files cleanup
-echo "Cleaning npm directories..."
-sudo rm -rf /usr/lib/node_modules/npm
-sudo rm -rf /usr/lib/node_modules/.staging
-sudo rm -rf /usr/lib/node_modules/.package-lock.json
+for dir in "${npm_dirs[@]}"; do
+    if [ -d "$dir" ] || [ -f "$dir" ]; then
+        echo "Removing $dir..."
+        if ! sudo rm -rf "$dir" 2>/dev/null; then
+            # If directory not empty, try force remove
+            find "$dir" -type f -delete 2>/dev/null
+            find "$dir" -type d -empty -delete 2>/dev/null
+            remaining=$(find "$dir" -type d 2>/dev/null | wc -l)
+            if [ "$remaining" -gt 0 ]; then
+                echo "⚠️  Warning: Could not fully remove $dir ($remaining items remain)"
+            fi
+        fi
+    fi
+done
 
 # 6. Clean up service files
 echo "Cleaning service files..."
