@@ -453,9 +453,11 @@ In this case, use `node-red`.`gristleking.dev`/`metsci-ldds75-data`.  We'll use 
 
 ![Configure Zero Trust Appication](/images/tutorial-extras/004-images/cloudflare-configure-application-details.png)
 
-Scroll down past `Application Appearances` and `Tags` etc to the bottom and click `Next` to proceed to the `Policies` section.  
+Scroll down past `Application Appearances` and `Tags` etc to the bottom.
 
-#### - Policy Rule
+Click `Next` to proceed to the `Policies` section.  
+
+#### Policy Rule
 
 We'll use the same `Service Auth` policy as the global application, but this time we'll restrict it to the `ldds75` token.
 
@@ -469,7 +471,9 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
 
-Nice work!  I know it's hard to see it, but we're making progress here.  
+Nice work!  We've now set a `Global Application` to make sure only services with a token can use our `node-red.gristleking.dev` domain, and then a `LDDS75 Application` to set a path for using the ldds75.
+
+I know it's hard to see it, but we're making progress here.  
 
 ---
 ## 3. **Setting Up Your LDDS 75 Sensor**
@@ -497,13 +501,26 @@ Quick note:  You *can't* see the **Device Metrics** properly in Chirpstack, whic
 ### C. Configure For Fast Firing
 We're going to need some data coming through the tunnel in a bit, so let's set up the LDDS75 to fire every minute for now, then we'll pull the power until we're ready to test.
 
-Use this guide to set up the LDDS75 to fire every minute: https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/tutorial-basics/008-configure-a-device.md
+Use [this guide](https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/tutorial-basics/008-configure-a-device.md
+) to set up the LDDS75 to fire every minute.  You "could" theoretically do all this with downlinks, but A) I'm not covering that here and B) I want you to have the ability to wire into a sensor and tell it what to do.
+
+However you do it...
 
 Once you've got it set up and seen a few packets come through, pull the power on your LDDS75 using the yellow jumper; we'll use it again in a bit.
 
+![LDDS 75 jumper](/images/tutorial-extras/004-images/ldds-75-jumper-power-off.jpeg)
+
 ### C. Set Up The HTTP Integration In MetSci
 
-In the MetSci LDDS75 `Application`, look for the `Integrations` tab.  Find 'HTTP Integrations" and hit the `+`.  Leave the payload encoding set to JSON. Change the event endpoint to `https://node-red.<YOUR-DOMAIN>/metsci-ldds75-data/` then add two headers:
+Head back over to the [MeteoScientific Console](https://console.meteoscientific.com/front/login) and in `Applications`-->`LDDS 75` (or whatever you called it), look for the `Integrations` tab.  
+
+![MetSci LDDS 75 Integrations](/images/tutorial-extras/004-images/metsci-applications-integrations-tab.png)
+
+Find 'HTTP Integrations" and hit the `+`.  
+
+Leave the payload encoding set to JSON. 
+
+Change the event endpoint to `https://node-red.<YOUR-DOMAIN>/metsci-ldds75-data/` then add two headers:
 
 ```
 CF-Access-Client-ID <your-access-id>
