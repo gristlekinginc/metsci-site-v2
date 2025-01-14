@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.1"  
+VERSION="1.3.2"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -485,12 +485,15 @@ install_nodered() {
     # Install Node-RED
     sudo npm install -g --unsafe-perm node-red
     
+    # Add bcrypt installation
+    echo "Installing required Node-RED dependencies..."
+    cd ~/.node-red
+    npm install bcrypt
+    cd ~
+    
     # Create settings directory
     sudo mkdir -p /home/$SUDO_USER/.node-red
     
-    # Add bcrypt for password hashing
-    sudo npm install -g bcrypt
-
     # Update the settings.js template to use hashed password
     NODE_RED_SETTINGS=$(cat << 'EOL'
 module.exports = {

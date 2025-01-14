@@ -1,5 +1,4 @@
 #!/bin/bash
-# Version 1.2.1
 # This script provides basic security hardening for MetSci dashboard installation
 
 #----------------------------------------------------------------------
@@ -16,7 +15,7 @@ exec 1> >(tee -a "$LOG_FILE") 2>&1
 #----------------------------------------------------------------------
 # Pre-Checks & Warnings
 #----------------------------------------------------------------------
-echo "MeteoScientific Pi Security Setup v1.2.0"
+echo "MeteoScientific Pi Security Setup v1.2.2"
 echo "This script prepares your Pi for secure dashboard installation"
 
 # Check if running as root
@@ -129,7 +128,7 @@ sudo chown -R metsci-service:metsci-service /home/metsci-service/.node-red
 # fail2ban Setup
 #----------------------------------------------------------------------
 echo "Installing fail2ban..."
-sudo apt-get install -y fail2ban
+sudo apt-get install -y fail2ban >/dev/null 2>&1
 sudo tee /etc/fail2ban/jail.local > /dev/null << EOF
 [DEFAULT]
 bantime = 10m
@@ -151,7 +150,7 @@ sudo systemctl restart fail2ban
 # Automatic Updates
 #----------------------------------------------------------------------
 echo "Setting up automatic updates..."
-sudo apt-get install -y unattended-upgrades apt-listchanges
+sudo apt-get install -y unattended-upgrades apt-listchanges >/dev/null 2>&1
 sudo tee /etc/apt/apt.conf.d/20auto-upgrades > /dev/null << EOL
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Download-Upgradeable-Packages "1";

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Version 1.0.9
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
-# It will remove Node-RED, InfluxDB, and Grafana completely.
+# It will remove Node-RED, InfluxDB, and Grafana completely, and is used to clean
 
 echo "Starting cleanup process..."
 
