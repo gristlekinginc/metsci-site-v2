@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.2"  
+VERSION="1.3.3"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -210,30 +210,6 @@ configure_log_rotation() {
     create 0640 root root
 }
 EOL
-}
-
-##############################################################################
-# print_install_summary
-# Shows summary of services to be installed, gets user confirmation.
-##############################################################################
-print_install_summary() {
-    echo
-    echo "Installation Summary"
-    echo "--------------------"
-    echo
-    echo "The following services will be installed:"
-    echo "  1. Node-RED"
-    echo "  2. InfluxDB"
-    echo "  3. Grafana"
-    echo
-    echo "Credentials will be displayed after successful installation."
-    echo
-    read -p "Continue with installation? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Installation cancelled."
-        exit 1
-    fi
 }
 
 ##############################################################################
@@ -481,53 +457,80 @@ install_nodejs() {
 ##############################################################################
 install_nodered() {
     echo "Installing Node-RED..."
+    source "$ENV_FILE"
     
-    # Install Node-RED
-    sudo npm install -g --unsafe-perm node-red
+    # Install Node-RED and bcryptjs
+    sudo npm install -g --unsafe-perm node-red bcryptjs || error_exit "Failed to install Node-RED"
     
-    # Add bcrypt installation
-    echo "Installing required Node-RED dependencies..."
-    cd ~/.node-red
-    npm install bcrypt
-    cd ~
+    # Create systemd service file
+    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
+[Unit]
+Description=Node-RED
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/bin/node-red
+Restart=on-failure
+KillSignal=SIGINT
+User=$SUDO_USER
+Environment=NODE_RED_OPTIONS=
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+    # Create settings file with authentication
+    sudo mkdir -p ~/.node-red
+    cd ~/.node-red || error_exit "Failed to access Node-RED directory"
     
-    # Create settings directory
-    sudo mkdir -p /home/$SUDO_USER/.node-red
+    # Install required nodes
+    npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required nodes"
     
-    # Update the settings.js template to use hashed password
-    NODE_RED_SETTINGS=$(cat << 'EOL'
+    # Generate password hash
+    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
+    
+    # Update settings.js
+    cat > settings.js << EOL
 module.exports = {
     uiPort: process.env.PORT || 1880,
-    mqttReconnectTime: 15000,
-    serialReconnectTime: 15000,
-    debugMaxLength: 1000,
-    functionGlobalContext: {},
     
+    // Security settings
     adminAuth: {
         type: "credentials",
         users: [{
-            username: "${NODERED_USERNAME}",
-            // Password will be replaced with bcrypt hash
-            password: "${NODERED_PASSWORD_HASH}",
+            username: "$NODERED_USERNAME",
+            password: "$NODERED_HASH",
             permissions: "*"
         }]
     },
     
+    // Node-RED settings
+    flowFile: 'flows.json',
+    credentialSecret: "$(openssl rand -base64 24)",
+    
+    // Editor settings
     editorTheme: {
         projects: {
             enabled: false
         }
     },
     
+    // InfluxDB connection
     influxdb: {
-        url: 'http://localhost:8086',
-        token: '${INFLUXDB_TOKEN}',
-        org: '${INFLUXDB_ORG}',
-        bucket: '${INFLUXDB_BUCKET}'
+        version: 2,
+        url: "http://localhost:8086",
+        token: "$INFLUXDB_TOKEN",
+        org: "$INFLUXDB_ORG",
+        bucket: "$INFLUXDB_BUCKET"
     },
     
-    credentialSecret: "${CREDENTIAL_SECRET}",
+    // Runtime settings
+    functionGlobalContext: { },
     
+    // Node settings
+    nodeMessageBufferMaxLength: 2000,
+    
+    // Logging settings
     logging: {
         console: {
             level: "info",
@@ -537,42 +540,6 @@ module.exports = {
     }
 }
 EOL
-)
-
-    # Hash the password
-    NODERED_PASSWORD_HASH=$(node -e "console.log(require('bcrypt').hashSync('${NODERED_PASSWORD}', 8))")
-
-    # Replace the placeholder with the hashed password
-    NODE_RED_SETTINGS=${NODE_RED_SETTINGS/\${NODERED_PASSWORD_HASH}/$NODERED_PASSWORD_HASH}
-
-    # Create settings.js with basic auth
-    echo "$NODE_RED_SETTINGS" > /home/$SUDO_USER/.node-red/settings.js
-    
-    # Set proper ownership
-    sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
-    
-    # Create service file
-    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
-[Unit]
-Description=Node-RED
-After=network.target
-
-[Service]
-ExecStart=/usr/bin/node-red --userDir /home/$SUDO_USER/.node-red
-Restart=on-failure
-User=$SUDO_USER
-Group=$SUDO_USER
-
-[Install]
-WantedBy=multi-user.target
-EOL
-    
-    # Enable and start Node-RED
-    sudo systemctl daemon-reload
-    sudo systemctl enable nodered
-    sudo systemctl start nodered
-    
-    echo "✓ Node-RED installed and configured"
 }
 
 ##############################################################################
