@@ -404,8 +404,14 @@ Name your token something descriptive (I'm using `ldds75`) and set the duration 
 
 ![Add a Service Token in Zero Trust](/images/tutorial-extras/004-images/cloudflare-configure-service-auth-token-ldds75.png)
 
-That will give you an `Access ID` and an `Access secret`.  Save **both the headers and the access codes** in a secure place.  We'll need them when we set up the HTTP integration in MetSci.
+That will give you an `Access ID` and an `Access secret`.  Save **both the headers and the access codes** in a secure place.  We'll need them when we set up the HTTP integration in MetSci.  What you save should look like this:
 
+```
+CF-Access-Client-Id: 5xxxxxxxxxxxxxxxxxxxxxxxx3.access
+
+CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
+```
+Hit the `Save` button at the bottom right.
 
 ### H. Add A Zero Trust Application
 
@@ -415,7 +421,7 @@ With our Service Token set up, go to `Access-->Applications` and add a new Cloud
 
 Select `Self Hosted`
 
-#### - Application Details 
+#### Application Details 
 
 We're going to set up 2 Applications to start.  One is a "global" applications that references all tokens for Node-RED. 
 
