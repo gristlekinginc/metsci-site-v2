@@ -726,7 +726,9 @@ With your flow set up, click `Deploy` in the top-right.
 
 You should see a green bar and the word "Deployed" at the top of the screen.  
 
-Now go back to your LDDS75 and power it back on.  Since you set it to fire on a one minute interval, you'll know quickly if everything is working or not as you'll see the data start flowing through in the debug panel on the right side.  Remember, it might take a minute or two for the first join to complete and the data to start flowing.
+Now go back to your LDDS75 and power it back on.  Since you set it to fire on a one minute interval, you'll know quickly if everything is working or not as you'll see the data start flowing through in the debug panel on the right side.  
+
+Remember, it might take a minute or two for the first join to complete and the data to start flowing.
 
 ![Connecting the nodes](/images/tutorial-extras/004-images/node-red-first-flow.png)
 

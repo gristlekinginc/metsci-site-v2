@@ -619,21 +619,28 @@ install_influxdb() {
         --token "$INFLUXDB_TOKEN" \
         --force 2>/dev/null || error_exit "Failed to initialize InfluxDB"
     
+    # Add verification step
+    if ! influx bucket list --org "$INFLUXDB_ORG" | grep -q "sensors"; then
+        error_exit "InfluxDB setup verification failed" "rollback"
+    fi
+    
     # Create all-access token for Node-RED
-    echo "Creating Node-RED access token..."
     NODERED_TOKEN=$(influx auth create \
         --org "$INFLUXDB_ORG" \
         --all-access \
         --description "Node-RED Integration" \
         --json | jq -r '.token')
     
-    # Update .env with the new Node-RED token
-    sudo sed -i "s/INFLUXDB_TOKEN=.*/INFLUXDB_TOKEN=$NODERED_TOKEN/" "$ENV_FILE"
-    
-    # Verify setup
-    if ! influx auth ls --user "$INFLUXDB_USERNAME" &>/dev/null; then
-        error_exit "Failed to verify InfluxDB setup"
+    # Verify token was created
+    if [ -z "$NODERED_TOKEN" ]; then
+        error_exit "Failed to create Node-RED token" "rollback"
     fi
+    
+    # Update credentials file with new token
+    sudo sed -i "s/Token: .*/Token: $NODERED_TOKEN/" "$CREDS_FILE"
+    
+    # Verify InfluxDB setup
+    verify_influxdb_setup "$INFLUXDB_ORG" "$INFLUXDB_USERNAME"
     
     echo "✓ InfluxDB installed and configured with user: $INFLUXDB_USERNAME"
 }
@@ -842,6 +849,109 @@ check_security_setup() {
         # Use metsci-service user if it exists
         SUDO_USER="metsci-service"
     fi
+}
+
+##############################################################################
+# Function to verify InfluxDB setup
+##############################################################################
+verify_influxdb_setup() {
+    local org=$1
+    local username=$2
+    local bucket="sensors"
+    
+    # Verify organization exists
+    if ! influx org list | grep -q "$org"; then
+        error_exit "Organization verification failed" "rollback"
+    fi
+    
+    # Verify user exists
+    if ! influx user list | grep -q "$username"; then
+        error_exit "User verification failed" "rollback"
+    }
+    
+    # Verify bucket exists
+    if ! influx bucket list --org "$org" | grep -q "$bucket"; then
+        error_exit "Bucket verification failed" "rollback"
+    }
+    
+    # Verify token works
+    if ! influx auth ls --user "$username" &>/dev/null; then
+        error_exit "Token verification failed" "rollback"
+    }
+    
+    echo "✓ InfluxDB setup verified successfully"
+}
+
+##############################################################################
+# Function to setup Node-RED
+##############################################################################
+setup_nodered() {
+    echo "Setting up Node-RED..."
+    
+    # Create settings.js if it doesn't exist
+    if [ ! -f "$NODERED_SETTINGS" ]; then
+        mkdir -p "$(dirname "$NODERED_SETTINGS")"
+        cp /usr/lib/node_modules/node-red/settings.js "$NODERED_SETTINGS"
+    fi
+    
+    # Update Node-RED settings with InfluxDB credentials
+    cat >> "$NODERED_SETTINGS" << EOF
+    influxdb: {
+        url: 'http://localhost:8086',
+        token: '$NODERED_TOKEN',
+        org: '$INFLUXDB_ORG',
+        bucket: 'sensors'
+    },
+EOF
+    
+    # Verify Node-RED can start
+    if ! sudo systemctl start nodered; then
+        error_exit "Failed to start Node-RED" "rollback"
+    fi
+    
+    echo "✓ Node-RED configured successfully"
+}
+
+##############################################################################
+# Function to create and verify credentials file
+##############################################################################
+create_credentials_file() {
+    local creds_file="$1"
+    
+    # Create credentials file with proper permissions
+    touch "$creds_file"
+    chmod 600 "$creds_file"
+    
+    # Write credentials
+    cat > "$creds_file" << EOF
+MeteoScientific Dashboard Credentials
+====================================
+Generated on: $(date)
+
+Node-RED:
+Username: $NODERED_USERNAME
+Password: $NODERED_PASSWORD
+
+InfluxDB:
+Username: $INFLUXDB_USERNAME
+Password: $INFLUXDB_PASSWORD
+Organization: $INFLUXDB_ORG
+Bucket: sensors
+Token: $NODERED_TOKEN
+
+Grafana:
+Username: $GRAFANA_USERNAME
+Password: $GRAFANA_PASSWORD
+
+Save these credentials and delete this file!
+EOF
+    
+    # Verify file exists and has correct permissions
+    if [ ! -f "$creds_file" ] || [ "$(stat -c %a "$creds_file")" != "600" ]; then
+        error_exit "Failed to create credentials file with proper permissions" "rollback"
+    }
+    
+    echo "✓ Credentials file created successfully"
 }
 
 ##############################################################################
