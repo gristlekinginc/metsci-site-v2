@@ -466,90 +466,82 @@ install_nodered() {
         error_exit "Environment file not found. Has generate_credentials been run?"
     fi
     
-    # Install Node-RED and bcryptjs
-    sudo npm install -g --unsafe-perm node-red bcryptjs || error_exit "Failed to install Node-RED"
+    # Install Node-RED globally
+    npm install -g --unsafe-perm node-red || error_exit "Failed to install Node-RED"
     
-    # Create systemd service file
-    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
+    # Install bcryptjs for password hashing
+    npm install -g bcryptjs || error_exit "Failed to install bcryptjs"
+    
+    # Generate hashed password for Node-RED
+    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync('${NODERED_PASSWORD}', 8))")
+    
+    # Create Node-RED user directory and settings
+    mkdir -p /home/$SUDO_USER/.node-red
+    cat > /home/$SUDO_USER/.node-red/settings.js << EOL
+module.exports = {
+    credentialSecret: "${CREDENTIAL_SECRET}",
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: "${NODERED_USERNAME}",
+            password: "${NODERED_HASH}",
+            permissions: "*"
+        }]
+    },
+    httpNodeAuth: {
+        user: "${NODERED_USERNAME}",
+        pass: "${NODERED_HASH}"
+    },
+    uiPort: ${NODERED_PORT},
+    flowFile: 'flows.json',
+    flowFilePretty: true,
+    userDir: '/home/${SUDO_USER}/.node-red',
+    functionGlobalContext: {}
+}
+EOL
+
+    # Set correct ownership
+    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
+    
+    # Install required nodes in the user directory
+    cd /home/$SUDO_USER/.node-red || error_exit "Failed to change directory"
+    
+    # Install InfluxDB nodes with specific version
+    npm install node-red-contrib-influxdb@3.0.1 || error_exit "Failed to install InfluxDB nodes"
+    
+    # Create systemd service
+    cat > /etc/systemd/system/nodered.service << EOL
 [Unit]
 Description=Node-RED
-After=syslog.target network.target
+After=network.target
 
 [Service]
 ExecStart=/usr/bin/node-red
 Restart=on-failure
-KillSignal=SIGINT
 User=$SUDO_USER
-Environment=NODE_RED_OPTIONS=
+Group=$SUDO_USER
+Environment=NODE_ENV=production
+WorkingDirectory=/home/$SUDO_USER/.node-red
 
 [Install]
 WantedBy=multi-user.target
 EOL
 
-    # Create settings file with authentication
-    sudo mkdir -p ~/.node-red
-    cd ~/.node-red || error_exit "Failed to access Node-RED directory"
+    # Enable and start Node-RED service
+    systemctl daemon-reload
+    systemctl enable nodered
+    systemctl start nodered
     
-    # Install required nodes
-    echo "Installing Node-RED nodes..."
-    npm install @node-red/nodes-registry
-    npm install node-red-contrib-influxdb@2.3.3 || error_exit "Failed to install InfluxDB nodes"
-    npm install bcryptjs || error_exit "Failed to install bcryptjs"
+    # Wait for Node-RED to start
+    echo "Waiting for Node-RED to start..."
+    sleep 5
     
-    # Generate password hash
-    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
+    # Verify service is running
+    if ! systemctl is-active --quiet nodered; then
+        error_exit "Node-RED failed to start. Check logs with: journalctl -u nodered"
+    fi
     
-    # Update settings.js
-    cat > settings.js << EOL
-module.exports = {
-    uiPort: process.env.PORT || 1880,
-    
-    // Security settings
-    adminAuth: {
-        type: "credentials",
-        users: [{
-            username: "$NODERED_USERNAME",
-            password: "$NODERED_HASH",
-            permissions: "*"
-        }]
-    },
-    
-    // Node-RED settings
-    flowFile: 'flows.json',
-    credentialSecret: "$(openssl rand -base64 24)",
-    
-    // Editor settings
-    editorTheme: {
-        projects: {
-            enabled: false
-        }
-    },
-    
-    // InfluxDB connection
-    influxdb: {
-        version: 2,
-        url: "http://localhost:8086",
-        token: "$INFLUXDB_TOKEN",
-        org: "$INFLUXDB_ORG",
-        bucket: "$INFLUXDB_BUCKET"
-    },
-    
-    // Runtime settings
-    functionGlobalContext: { },
-    
-    // Node settings
-    nodeMessageBufferMaxLength: 2000,
-    
-    // Logging settings
-    logging: {
-        console: {
-            level: "info",
-            metrics: false,
-            audit: false
-        }
-    }
-}
-EOL
+    echo "✓ Node-RED installed and configured"
 }
 
 ##############################################################################
