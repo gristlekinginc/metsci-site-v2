@@ -833,17 +833,17 @@ verify_influxdb_setup() {
     # Verify user exists
     if ! influx user list | grep -q "$username"; then
         error_exit "User verification failed" "rollback"
-    }
+    fi
     
     # Verify bucket exists
     if ! influx bucket list --org "$org" | grep -q "$bucket"; then
         error_exit "Bucket verification failed" "rollback"
-    }
+    fi
     
     # Verify token works
     if ! influx auth ls --user "$username" &>/dev/null; then
         error_exit "Token verification failed" "rollback"
-    }
+    fi
     
     echo "✓ InfluxDB setup verified successfully"
 }
