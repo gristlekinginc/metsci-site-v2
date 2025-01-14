@@ -75,7 +75,7 @@ Your Pi can be made a bit more secure with a few commands.  We're going to wrap 
 There's nothing ultra fancy in here, just generally good Pi housekeeping.  Answer `y` when it asks you about the SSH port. 
 
 ```bash 
-curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/secure-pi.sh -o secure-pi.sh && chmod +x secure-pi.sh && sudo ./secure-pi.sh
+curl -sSL meteoscientific.com/scripts/secure-pi.sh -o secure.sh && chmod +x secure.sh && sudo ./secure.sh
 ```
 
 Once you've run it to the end, you'll see a bunch of info confirming what it did. Go ahead and reboot the Pi now.
@@ -91,7 +91,7 @@ sudo reboot
 Copy & paste the following command into your Pi's Terminal:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/gristlekinginc/metsci-site-v2/main/docs/scripts/install-dashboard-v3.sh -o install-dashboard-packages.sh && chmod +x install-dashboard-packages.sh && sudo ./install-dashboard-packages.sh
+-sSL meteoscientific.com/scripts/install-dashboard-v3.sh -o dashboard.sh && chmod +x dashboard.sh && sudo ./dashboard.sh
 ```
 
 During the installation you'll get a few questions and warnings. 

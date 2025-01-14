@@ -8,5 +8,16 @@
     "silent": true
   },
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/scripts/(.*).sh",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/x-sh"
+        }
+      ]
+    }
+  ]
 } 
