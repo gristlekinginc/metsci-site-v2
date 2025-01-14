@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.4.0"  
+VERSION="1.4.1"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -421,34 +421,24 @@ check_requirements() {
 # Installs Node.js (v20.x) via NodeSource, cleans up partial installs first.
 ##############################################################################
 install_nodejs() {
+    show_progress "4" "Installing Node.js"
     echo "Installing Node.js..."
     
-    # Clean up any failed installations
+    # Clean up any failed installations (from v1)
     sudo apt-get remove -y nodejs npm || true
     sudo apt-get autoremove -y
     sudo rm -rf /etc/apt/sources.list.d/nodesource.list*
     
-    # Add NodeSource repository
-    echo "Adding NodeSource repository..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || {
-        error_exit "Failed to add NodeSource repository" "rollback"
-    }
+    # Add NodeSource repository (from v1)
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || error_exit "Failed to add NodeSource repository"
     
-    # Install Node.js
-    echo "Installing Node.js packages..."
-    sudo apt-get install -y nodejs || {
-        error_exit "Failed to install Node.js" "rollback"
-    }
+    # Install Node.js (from v1)
+    sudo apt-get install -y nodejs || error_exit "Failed to install Node.js"
     
-    # Update npm to latest version
-    echo "Updating npm to latest version..."
-    sudo npm install -g npm@latest || {
-        error_exit "Failed to update npm" "rollback"
-    }
+    # Update npm to latest version (from v1)
+    sudo npm install -g npm@latest || error_exit "Failed to update npm"
     
-    node_version=$(node --version)
-    npm_version=$(npm --version)
-    echo "✓ Node.js $node_version (npm $npm_version) installed successfully"
+    echo "✓ Node.js v$(node --version) (npm $(npm --version)) installed successfully"
 }
 
 ##############################################################################
@@ -459,30 +449,17 @@ install_nodered() {
     show_progress "5" "Installing Node-RED"
     echo "Installing Node-RED..."
     
-    # Source environment variables
-    if [ -f "$ENV_FILE" ]; then
-        source "$ENV_FILE"
-    else
-        error_exit "Environment file not found. Has generate_credentials been run?"
-    fi
-    
-    # Install Node-RED globally
-    npm install -g --unsafe-perm node-red || error_exit "Failed to install Node-RED"
+    # Install Node-RED globally (from v1)
+    sudo npm install -g --unsafe-perm node-red || error_exit "Failed to install Node-RED"
     
     # Create Node-RED user directory
     mkdir -p /home/$SUDO_USER/.node-red
     cd /home/$SUDO_USER/.node-red || error_exit "Failed to change directory"
     
-    # Install bcryptjs locally in Node-RED directory
-    npm install bcryptjs || error_exit "Failed to install bcryptjs"
-    
-    # Generate hashed password for Node-RED
-    NODERED_HASH=$(node -e "const bcrypt = require('/home/$SUDO_USER/.node-red/node_modules/bcryptjs'); console.log(bcrypt.hashSync('${NODERED_PASSWORD}', 8))")
-    
-    # Create settings.js with debug logging enabled
+    # Create settings.js (from v1, fixed syntax)
     cat > /home/$SUDO_USER/.node-red/settings.js << EOL
 module.exports = {
-    credentialSecret: "${CREDENTIAL_SECRET}",
+    uiPort: process.env.PORT || 1880,
     adminAuth: {
         type: "credentials",
         users: [{
@@ -495,7 +472,6 @@ module.exports = {
         user: "${NODERED_USERNAME}",
         pass: "${NODERED_HASH}"
     },
-    uiPort: ${NODERED_PORT},
     flowFile: 'flows.json',
     flowFilePretty: true,
     userDir: '/home/${SUDO_USER}/.node-red',
@@ -510,62 +486,45 @@ module.exports = {
 }
 EOL
 
-    # Set correct ownership
-    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
-    
-    # Install InfluxDB nodes
-    npm install node-red-contrib-influxdb@0.7.0 || error_exit "Failed to install InfluxDB nodes"
-    
-    # Create systemd service with proper environment and permissions
-    cat > /etc/systemd/system/nodered.service << EOL
+    # Create systemd service file (from v1)
+    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
 [Unit]
 Description=Node-RED
-After=network.target
+After=syslog.target network.target
 
 [Service]
-Type=simple
+ExecStart=/usr/bin/node-red
+Restart=on-failure
 User=$SUDO_USER
 Group=$SUDO_USER
-Environment="HOME=/home/$SUDO_USER"
-Environment="NODE_ENV=production"
-Environment="NODE_OPTIONS=--max-old-space-size=512"
-Environment="NODE_RED_OPTIONS=-v"
-WorkingDirectory=/home/$SUDO_USER/.node-red
-ExecStart=/usr/bin/env node-red
-Restart=on-failure
-RestartSec=10
-StandardOutput=journal
-StandardError=journal
-TimeoutStartSec=180
-KillMode=process
+Environment=NODE_ENV=production
 
 [Install]
 WantedBy=multi-user.target
 EOL
 
-    # Enable and start Node-RED service
-    systemctl daemon-reload
-    systemctl enable nodered
-    systemctl start nodered
-    
-    # Wait for Node-RED with better logging
+    # Set correct ownership
+    sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
+
+    # Enable and start Node-RED
+    sudo systemctl daemon-reload
+    sudo systemctl enable nodered
+    sudo systemctl start nodered
+
+    # Wait for Node-RED with better logging (from v3)
     echo "Waiting for Node-RED to start..."
-    for i in {1..60}; do
-        if curl -s http://localhost:${NODERED_PORT} >/dev/null; then
+    for i in {1..30}; do
+        if curl -s http://localhost:1880/ >/dev/null; then
             echo "✓ Node-RED is responding"
-            return 0
+            break
         fi
-        echo "Waiting for Node-RED... ($i/60)"
-        # Check service status
+        echo "Waiting for Node-RED... ($i/30)"
         if ! systemctl is-active --quiet nodered; then
-            echo "Node-RED service failed. Checking logs..."
             journalctl -u nodered -n 50 --no-pager
             error_exit "Node-RED failed to start. See logs above."
         fi
         sleep 2
     done
-    
-    error_exit "Node-RED did not respond within timeout period"
 }
 
 ##############################################################################
