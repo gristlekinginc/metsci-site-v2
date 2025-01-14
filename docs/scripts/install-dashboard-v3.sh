@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.2.7"  
+VERSION="1.2.8"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -565,6 +565,7 @@ EOL
 ##############################################################################
 install_influxdb() {
     echo "Installing InfluxDB..."
+    source "$ENV_FILE"
     
     # Install InfluxDB
     wget -q https://repos.influxdata.com/influxdata-archive_compat.key
