@@ -32,7 +32,7 @@ LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Arrays used for random username generation
-NODERED_NAMES=("neo" "morpheus" "trinity" "oracle" "tank" "dozer" "switch" "apoc" "niobe" "link" "commander")
+NODERED_NAMES=("neo" "morpheus" "trinity" "oracle" "tank" "dozer" "switch" "apoc" "niobe" "commander")
 INFLUXDB_NAMES=("skywalker" "kenobi" "yoda" "windu" "ewok" "bobafett" "lando" "vader" "hansolo" "wookie" "salaciouscrumb")
 GRAFANA_NAMES=("muaddib" "chani" "stilgar" "leto" "ghanima" "irulan" "hawat" "kynes" "gurney" "idaho" "fenring")
 
@@ -565,7 +565,9 @@ EOL
 ##############################################################################
 install_influxdb() {
     echo "Installing InfluxDB..."
-    source "$ENV_FILE"
+    
+    # Source environment variables
+    source "$ENV_FILE" || error_exit "Failed to source environment file"
     
     # Install InfluxDB
     wget -q https://repos.influxdata.com/influxdata-archive_compat.key
@@ -580,30 +582,47 @@ install_influxdb() {
     
     # Wait for InfluxDB to be ready
     echo "Waiting for InfluxDB to start..."
+    max_attempts=30
+    attempt=1
+    while ! curl -s http://localhost:8086/health >/dev/null; do
+        if [ $attempt -ge $max_attempts ]; then
+            error_exit "InfluxDB failed to start after $max_attempts attempts" "rollback"
+        fi
+        echo "Waiting for InfluxDB to be ready... (attempt $attempt/$max_attempts)"
+        sleep 2
+        ((attempt++))
+    done
+    
+    echo "InfluxDB is responding to health checks. Waiting additional time for full initialization..."
     sleep 10
     
-    # Initialize InfluxDB (token already in ENV_FILE from generate_credentials)
-    echo "Setting up InfluxDB..."
-    influx setup \
+    # Debug output
+    echo "Attempting InfluxDB setup with:"
+    echo "Username: $INFLUXDB_USERNAME"
+    echo "Organization: $INFLUXDB_ORG"
+    echo "Bucket: sensors"
+    
+    # Initialize InfluxDB with error capture
+    setup_output=$(influx setup \
         --username "$INFLUXDB_USERNAME" \
         --password "$INFLUXDB_PASSWORD" \
         --org "$INFLUXDB_ORG" \
         --bucket "sensors" \
         --retention 365d \
         --token "$INFLUXDB_TOKEN" \
-        --force 2>/dev/null || error_exit "Failed to initialize InfluxDB"
+        --force 2>&1)
     
-    # Verify setup with increased timeout
-    max_attempts=30
-    attempt=1
-    while ! influx bucket list --org "$INFLUXDB_ORG" | grep -q "sensors"; do
-        if [ $attempt -ge $max_attempts ]; then
-            error_exit "InfluxDB setup verification failed after 30 attempts" "rollback"
-        fi
-        echo "Waiting for InfluxDB to be ready... (attempt $attempt/$max_attempts)"
-        sleep 2
-        ((attempt++))
-    done
+    if [ $? -ne 0 ]; then
+        echo "InfluxDB setup failed with output:"
+        echo "$setup_output"
+        error_exit "Failed to initialize InfluxDB" "rollback"
+    fi
+    
+    # Verify setup
+    echo "Verifying InfluxDB setup..."
+    if ! influx bucket list --org "$INFLUXDB_ORG" | grep -q "sensors"; then
+        error_exit "InfluxDB bucket verification failed" "rollback"
+    fi
     
     echo "✓ InfluxDB installed and configured"
 }
