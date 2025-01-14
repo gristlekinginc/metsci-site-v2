@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.6"  
+VERSION="1.3.8"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -469,14 +469,17 @@ install_nodered() {
     # Install Node-RED globally
     npm install -g --unsafe-perm node-red || error_exit "Failed to install Node-RED"
     
-    # Install bcryptjs for password hashing
-    npm install -g bcryptjs || error_exit "Failed to install bcryptjs"
+    # Create Node-RED user directory
+    mkdir -p /home/$SUDO_USER/.node-red
+    cd /home/$SUDO_USER/.node-red || error_exit "Failed to change directory"
+    
+    # Install bcryptjs locally in Node-RED directory
+    npm install bcryptjs || error_exit "Failed to install bcryptjs"
     
     # Generate hashed password for Node-RED
-    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync('${NODERED_PASSWORD}', 8))")
+    NODERED_HASH=$(node -e "const bcrypt = require('/home/$SUDO_USER/.node-red/node_modules/bcryptjs'); console.log(bcrypt.hashSync('${NODERED_PASSWORD}', 8))")
     
-    # Create Node-RED user directory and settings
-    mkdir -p /home/$SUDO_USER/.node-red
+    # Create settings.js
     cat > /home/$SUDO_USER/.node-red/settings.js << EOL
 module.exports = {
     credentialSecret: "${CREDENTIAL_SECRET}",
@@ -503,11 +506,8 @@ EOL
     # Set correct ownership
     chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
     
-    # Install required nodes in the user directory
-    cd /home/$SUDO_USER/.node-red || error_exit "Failed to change directory"
-    
     # Install InfluxDB nodes with specific version
-    npm install node-red-contrib-influxdb@3.0.1 || error_exit "Failed to install InfluxDB nodes"
+    npm install node-red-contrib-influxdb@0.7.0 || error_exit "Failed to install InfluxDB nodes"
     
     # Create systemd service
     cat > /etc/systemd/system/nodered.service << EOL
