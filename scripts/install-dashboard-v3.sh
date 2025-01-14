@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.9"  
+VERSION="1.4.0"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -516,7 +516,7 @@ EOL
     # Install InfluxDB nodes
     npm install node-red-contrib-influxdb@0.7.0 || error_exit "Failed to install InfluxDB nodes"
     
-    # Create systemd service with increased timeout
+    # Create systemd service with proper environment and permissions
     cat > /etc/systemd/system/nodered.service << EOL
 [Unit]
 Description=Node-RED
@@ -524,14 +524,20 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/node-red
-Restart=on-failure
-RestartSec=10
-TimeoutStartSec=180
 User=$SUDO_USER
 Group=$SUDO_USER
-Environment=NODE_ENV=production
+Environment="HOME=/home/$SUDO_USER"
+Environment="NODE_ENV=production"
+Environment="NODE_OPTIONS=--max-old-space-size=512"
+Environment="NODE_RED_OPTIONS=-v"
 WorkingDirectory=/home/$SUDO_USER/.node-red
+ExecStart=/usr/bin/env node-red
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=180
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
