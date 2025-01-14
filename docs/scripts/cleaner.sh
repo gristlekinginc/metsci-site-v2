@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.8
+# Version 1.0.9
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will remove Node-RED, InfluxDB, and Grafana completely.
 
@@ -27,12 +27,13 @@ echo "Removing packages..."
 for package in nodejs npm influxdb2 grafana grafana-enterprise; do
     if dpkg -l | grep -q "^ii.*$package"; then
         echo "Removing $package..."
-        sudo apt-get remove --purge -y $package
+        # Redirect stderr to suppress dpkg warnings about non-empty directories
+        sudo apt-get remove --purge -y $package 2>/dev/null || true
     else
         echo "Package $package not installed, skipping..."
     fi
 done
-sudo apt-get autoremove --purge -y
+sudo apt-get autoremove --purge -y 2>/dev/null || true
 
 # 4. Clean up configuration directories
 echo "Removing configuration directories..."
@@ -57,6 +58,12 @@ sudo rm -rf /usr/local/lib/node_modules
 sudo rm -rf ~/.npm
 sudo rm -rf /usr/local/bin/node*
 sudo rm -rf /usr/local/bin/npm*
+
+# Add before the Node.js files cleanup
+echo "Cleaning npm directories..."
+sudo rm -rf /usr/lib/node_modules/npm
+sudo rm -rf /usr/lib/node_modules/.staging
+sudo rm -rf /usr/lib/node_modules/.package-lock.json
 
 # 6. Clean up service files
 echo "Cleaning service files..."
