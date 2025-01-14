@@ -3,13 +3,30 @@
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
 # It will remove Node-RED, InfluxDB, and Grafana completely, and is used to clean
 
+# Force standard output formatting
+export TERM=linux
+stty columns 80 rows 24 2>/dev/null || true
+
 echo "Starting cleanup process..."
+
+# Add more aggressive process cleanup before the service stops
+echo "Forcefully stopping any remaining processes..."
+for process in "node-red" "influxd" "grafana-server"; do
+    if pgrep -f "$process" > /dev/null; then
+        echo "Killing $process processes..."
+        sudo pkill -9 -f "$process" || true
+    fi
+done
 
 # 1. Stop services first
 echo "Stopping services..."
 for service in nodered influxdb grafana-server; do
     sudo systemctl stop $service 2>/dev/null || true
     sudo systemctl disable $service 2>/dev/null || true
+    # Add force kill if service stop fails
+    if systemctl is-active --quiet $service; then
+        sudo killall -9 $service 2>/dev/null || true
+    fi
     echo "✓ $service stopped"
 done
 
@@ -133,10 +150,16 @@ done
 
 # Check ports
 echo "Checking ports..."
-ports=(1880 8086 3000)
-for port in "${ports[@]}"; do
+for port in 1880 8086 3000; do
     if netstat -tuln | grep -q ":$port "; then
         echo "⚠️  Warning: Port $port is still in use"
+        # Add process identification
+        pid=$(sudo lsof -t -i:$port 2>/dev/null)
+        if [ ! -z "$pid" ]; then
+            echo "Process using port $port: $(ps -p $pid -o comm=)"
+            echo "Attempting to force kill process..."
+            sudo kill -9 $pid 2>/dev/null || true
+        fi
     else
         echo "✓ Port $port is free"
     fi
