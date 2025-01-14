@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.1.7
+# Version 1.1.8
 
 # Set up logging
 LOG_FILE="/home/$SUDO_USER/security-setup.log"
@@ -62,7 +62,7 @@ check_port() {
     # Skip SSH port check since we're using it
     if [ "$service" = "SSH" ]; then
         return 0
-    }
+    fi
     
     if netstat -tuln | grep -q ":$port "; then
         echo -e "${YELLOW}Warning: Port $port is already in use. This might be okay if $service is already running.${NC}"
