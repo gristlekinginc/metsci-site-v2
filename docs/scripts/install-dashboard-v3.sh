@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.2.6"  # Bump the version for this "fixed" version
+VERSION="1.2.7"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -32,9 +32,9 @@ LOG_FILE="/tmp/dashboard-install-$(date +%Y%m%d-%H%M%S).log"
 exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Arrays used for random username generation
-NODERED_NAMES=("vulcan" "klingon" "romulan" "cardassian" "bajoran" "ender" "philotes")
-INFLUXDB_NAMES=("ewok" "wookiee" "jawa" "tusken" "gungan" "hutt")
-GRAFANA_NAMES=("drysine" "nexus" "matrix" "cipher" "neural" "quantum" "serrin" "neo")
+NODERED_NAMES=("neo" "morpheus" "trinity" "oracle" "tank" "dozer" "switch" "apoc" "niobe" "link" "commander")
+INFLUXDB_NAMES=("skywalker" "kenobi" "yoda" "windu" "ewok" "bobafett" "lando" "vader" "hansolo" "wookie" "salaciouscrumb")
+GRAFANA_NAMES=("muaddib" "chani" "stilgar" "leto" "ghanima" "irulan" "hawat" "kynes" "gurney" "idaho" "fenring")
 
 #----------------------------------------------------------------------
 # Functions
@@ -175,8 +175,9 @@ Environment=INFLUXD_BOLT_MAX_CACHE=512MB
 Environment=INFLUXD_MAX_CONCURRENT_COMPACTIONS=2
 EOL
 
-    # Grafana memory optimization
-    sudo tee -a /etc/grafana/grafana.ini > /dev/null << EOL
+    # Grafana memory optimization - only append if not already present
+    if ! grep -q "\[analytics\]" /etc/grafana/grafana.ini; then
+        sudo tee -a /etc/grafana/grafana.ini > /dev/null << EOL
 [analytics]
 reporting_enabled = false
 
@@ -186,6 +187,7 @@ enabled = false
 [dashboards]
 versions_to_keep = 5
 EOL
+    fi
 
     sudo systemctl daemon-reload
 }
@@ -479,75 +481,47 @@ install_nodejs() {
 ##############################################################################
 install_nodered() {
     echo "Installing Node-RED..."
-    source "$ENV_FILE"
     
-    # Install Node-RED and bcryptjs globally
-    sudo npm install -g --unsafe-perm node-red bcryptjs || error_exit "Failed to install Node-RED"
+    # Install Node-RED
+    sudo npm install -g --unsafe-perm node-red
     
-    # Create systemd service file
-    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
-[Unit]
-Description=Node-RED
-After=syslog.target network.target
-
-[Service]
-ExecStart=/usr/bin/node-red
-Restart=on-failure
-KillSignal=SIGINT
-User=$SUDO_USER
-Environment=NODE_RED_OPTIONS=
-
-[Install]
-WantedBy=multi-user.target
-EOL
-
-    # Create the ~/.node-red folder under $SUDO_USER’s home
-    sudo -u "$SUDO_USER" mkdir -p /home/"$SUDO_USER"/.node-red
-    cd /home/"$SUDO_USER"/.node-red || error_exit "Failed to access Node-RED directory"
+    # Create settings directory
+    sudo mkdir -p /home/$SUDO_USER/.node-red
     
-    # Install required nodes in that .node-red folder
-    sudo -u "$SUDO_USER" npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required Node-RED nodes"
-    
-    # Generate password hash
-    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
-    
-    # Create a settings.js file with authentication
-    cat > settings.js << EOL
+    # Create settings.js with basic auth
+    cat > /home/$SUDO_USER/.node-red/settings.js << EOF
 module.exports = {
     uiPort: process.env.PORT || 1880,
+    mqttReconnectTime: 15000,
+    serialReconnectTime: 15000,
+    debugMaxLength: 1000,
+    functionGlobalContext: {},
     
-    // Security
+    // Basic auth for simplicity - protected by Cloudflare Zero Trust
     adminAuth: {
         type: "credentials",
         users: [{
             username: "$NODERED_USERNAME",
-            password: "$NODERED_HASH",
+            password: "$NODERED_PASSWORD",
             permissions: "*"
         }]
     },
     
-    flowFile: 'flows.json',
-    credentialSecret: "$(openssl rand -base64 24)",
-
     editorTheme: {
         projects: {
             enabled: false
         }
     },
-
-    // InfluxDB connection
-    influxdb: {
-        version: 2,
-        url: "http://localhost:8086",
-        token: "$INFLUXDB_TOKEN",
-        org: "$INFLUXDB_ORG",
-        bucket: "$INFLUXDB_BUCKET"
-    },
-
-    functionGlobalContext: { },
     
-    nodeMessageBufferMaxLength: 2000,
-
+    influxdb: {
+        url: 'http://localhost:8086',
+        token: '$INFLUXDB_TOKEN',
+        org: '$INFLUXDB_ORG',
+        bucket: 'sensors'
+    },
+    
+    credentialSecret: false,
+    
     logging: {
         console: {
             level: "info",
@@ -556,10 +530,33 @@ module.exports = {
         }
     }
 }
-EOL
+EOF
+    
+    # Set proper ownership
+    sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
+    
+    # Create service file
+    sudo tee /etc/systemd/system/nodered.service > /dev/null << EOL
+[Unit]
+Description=Node-RED
+After=network.target
 
-    # Fix permissions
-    sudo chown -R "$SUDO_USER":"$SUDO_USER" /home/"$SUDO_USER"/.node-red
+[Service]
+ExecStart=/usr/bin/node-red --userDir /home/$SUDO_USER/.node-red
+Restart=on-failure
+User=$SUDO_USER
+Group=$SUDO_USER
+
+[Install]
+WantedBy=multi-user.target
+EOL
+    
+    # Enable and start Node-RED
+    sudo systemctl daemon-reload
+    sudo systemctl enable nodered
+    sudo systemctl start nodered
+    
+    echo "✓ Node-RED installed and configured"
 }
 
 ##############################################################################
@@ -568,47 +565,23 @@ EOL
 ##############################################################################
 install_influxdb() {
     echo "Installing InfluxDB..."
-    source "$ENV_FILE"
-    
-    # Stop and remove any existing installation
-    if systemctl is-active --quiet influxdb; then
-        sudo systemctl stop influxdb
-    fi
-    
-    # Add InfluxDB repository and key
-    curl -s https://repos.influxdata.com/influxdata-archive_compat.key \
-        | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.asc > /dev/null
-    echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.asc] https://repos.influxdata.com/debian stable main" \
-        | sudo tee /etc/apt/sources.list.d/influxdata.list
-    
-    # Update package list
-    sudo apt-get update || error_exit "Failed to update package list"
     
     # Install InfluxDB
-    sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
+    wget -q https://repos.influxdata.com/influxdata-archive_compat.key
+    echo '393e8779c89ac8d958f81f942f9ad7fb82a25e133faddaf92e15b16e6ac9ce4c influxdata-archive_compat.key' | sha256sum -c && cat influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
+    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main' | sudo tee /etc/apt/sources.list.d/influxdata.list
     
-    # Start service
-    echo "Starting InfluxDB service..."
-    sudo systemctl daemon-reload
+    sudo apt-get update && sudo apt-get install -y influxdb2
+    
+    # Start InfluxDB
     sudo systemctl enable influxdb
     sudo systemctl start influxdb
     
     # Wait for InfluxDB to be ready
-    echo "Waiting for InfluxDB to be ready..."
-    for i in {1..30}; do
-        if curl -s http://localhost:8086/health >/dev/null; then
-            echo "InfluxDB is responding to health checks."
-            break
-        fi
-        echo "Waiting for InfluxDB... ($i/30)"
-        sleep 2
-        if [ $i -eq 30 ]; then
-            journalctl -u influxdb --no-pager -n 50
-            error_exit "InfluxDB failed to respond to health checks" "rollback"
-        fi
-    done
+    echo "Waiting for InfluxDB to start..."
+    sleep 10
     
-    # Initialize InfluxDB
+    # Initialize InfluxDB (token already in ENV_FILE from generate_credentials)
     echo "Setting up InfluxDB..."
     influx setup \
         --username "$INFLUXDB_USERNAME" \
@@ -619,30 +592,19 @@ install_influxdb() {
         --token "$INFLUXDB_TOKEN" \
         --force 2>/dev/null || error_exit "Failed to initialize InfluxDB"
     
-    # Add verification step
-    if ! influx bucket list --org "$INFLUXDB_ORG" | grep -q "sensors"; then
-        error_exit "InfluxDB setup verification failed" "rollback"
-    fi
+    # Verify setup with increased timeout
+    max_attempts=30
+    attempt=1
+    while ! influx bucket list --org "$INFLUXDB_ORG" | grep -q "sensors"; do
+        if [ $attempt -ge $max_attempts ]; then
+            error_exit "InfluxDB setup verification failed after 30 attempts" "rollback"
+        fi
+        echo "Waiting for InfluxDB to be ready... (attempt $attempt/$max_attempts)"
+        sleep 2
+        ((attempt++))
+    done
     
-    # Create all-access token for Node-RED
-    NODERED_TOKEN=$(influx auth create \
-        --org "$INFLUXDB_ORG" \
-        --all-access \
-        --description "Node-RED Integration" \
-        --json | jq -r '.token')
-    
-    # Verify token was created
-    if [ -z "$NODERED_TOKEN" ]; then
-        error_exit "Failed to create Node-RED token" "rollback"
-    fi
-    
-    # Update credentials file with new token
-    sudo sed -i "s/Token: .*/Token: $NODERED_TOKEN/" "$CREDS_FILE"
-    
-    # Verify InfluxDB setup
-    verify_influxdb_setup "$INFLUXDB_ORG" "$INFLUXDB_USERNAME"
-    
-    echo "✓ InfluxDB installed and configured with user: $INFLUXDB_USERNAME"
+    echo "✓ InfluxDB installed and configured"
 }
 
 ##############################################################################
@@ -711,12 +673,12 @@ start_services() {
 # Checks each service port and then does a final systemctl is-active check.
 ##############################################################################
 verify_services() {
-    echo "Verifying services..."
+    echo "Verifying all services are running..."
     
     # Node-RED port check
     echo "Checking Node-RED on port 1880..."
     for i in {1..30}; do
-        if curl -s http://localhost:1880 >/dev/null; then
+        if curl -s http://localhost:1880/ >/dev/null; then
             echo "✓ Node-RED verified"
             break
         fi
@@ -731,7 +693,8 @@ verify_services() {
     echo "Checking InfluxDB on port 8086..."
     for i in {1..30}; do
         if curl -s http://localhost:8086/health >/dev/null; then
-            echo "✓ InfluxDB verified"
+            echo "✓ InfluxDB port verified"
+            verify_influxdb_setup "$INFLUXDB_ORG" "$INFLUXDB_USERNAME"
             break
         fi
         echo "Waiting for InfluxDB... ($i/30)"
@@ -836,7 +799,6 @@ print_completion() {
 # Checks if secure-pi.sh has been run
 ##############################################################################
 check_security_setup() {
-    # Check if secure-pi.sh has been run
     if ! id metsci-service >/dev/null 2>&1; then
         echo -e "${YELLOW}Warning: Security setup not detected. It's recommended to run secure-pi.sh first.${NC}"
         echo "Get it from: https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/scripts/secure-pi.sh"
@@ -848,6 +810,10 @@ check_security_setup() {
     else
         # Use metsci-service user if it exists
         SUDO_USER="metsci-service"
+        # Verify home directory exists
+        if [ ! -d "/home/$SUDO_USER" ]; then
+            error_exit "Home directory for $SUDO_USER does not exist"
+        fi
     fi
 }
 
@@ -880,78 +846,6 @@ verify_influxdb_setup() {
     }
     
     echo "✓ InfluxDB setup verified successfully"
-}
-
-##############################################################################
-# Function to setup Node-RED
-##############################################################################
-setup_nodered() {
-    echo "Setting up Node-RED..."
-    
-    # Create settings.js if it doesn't exist
-    if [ ! -f "$NODERED_SETTINGS" ]; then
-        mkdir -p "$(dirname "$NODERED_SETTINGS")"
-        cp /usr/lib/node_modules/node-red/settings.js "$NODERED_SETTINGS"
-    fi
-    
-    # Update Node-RED settings with InfluxDB credentials
-    cat >> "$NODERED_SETTINGS" << EOF
-    influxdb: {
-        url: 'http://localhost:8086',
-        token: '$NODERED_TOKEN',
-        org: '$INFLUXDB_ORG',
-        bucket: 'sensors'
-    },
-EOF
-    
-    # Verify Node-RED can start
-    if ! sudo systemctl start nodered; then
-        error_exit "Failed to start Node-RED" "rollback"
-    fi
-    
-    echo "✓ Node-RED configured successfully"
-}
-
-##############################################################################
-# Function to create and verify credentials file
-##############################################################################
-create_credentials_file() {
-    local creds_file="$1"
-    
-    # Create credentials file with proper permissions
-    touch "$creds_file"
-    chmod 600 "$creds_file"
-    
-    # Write credentials
-    cat > "$creds_file" << EOF
-MeteoScientific Dashboard Credentials
-====================================
-Generated on: $(date)
-
-Node-RED:
-Username: $NODERED_USERNAME
-Password: $NODERED_PASSWORD
-
-InfluxDB:
-Username: $INFLUXDB_USERNAME
-Password: $INFLUXDB_PASSWORD
-Organization: $INFLUXDB_ORG
-Bucket: sensors
-Token: $NODERED_TOKEN
-
-Grafana:
-Username: $GRAFANA_USERNAME
-Password: $GRAFANA_PASSWORD
-
-Save these credentials and delete this file!
-EOF
-    
-    # Verify file exists and has correct permissions
-    if [ ! -f "$creds_file" ] || [ "$(stat -c %a "$creds_file")" != "600" ]; then
-        error_exit "Failed to create credentials file with proper permissions" "rollback"
-    }
-    
-    echo "✓ Credentials file created successfully"
 }
 
 ##############################################################################
