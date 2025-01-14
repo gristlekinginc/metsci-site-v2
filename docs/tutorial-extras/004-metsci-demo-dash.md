@@ -433,7 +433,7 @@ Set the Application name to `Node-RED` and set the `Session Duration` to `24 hou
 
 ![Add a global application](/images/tutorial-extras/004-images/cloudflare-global-application.png)
 
-Click `Next` to proceed to the `Policies` section.  Here we'll set up a Policy rule that requires anything using this Application to have a valid token.
+Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  Here we'll set up a Policy rule that requires anything using this Application to have a valid token.
 
 Set the policy name to `Node-RED` and set the Action to `Service Auth`, leave the duration as is.
 
@@ -441,13 +441,15 @@ Scroll down a bit until you see `Configure rules`.  On the Selector choose `Any 
 
 ![Add a policy rule](/images/tutorial-extras/004-images/cloudflare-global-application-policy.png)
 
-Hit `Next` and scroll down to the bottom, then click `Add Application`.
+Hit `Next` and scroll down to the bottom of the next page (past `CORS`, `Cookies`, and `Additional Settings`), then click `Add Application`.
 
-#### - LDDS75 Application
+#### LDDS75 Application
 
-Now you'll create the LDDS75 Application.  Give  it a descriptive name like `ldds75`, leave the session duration at `24 hours` then enter the subdomain, domain, and path it'll use.
+Now you'll create the LDDS75 Application.  Hit the `Add Application`, then `Self Hosted` (just like last time), then give it a descriptive name like `ldds75`.  
 
-In this case, use `node-red.gristleking.dev/metsci-ldds75-data`.  We'll use that path later when we set up our Node-RED flow.
+Leave the session duration at `24 hours` then enter the subdomain, domain, and path it'll use.
+
+In this case, use `node-red`.`gristleking.dev`/`metsci-ldds75-data`.  We'll use that path later when we set up our Node-RED flow.
 
 ![Configure Zero Trust Appication](/images/tutorial-extras/004-images/cloudflare-configure-application-details.png)
 
