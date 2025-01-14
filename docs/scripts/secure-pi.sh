@@ -169,6 +169,9 @@ echo "Creating service user..."
 echo -e "${YELLOW}This creates a non-root user for running services${NC}"
 sudo useradd -m -s /bin/bash metsci-service
 sudo usermod -aG sudo metsci-service
+# Create .node-red directory with proper permissions
+sudo mkdir -p /home/metsci-service/.node-red
+sudo chown -R metsci-service:metsci-service /home/metsci-service/.node-red
 
 # 4. Set up fail2ban
 echo "Installing fail2ban..."
@@ -288,14 +291,14 @@ IP: $(hostname -I | awk '{print $1}')
 Completed Security Measures:
 - Secure SSH settings (no root login, strong passwords)
 - Basic firewall (UFW) with allowed ports:
-  * SSH: $SSH_PORT
+  * SSH: 22
   * Node-RED: $NODERED_PORT
   * InfluxDB: $INFLUXDB_PORT
   * Grafana: $GRAFANA_PORT
 - Automatic updates enabled
 - fail2ban installed and configured
 - Local network protection
-- System user 'metsci-service' created
+- System user 'metsci-service' created for dashboard
 
 Configuration Files Modified:
 - /etc/ssh/sshd_config.d/security.conf
@@ -387,3 +390,29 @@ main() {
     check_dashboard_version
     # ... rest of main function ...
 }
+
+# Add at the start after colors
+VERSION="1.0.0"
+MIN_DASHBOARD_VERSION="1.3.0"
+
+# Check if this is being run before dashboard install
+check_dashboard_version() {
+    if [ -f "/etc/metsci-dashboard/.env" ]; then
+        DASHBOARD_VERSION=$(grep "VERSION=" /etc/metsci-dashboard/.env | cut -d'"' -f2)
+        if [ -n "$DASHBOARD_VERSION" ] && [ "$DASHBOARD_VERSION" \< "$MIN_DASHBOARD_VERSION" ]; then
+            echo -e "${RED}Error: Incompatible dashboard version detected ($DASHBOARD_VERSION)${NC}"
+            echo "This security script requires dashboard version $MIN_DASHBOARD_VERSION or higher"
+            exit 1
+        fi
+    fi
+}
+
+# Add at start of script
+if [ -f "/etc/metsci-dashboard/.env" ]; then
+    echo -e "${YELLOW}Warning: Dashboard installation detected. Some security settings may be overwritten.${NC}"
+    read -p "Continue? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
