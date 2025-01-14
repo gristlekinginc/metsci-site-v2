@@ -39,11 +39,16 @@ echo "Removing configuration directories..."
 sudo rm -rf /etc/influxdb*
 sudo rm -rf /etc/grafana
 sudo rm -rf ~/.node-red
+sudo rm -rf /home/metsci-service/.node-red
 sudo rm -rf /etc/metsci-dashboard
 sudo rm -rf /var/lib/influxdb*
 sudo rm -rf /var/log/influxdb*
 sudo rm -rf ~/.influxdbv2
 sudo rm -rf /etc/default/influxdb*
+
+# Also add user cleanup
+echo "Removing service user..."
+sudo userdel -r metsci-service 2>/dev/null || true
 
 # 5. Clean up Node.js files
 echo "Cleaning Node.js files..."

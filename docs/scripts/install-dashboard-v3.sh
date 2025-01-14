@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.3.0"  
+VERSION="1.3.1"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -488,8 +488,11 @@ install_nodered() {
     # Create settings directory
     sudo mkdir -p /home/$SUDO_USER/.node-red
     
-    # Create settings.js with basic auth
-    cat > /home/$SUDO_USER/.node-red/settings.js << EOF
+    # Add bcrypt for password hashing
+    sudo npm install -g bcrypt
+
+    # Update the settings.js template to use hashed password
+    NODE_RED_SETTINGS=$(cat << 'EOL'
 module.exports = {
     uiPort: process.env.PORT || 1880,
     mqttReconnectTime: 15000,
@@ -497,12 +500,12 @@ module.exports = {
     debugMaxLength: 1000,
     functionGlobalContext: {},
     
-    // Basic auth for simplicity - protected by Cloudflare Zero Trust
     adminAuth: {
         type: "credentials",
         users: [{
-            username: "$NODERED_USERNAME",
-            password: "$NODERED_PASSWORD",
+            username: "${NODERED_USERNAME}",
+            // Password will be replaced with bcrypt hash
+            password: "${NODERED_PASSWORD_HASH}",
             permissions: "*"
         }]
     },
@@ -515,12 +518,12 @@ module.exports = {
     
     influxdb: {
         url: 'http://localhost:8086',
-        token: '$INFLUXDB_TOKEN',
-        org: '$INFLUXDB_ORG',
-        bucket: 'sensors'
+        token: '${INFLUXDB_TOKEN}',
+        org: '${INFLUXDB_ORG}',
+        bucket: '${INFLUXDB_BUCKET}'
     },
     
-    credentialSecret: false,
+    credentialSecret: "${CREDENTIAL_SECRET}",
     
     logging: {
         console: {
@@ -530,7 +533,17 @@ module.exports = {
         }
     }
 }
-EOF
+EOL
+)
+
+    # Hash the password
+    NODERED_PASSWORD_HASH=$(node -e "console.log(require('bcrypt').hashSync('${NODERED_PASSWORD}', 8))")
+
+    # Replace the placeholder with the hashed password
+    NODE_RED_SETTINGS=${NODE_RED_SETTINGS/\${NODERED_PASSWORD_HASH}/$NODERED_PASSWORD_HASH}
+
+    # Create settings.js with basic auth
+    echo "$NODE_RED_SETTINGS" > /home/$SUDO_USER/.node-red/settings.js
     
     # Set proper ownership
     sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
