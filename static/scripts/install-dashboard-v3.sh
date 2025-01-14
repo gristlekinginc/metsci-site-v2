@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.4.1"  
+VERSION="1.4.2"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -600,40 +600,65 @@ install_influxdb() {
 # Installs and configures Grafana.
 ##############################################################################
 install_grafana() {
+    show_progress "7" "Installing Grafana"
     echo "Installing Grafana..."
     
-    # Add repository and key
-    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/grafana.gpg
+    # Remove any existing Grafana installation
+    sudo systemctl stop grafana-server || true
+    sudo killall -9 grafana-server || true
+    sudo apt-get remove -y grafana || true
+    sudo rm -f /var/run/grafana-server.pid
+    sudo rm -f /run/grafana.pid
     
-    echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | \
-        sudo tee /etc/apt/sources.list.d/grafana.list > /dev/null
+    # Install Grafana
+    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/grafana.gpg
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
     
     sudo apt-get update
     sudo apt-get install -y grafana
     
-    # Create config directory if it doesn't exist
-    sudo mkdir -p /etc/grafana
-    
-    # Configure Grafana before starting
-    configure_grafana
-    
-    # Start Grafana
+    # Create proper systemd service file
+    sudo tee /etc/systemd/system/grafana-server.service << EOL
+[Unit]
+Description=Grafana instance
+Documentation=http://docs.grafana.org
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+User=grafana
+Group=grafana
+ExecStart=/usr/share/grafana/bin/grafana server \
+    --config=/etc/grafana/grafana.ini \
+    --pidfile=/var/run/grafana-server.pid
+LimitNOFILE=10000
+TimeoutStopSec=20
+Restart=always
+WorkingDirectory=/usr/share/grafana
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+    # Reload systemd and restart Grafana
     sudo systemctl daemon-reload
     sudo systemctl enable grafana-server
-    sudo systemctl start grafana-server
+    sudo systemctl restart grafana-server
     
-    # Wait for Grafana to be ready
+    # Wait for Grafana with better error handling
     echo "Waiting for Grafana to start..."
-    for i in {1..30}; do
-        if curl -s http://localhost:3000/api/health >/dev/null; then
+    for i in {1..45}; do
+        if curl -s http://localhost:3000/api/health | grep -q "ok"; then
             echo "✓ Grafana is responding"
             break
         fi
-        echo -n "."
-        sleep 2
-        if [ $i -eq 30 ]; then
-            error_exit "Grafana failed to start" rollback
+        echo "Waiting for Grafana... ($i/45)"
+        if ! systemctl is-active --quiet grafana-server; then
+            journalctl -u grafana-server --no-pager -n 50
+            error_exit "Grafana failed to start. See logs above."
         fi
+        sleep 2
     done
 }
 
