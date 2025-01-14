@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.5.0"  
+VERSION="1.5.1"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -449,8 +449,12 @@ install_nodered() {
     show_progress "5" "Installing Node-RED"
     echo "Installing Node-RED..."
     
-    # Use official Node-RED install script with automatic confirmation
-    bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) --confirm-install --confirm-pi || error_exit "Failed to install Node-RED"
+    # Use official Node-RED install script with all required flags
+    bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) \
+        --confirm-install \
+        --confirm-pi \
+        --nodered-user "$SUDO_USER" \
+        --confirm-root || error_exit "Failed to install Node-RED"
     
     # Enable and start the service
     sudo systemctl enable nodered.service
@@ -466,12 +470,12 @@ install_nodered() {
         sleep 2
     done
     
-    # Install InfluxDB nodes
-    echo "Installing InfluxDB integration..."
+    # Install InfluxDB nodes after Node-RED and InfluxDB are installed
+    echo "Installing InfluxDB nodes for Node-RED..."
     cd /home/$SUDO_USER/.node-red || error_exit "Failed to change directory"
     npm install node-red-contrib-influxdb || error_exit "Failed to install InfluxDB nodes"
     
-    # Create a basic flow connecting to InfluxDB
+    # Create default InfluxDB configuration node
     cat > /home/$SUDO_USER/.node-red/flows.json << EOL
 [
     {
@@ -689,8 +693,6 @@ Installation completed successfully!
    - Bucket: sensors
    - Token: ${INFLUXDB_TOKEN}
 
-Use @InfluxDBv2 @Grafana @Node-RED and @https://flows.nodered.org/node/node-red-contrib-influxdb for the installation of InfluxDB nodes in Node-RED.
-
 3. Grafana Credentials
    - Username: ${GRAFANA_USERNAME}
    - Password: ${GRAFANA_PASSWORD}
@@ -790,6 +792,55 @@ verify_influxdb_setup() {
 }
 
 ##############################################################################
+# print_install_summary
+# Displays installation summary and credentials
+##############################################################################
+print_install_summary() {
+    # Get IP address for display
+    PI_IP=$(hostname -I | awk '{print $1}')
+    
+    # Create summary in credentials file
+    cat > "${CREDS_FILE}" << EOL
+======= MeteoScientific Demo Dashboard ========
+
+Installation completed successfully!
+
+1. Node-RED Credentials
+   - Username: ${NODERED_USERNAME}
+   - Password: ${NODERED_PASSWORD}
+
+2. InfluxDB Credentials
+   - Username: ${INFLUXDB_USERNAME}
+   - Password: ${INFLUXDB_PASSWORD}
+   - Organization: ${INFLUXDB_ORG}
+   - Bucket: sensors
+   - Token: ${INFLUXDB_TOKEN}
+
+3. Grafana Credentials
+   - Username: ${GRAFANA_USERNAME}
+   - Password: ${GRAFANA_PASSWORD}
+
+⚠️  IMPORTANT: Save these credentials and delete the credentials file!
+   (${CREDS_FILE})
+
+Services are accessible at:
+   Node-RED: http://${PI_IP}:1880
+   InfluxDB: http://${PI_IP}:8086
+   Grafana:  http://${PI_IP}:3000
+
+For troubleshooting, check the log at: ${LOG_FILE}
+==============================================
+EOL
+
+    # Set proper permissions on credentials file
+    chmod 600 "${CREDS_FILE}"
+    chown "${SUDO_USER}:${SUDO_USER}" "${CREDS_FILE}"
+    
+    # Display the credentials
+    cat "${CREDS_FILE}"
+}
+
+##############################################################################
 # main
 # Orchestrates the entire install in a step-by-step fashion.
 ##############################################################################
@@ -828,6 +879,9 @@ main() {
     show_progress 9 "Starting and verifying services"
     start_services
     verify_services
+    
+    # Print the installation summary with all credentials
+    print_install_summary
     
     print_completion
 }

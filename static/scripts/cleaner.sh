@@ -7,31 +7,43 @@
 export TERM=linux
 stty columns 80 rows 24 2>/dev/null || true
 
+# Clear any existing formatting
+reset
+
+# Function to standardize output
+print_status() {
+    printf "%-70s" "$1"
+}
+
+print_result() {
+    printf "%s\n" "$2"
+}
+
 echo "Starting cleanup process..."
 
 # Add more aggressive process cleanup before the service stops
-echo "Forcefully stopping any remaining processes..."
+print_status "Forcefully stopping any remaining processes..."
 for process in "node-red" "influxd" "grafana-server"; do
     if pgrep -f "$process" > /dev/null; then
-        echo "Killing $process processes..."
-        sudo pkill -9 -f "$process" || true
+        sudo pkill -9 -f "$process" 2>/dev/null || true
     fi
 done
+print_result "" "done"
 
 # 1. Stop services first
-echo "Stopping services..."
+print_status "Stopping services..."
 for service in nodered influxdb grafana-server; do
+    print_status "Stopping $service..."
     sudo systemctl stop $service 2>/dev/null || true
     sudo systemctl disable $service 2>/dev/null || true
-    # Add force kill if service stop fails
     if systemctl is-active --quiet $service; then
         sudo killall -9 $service 2>/dev/null || true
     fi
-    echo "✓ $service stopped"
+    print_result "" "✓"
 done
 
 # 2. Remove repository sources early
-echo "Removing repository sources..."
+print_status "Removing repository sources..."
 sudo rm -f /etc/apt/sources.list.d/nodesource.list*
 sudo rm -f /etc/apt/sources.list.d/influxdata.list
 sudo rm -f /etc/apt/sources.list.d/grafana.list
@@ -40,27 +52,27 @@ sudo rm -f /usr/share/keyrings/grafana.gpg
 sudo apt-get update
 
 # Add to the repository cleanup section
-echo "Cleaning up repository keys..."
+print_status "Cleaning up repository keys..."
 sudo rm -f /home/$SUDO_USER/influxdata-archive_compat.key*
 sudo rm -f /etc/apt/keyrings/influxdata-archive-keyring.gpg
 
 # 3. Remove packages
-echo "Removing packages..."
+print_status "Removing packages..."
 for package in nodejs npm influxdb2 grafana grafana-enterprise; do
+    print_status "Checking package $package..."
     if dpkg -l | grep -q "^ii.*$package"; then
-        echo "Removing $package..."
-        sudo apt-get remove --purge -y $package 2>/dev/null || {
-            # If normal remove fails, try force remove
-            sudo dpkg --force-all -P $package 2>/dev/null || true
+        sudo apt-get remove --purge -y $package >/dev/null 2>&1 || {
+            sudo dpkg --force-all -P $package >/dev/null 2>&1 || true
         }
+        print_result "" "removed"
     else
-        echo "Package $package not installed, skipping..."
+        print_result "" "not installed"
     fi
 done
-sudo apt-get autoremove --purge -y 2>/dev/null || true
+sudo apt-get autoremove --purge -y >/dev/null 2>&1 || true
 
 # 4. Clean up configuration directories
-echo "Removing configuration directories..."
+print_status "Removing configuration directories..."
 sudo rm -rf /etc/influxdb*
 sudo rm -rf /etc/grafana
 sudo rm -rf ~/.node-red
@@ -72,11 +84,11 @@ sudo rm -rf ~/.influxdbv2
 sudo rm -rf /etc/default/influxdb*
 
 # Also add user cleanup
-echo "Removing service user..."
+print_status "Removing service user..."
 sudo userdel -r metsci-service 2>/dev/null || true
 
 # 5. Clean up Node.js files
-echo "Cleaning Node.js files..."
+print_status "Cleaning Node.js files..."
 npm_dirs=(
     "/usr/lib/node_modules"
     "/usr/local/lib/node_modules"
@@ -101,7 +113,7 @@ for dir in "${npm_dirs[@]}"; do
 done
 
 # 6. Clean up service files
-echo "Cleaning service files..."
+print_status "Cleaning service files..."
 for service in nodered influxdb influxd grafana-server; do
     sudo rm -f /etc/systemd/system/$service.service
     sudo rm -f /lib/systemd/system/$service.service
@@ -109,20 +121,20 @@ done
 sudo systemctl daemon-reload
 
 # 7. Now perform verification checks
-echo "Performing verification checks..."
+print_status "Performing verification checks..."
 
 # Check for remaining packages
-echo "Checking for remaining packages..."
+print_status "Checking for remaining packages..."
 for pkg in nodejs npm influxdb2 grafana grafana-enterprise; do
     if dpkg -l | grep -q "^ii.*$pkg"; then
-        echo "⚠️  Warning: Package still installed: $pkg"
+        printf "⚠️  Warning: Package still installed: %s\n" "$pkg"
     else
-        echo "✓ Package removed: $pkg"
+        printf "✓ Package removed: %s\n" "$pkg"
     fi
 done
 
 # Check for remaining service files
-echo "Checking service files..."
+print_status "Checking service files..."
 service_files=(
     "/etc/systemd/system/nodered.service"
     "/etc/systemd/system/influxdb.service"
@@ -138,7 +150,7 @@ for file in "${service_files[@]}"; do
 done
 
 # Check for running processes
-echo "Checking for running processes..."
+print_status "Checking for running processes..."
 processes=("node-red" "influxd" "grafana")
 for proc in "${processes[@]}"; do
     if pgrep -f "$proc" > /dev/null; then
@@ -149,7 +161,7 @@ for proc in "${processes[@]}"; do
 done
 
 # Check ports
-echo "Checking ports..."
+print_status "Checking ports..."
 for port in 1880 8086 3000; do
     if netstat -tuln | grep -q ":$port "; then
         echo "⚠️  Warning: Port $port is still in use"
