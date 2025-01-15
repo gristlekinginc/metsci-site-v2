@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.5.4"  
+VERSION="1.5.5"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo "Hardware Requirements:"
 echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
@@ -781,7 +781,7 @@ check_security_setup() {
     # Check for metsci-service user
     if ! id metsci-service >/dev/null 2>&1; then
         echo -e "${YELLOW}Warning: Security setup not detected${NC}"
-        echo "It's recommended to run secure-pi.sh first:"
+        echo "Please run secure-pi.sh first:"
         echo "curl -sSL meteoscientific.com/scripts/secure-pi.sh -o secure-pi.sh"
         echo "chmod +x secure-pi.sh && sudo ./secure-pi.sh"
         read -p "Continue anyway? (y/n) " -n 1 -r
@@ -790,12 +790,21 @@ check_security_setup() {
             exit 1
         fi
     else
-        # Use metsci-service user if it exists
-        SUDO_USER="metsci-service"
-        # Verify home directory exists
-        if [ ! -d "/home/$SUDO_USER" ]; then
-            error_exit "Home directory for $SUDO_USER does not exist"
+        # Verify the user is set up correctly
+        if ! groups metsci-service | grep -q sudo; then
+            error_exit "metsci-service user exists but is not in sudo group"
         fi
+        
+        # Verify Node-RED directory exists and has correct ownership
+        if [ ! -d "/home/metsci-service/.node-red" ]; then
+            error_exit "Node-RED directory for metsci-service not found"
+        fi
+        
+        if [ "$(stat -c '%U:%G' /home/metsci-service/.node-red)" != "metsci-service:metsci-service" ]; then
+            error_exit "Incorrect ownership on Node-RED directory"
+        fi
+        
+        echo "✓ Security setup verified"
     fi
 }
 
