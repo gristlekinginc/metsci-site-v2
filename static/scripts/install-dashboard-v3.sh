@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.5.5"  
+VERSION="1.5.6"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo "Hardware Requirements:"
 echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
@@ -123,16 +123,18 @@ install_prerequisites() {
 # Sets up Grafana security and configuration.
 ##############################################################################
 configure_grafana() {
-    echo "Configuring Grafana security..."
+    # Set proper permissions first
+    sudo chown -R grafana:grafana /etc/grafana
+    sudo chmod 640 /etc/grafana/grafana.ini
     
-    # Update Grafana configuration file
+    # Update Grafana configuration
     sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
 [security]
 admin_user = ${GRAFANA_USERNAME}
 admin_password = ${GRAFANA_PASSWORD}
-
-[auth]
-disable_login_form = false
+disable_gravatar = true
+cookie_secure = true
+strict_transport_security = true
 
 [auth.anonymous]
 enabled = true
@@ -140,16 +142,18 @@ org_role = Viewer
 
 [feature_toggles]
 publicDashboards = true
-EOL
 
-    sudo chown grafana:grafana /etc/grafana/grafana.ini
-    sudo chmod 640 /etc/grafana/grafana.ini
+[dashboards]
+versions_to_keep = 5
+
+[analytics]
+reporting_enabled = false
+
+[metrics]
+enabled = false
+EOL
     
-    # Restart Grafana to apply changes
     sudo systemctl restart grafana-server
-    sleep 10  # Give Grafana time to restart
-    
-    echo "✓ Grafana security configured"
 }
 
 ##############################################################################
@@ -249,36 +253,30 @@ install_nodejs_and_npm() {
 install_nodered() {
     show_progress "2" "Installing Node-RED"
     
-    # Download the Node-RED install script
-    echo "Downloading Node-RED installer..."
+    # First ensure build dependencies are present
+    sudo apt-get install -y build-essential git || error_exit "Failed to install build dependencies"
+    
+    # Download the official Pi install script (don't use process substitution)
     curl -fsSL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered \
         -o /tmp/nodered-install.sh || error_exit "Failed to download Node-RED installer"
     
-    # Make it executable
+    # Make executable and run with proper flags
     chmod +x /tmp/nodered-install.sh
+    sudo -u $REAL_USER /tmp/nodered-install.sh --confirm-install --confirm-pi \
+        --node-red-user metsci-service || error_exit "Failed to install Node-RED"
     
-    # Run the installer
-    sudo -u $SUDO_USER /tmp/nodered-install.sh --confirm-install --confirm-pi || \
-        error_exit "Failed to install Node-RED"
+    # Configure systemd service for metsci-service user
+    sudo sed -i 's/User=pi/User=metsci-service/' /lib/systemd/system/nodered.service
+    sudo sed -i 's/Group=pi/Group=metsci-service/' /lib/systemd/system/nodered.service
+    sudo sed -i 's/WorkingDirectory=\/home\/pi/WorkingDirectory=\/home\/metsci-service/' /lib/systemd/system/nodered.service
     
-    # Clean up
-    rm -f /tmp/nodered-install.sh
+    # Set memory limit
+    sudo sed -i 's/NODE_OPTIONS=.*/NODE_OPTIONS=--max-old-space-size=256/' /lib/systemd/system/nodered.service
     
-    # Enable and start the service
+    # Reload and restart
+    sudo systemctl daemon-reload
     sudo systemctl enable nodered.service
     sudo systemctl start nodered.service
-    
-    # Verify Node-RED is running
-    for i in {1..30}; do
-        if curl -s http://localhost:1880/ > /dev/null; then
-            echo "✓ Node-RED is running"
-            break
-        fi
-        if [ $i -eq 30 ]; then
-            error_exit "Node-RED failed to start"
-        fi
-        sleep 2
-    done
 }
 
 ##############################################################################
@@ -841,7 +839,7 @@ verify_influxdb_setup() {
 
 ##############################################################################
 # print_install_summary
-# Displays installation summary and credentials
+# Displays installation summary and saves credentials
 ##############################################################################
 print_install_summary() {
     # Get IP address for display
@@ -882,10 +880,46 @@ EOL
 
     # Set proper permissions on credentials file
     chmod 600 "${CREDS_FILE}"
-    chown "${SUDO_USER}:${SUDO_USER}" "${CREDS_FILE}"
+    chown "${REAL_USER}:${REAL_USER}" "${CREDS_FILE}"
     
     # Display the credentials
     cat "${CREDS_FILE}"
+}
+
+##############################################################################
+# configure_nodered_security
+# Configures Node-RED security
+##############################################################################
+configure_nodered_security() {
+    # Install node-red-admin for password hashing
+    sudo npm install -g node-red-admin
+    
+    # Generate hash properly
+    NODERED_HASH=$(node-red-admin hash-pw <<< "${NODERED_PASSWORD}" | tail -n1)
+    
+    # Configure settings.js with proper security
+    sudo tee /home/metsci-service/.node-red/settings.js > /dev/null << EOL
+module.exports = {
+    credentialSecret: "${NODERED_CRED_SECRET}",
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: "${NODERED_USERNAME}",
+            password: "${NODERED_HASH}",
+            permissions: "*"
+        }]
+    },
+    httpNodeAuth: {type: "none"},
+    httpStaticAuth: {type: "none"},
+    uiPort: 1880,
+    mqttReconnectTime: 15000,
+    serialReconnectTime: 15000,
+    debugMaxLength: 1000,
+    functionGlobalContext: {}
+}
+EOL
+    
+    sudo chown -R metsci-service:metsci-service /home/metsci-service/.node-red/
 }
 
 ##############################################################################
@@ -894,7 +928,7 @@ EOL
 ##############################################################################
 main() {
     # Version and requirements banner
-    echo "MeteoScientific Dashboard Installer v1.5.2"
+    echo "MeteoScientific Dashboard Installer v$VERSION"
     echo
     echo "Hardware Requirements:"
     echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
