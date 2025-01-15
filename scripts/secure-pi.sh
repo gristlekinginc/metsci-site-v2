@@ -15,7 +15,7 @@ exec 1> >(tee -a "$LOG_FILE") 2>&1
 #----------------------------------------------------------------------
 # Pre-Checks & Warnings
 #----------------------------------------------------------------------
-echo "MeteoScientific Pi Security Setup v1.2.2"
+echo "MeteoScientific Pi Security Setup v1.2.3"
 echo "This script prepares your Pi for secure dashboard installation"
 
 # Check if running as root
@@ -119,10 +119,34 @@ fi
 # Service User Setup
 #----------------------------------------------------------------------
 echo "Creating service user..."
+# Generate a secure random password
+METSCI_SERVICE_PASSWORD=$(openssl rand -base64 32)
+
+# Create user and set password non-interactively
 sudo useradd -m -s /bin/bash metsci-service
+echo "metsci-service:${METSCI_SERVICE_PASSWORD}" | sudo chpasswd
 sudo usermod -aG sudo metsci-service
+
+# Set up Node-RED directory and npm cache
 sudo mkdir -p /home/metsci-service/.node-red
+sudo mkdir -p /home/metsci-service/.npm
 sudo chown -R metsci-service:metsci-service /home/metsci-service/.node-red
+sudo chown -R metsci-service:metsci-service /home/metsci-service/.npm
+
+# Configure sudo access for metsci-service (specific permissions for Node-RED)
+sudo tee /etc/sudoers.d/metsci-nodered > /dev/null << EOL
+# Allow metsci-service to manage Node-RED service
+metsci-service ALL=(ALL) NOPASSWD: /usr/bin/npm
+metsci-service ALL=(ALL) NOPASSWD: /usr/bin/node
+metsci-service ALL=(ALL) NOPASSWD: /bin/systemctl start nodered
+metsci-service ALL=(ALL) NOPASSWD: /bin/systemctl stop nodered
+metsci-service ALL=(ALL) NOPASSWD: /bin/systemctl restart nodered
+metsci-service ALL=(ALL) NOPASSWD: /bin/systemctl status nodered
+metsci-service ALL=(ALL) NOPASSWD: /bin/systemctl enable nodered
+EOL
+
+# Set proper permissions on sudoers file
+sudo chmod 440 /etc/sudoers.d/metsci-nodered
 
 #----------------------------------------------------------------------
 # fail2ban Setup

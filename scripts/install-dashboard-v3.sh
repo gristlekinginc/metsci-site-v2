@@ -13,7 +13,7 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 # Version
-VERSION="1.6.0"
+VERSION="1.6.1"
 
 # File paths
 CREDS_FILE="/home/$SUDO_USER/metsci-credentials.txt"
@@ -238,43 +238,66 @@ install_nodejs_and_npm() {
 }
 
 install_nodered() {
-    echo "Installing Node-RED using the official script..."
-    
-    # Source environment file
+    echo "Installing Node-RED..."
     source "$ENV_FILE" || error_exit "Failed to source environment file"
     
     # Clean up any old installations
     sudo apt-get remove -y nodered || true
     sudo apt-get autoremove -y
     
-    # Download official script as metsci-service
-    sudo -u metsci-service curl -sL \
-        https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered \
-        -o /home/metsci-service/update-nodejs-and-nodered.sh || error_exit "Failed to download Node-RED installer"
+    # Install Node-RED and required packages globally
+    sudo npm install -g --unsafe-perm node-red bcryptjs || error_exit "Failed to install Node-RED"
     
-    # Make it executable
-    sudo chmod +x /home/metsci-service/update-nodejs-and-nodered.sh
-    
-    # Run official installer with correct parameters
-    sudo -u metsci-service /home/metsci-service/update-nodejs-and-nodered.sh \
-        --confirm-install \
-        --confirm-pi \
-        --confirm-root || error_exit "Failed to install Node-RED"
-    
-    # Modify service file to use metsci-service user
-    sudo sed -i 's/User=pi/User=metsci-service/' /lib/systemd/system/nodered.service
-    
-    # Update working directory in service file
-    sudo sed -i 's|WorkingDirectory=/home/pi|WorkingDirectory=/home/metsci-service|' /lib/systemd/system/nodered.service
-    
-    # Reload systemd to pick up changes
-    sudo systemctl daemon-reload
-    
-    # Create Node-RED directory if it doesn't exist
+    # Create Node-RED service file
+    sudo tee /lib/systemd/system/nodered.service > /dev/null << EOL
+[Unit]
+Description=Node-RED
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/bin/node-red
+Restart=on-failure
+KillSignal=SIGINT
+User=metsci-service
+Group=metsci-service
+WorkingDirectory=/home/metsci-service
+Environment=NODE_RED_OPTIONS=
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+    # Set up Node-RED directory and permissions
     sudo mkdir -p /home/metsci-service/.node-red
+    cd /home/metsci-service/.node-red || error_exit "Failed to access Node-RED directory"
+    
+    # Install required nodes as metsci-service
+    sudo -u metsci-service npm install bcryptjs node-red-contrib-influxdb || error_exit "Failed to install required nodes"
+    
+    # Configure settings.js with authentication
+    sudo tee /home/metsci-service/.node-red/settings.js > /dev/null << EOL
+module.exports = {
+    credentialSecret: "$(openssl rand -hex 32)",
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: "${NODERED_USERNAME}",
+            password: "$(echo "${NODERED_PASSWORD}" | node -e 'console.log(require("bcryptjs").hashSync(require("fs").readFileSync(0, "utf-8").trim(), 8))')",
+            permissions: "*"
+        }]
+    },
+    uiPort: 1880,
+    flowFile: 'flows.json',
+    flowFilePretty: true,
+    httpAdminRoot: '/'
+}
+EOL
+
+    # Set proper ownership
     sudo chown -R metsci-service:metsci-service /home/metsci-service/.node-red
     
-    # Enable and start service
+    # Enable and start Node-RED
+    sudo systemctl daemon-reload
     sudo systemctl enable nodered.service
     sudo systemctl start nodered.service
     
@@ -292,77 +315,6 @@ install_nodered() {
     done
     
     echo "✓ Node-RED installed successfully"
-    
-    # Configure settings
-    configure_nodered_settings
-}
-
-configure_nodered_settings() {
-    echo "Configuring Node-RED settings..."
-    
-    # Generate password hash
-    NODERED_HASH=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8))" "$NODERED_PASSWORD")
-    
-    # Create settings.js with our configuration
-    sudo -u metsci-service tee /home/metsci-service/.node-red/settings.js >/dev/null <<EOL
-module.exports = {
-    uiPort: process.env.PORT || 1880,
-    adminAuth: {
-        type: "credentials",
-        users: [{
-            username: "${NODERED_USERNAME}",
-            password: "${NODERED_HASH}",
-            permissions: "*"
-        }]
-    },
-    flowFile: 'flows.json',
-    credentialSecret: "$(openssl rand -base64 24)",
-    editorTheme: {
-        projects: { enabled: false }
-    },
-    
-    // InfluxDB connection
-    influxdb: {
-        version: 2,
-        url: "http://localhost:8086",
-        token: "${INFLUXDB_TOKEN}",
-        org: "${INFLUXDB_ORG}",
-        bucket: "sensors"
-    },
-    
-    // Runtime settings
-    functionGlobalContext: { },
-    
-    // Node settings
-    nodeMessageBufferMaxLength: 2000,
-    
-    // Logging settings
-    logging: {
-        console: {
-            level: "info",
-            metrics: false,
-            audit: false
-        }
-    }
-}
-EOL
-
-    # Set proper permissions
-    sudo chown metsci-service:metsci-service /home/metsci-service/.node-red/settings.js
-    sudo chmod 640 /home/metsci-service/.node-red/settings.js
-    
-    # Restart Node-RED to apply settings
-    sudo systemctl restart nodered.service
-    
-    # Verify restart
-    for i in {1..20}; do
-        if curl -s http://localhost:1880/ > /dev/null; then
-            echo "✓ Node-RED restarted with new configuration"
-            return
-        fi
-        sleep 2
-    done
-    error_exit "Node-RED failed to start after configuration"
 }
 
 install_influxdb() {
