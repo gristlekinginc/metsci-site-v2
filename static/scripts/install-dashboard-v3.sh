@@ -389,6 +389,9 @@ install_grafana() {
         error_exit "Failed to install Grafana" "rollback"
     }
     
+    # Remove any existing database to ensure clean first run
+    sudo rm -f /var/lib/grafana/grafana.db
+    
     # Configure Grafana
     sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
 [security]
@@ -397,6 +400,7 @@ admin_password = ${GRAFANA_PASSWORD}
 disable_gravatar = true
 cookie_secure = true
 strict_transport_security = true
+allow_sign_up = false
 
 [auth.anonymous]
 enabled = true
@@ -457,6 +461,17 @@ EOL
             error_exit "Grafana failed to start" "rollback"
         fi
     done
+
+    # Verify admin user was created correctly
+    if ! curl -s -f -u "${GRAFANA_USERNAME}:${GRAFANA_PASSWORD}" http://localhost:3000/api/user > /dev/null; then
+        # If login fails, create the admin user explicitly
+        echo "Initial admin user not created properly, creating manually..."
+        sudo grafana-cli admin user create \
+            --login "${GRAFANA_USERNAME}" \
+            --password "${GRAFANA_PASSWORD}" \
+            --email "${GRAFANA_USERNAME}@local.host" \
+            --role Admin || error_exit "Failed to create admin user" "rollback"
+    fi
     
     echo "✓ Grafana installed and configured with user: $GRAFANA_USERNAME"
 }

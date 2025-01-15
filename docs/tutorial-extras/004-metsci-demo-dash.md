@@ -560,7 +560,9 @@ Let me show you the whole "flow" first, it'll help you understand how it works.
 
 ![Node-RED flow](/images/tutorial-extras/004-images/node-red-full-flow.png)
 
-1. We'll start with an **HTTP In** node, labeled on the image above as `MetSci LDDS75 Input`.  Think of it as the greeter at Wal-Mart.  "Hey, how you doing, are you decent and sober? Come on in!" 
+#### 1. HTTP In
+
+We'll start with an **HTTP In** node, labeled on the image above as `MetSci LDDS75 Input`.  Think of it as the greeter at Wal-Mart.  "Hey, how you doing, are you decent and sober? Come on in!" 
 
 To add a node, you find it in the left menu bar, or just start typing in the name of the node at the top.  Once you see it, drag it onto the workspace. 
 
@@ -574,7 +576,9 @@ Once you've dragged a node in, double click it to configure it.  For the HTTP In
 
 ![Configuring the HTTP In node](/images/tutorial-extras/004-images/node-red-configure-http-in-ldds75.png)
 
-2. Next we'll add in a **https response** node.  This node will let the tunnel know everything is working and follow the best practices of always responding to http requests.  It's like when someone says "Hi" to you in the street; just say "Hi" back.
+#### 2. HTTPS Response
+
+Next we'll add in a **https response** node.  This node will let the tunnel know everything is working and follow the best practices of always responding to http requests.  It's like when someone says "Hi" to you in the street; just say "Hi" back.
 
 ![Adding an https response node](/images/tutorial-extras/004-images/node-red-http-response-node.png)
 
@@ -582,7 +586,9 @@ Just make sure you name it; leave everything else blank.
 
 With two nodes in the workspace, you can start connecting 'em.  Drag a "wire" from the grey dot on the right side of the HTTP In node to the grey dot on the left side of the HTTPS Response node.
 
-3. Now we'll add and configure a **JSON** node.  JSON nodes standardize the incoming data, parse errors, and make sure the next node in the flow gets the right data.
+#### 3. JSON
+
+Now we'll add and configure a **JSON** node.  JSON nodes standardize the incoming data, parse errors, and make sure the next node in the flow gets the right data.
 
    - Search for `json` and add it to your workspace
    - Double-click to configure:
@@ -595,7 +601,9 @@ This ensures our data is in the right format for processing, whether it comes fr
 
 Now drag a wire from the **HTTP IN** node to the **Parse JSON** node. At this point, you'll have a wire from the `HTTP In` node to the `Parse JSON` node, and a wire from the `Parse JSON` node to the `HTTPS Response` node.
 
-3. Next we'll add a **Switch** node to route the data to the correct sensor function.
+#### 4. Switch
+
+Next we'll add a **Switch** node to route the data to the correct sensor function.
    - Search for `switch` and add it to your workspace
    - Double-click to configure:
      - Name: `Route by Device Type`
@@ -618,7 +626,9 @@ If the incoming message contains "LDDS75", it goes to output 1, if it contains "
 
 Wire the `Parse JSON` node to the `Switch` node.  
 
-4. Add a **Function** node for the LDDS75.  Function nodes are what allow us to correctly setup the data for insertion into InfluxDB.  A JSON node cleans up the data, the Switch node routes it to the correct sensor function, and a Function node formats it for InfluxDB.
+#### 5. Function
+
+Add a **Function** node for the LDDS75.  Function nodes are what allow us to correctly setup the data for insertion into InfluxDB.  A JSON node cleans up the data, the Switch node routes it to the correct sensor function, and a Function node formats it for InfluxDB.
 
 Search for a `function` node and add it to your workspace.  
     - Double-click to configure:
@@ -637,34 +647,63 @@ try {
     msg.payload = [
         // Fields object (numeric measurements)
         {
+            // Sensor data
             distance: parseInt(originalPayload.object?.distance || 0),
             battery: parseFloat(originalPayload.object?.battery_voltage || 0),
             temperature: parseFloat(originalPayload.object?.temperature || 0),
+            
+            // RF metrics
             rssi: parseInt(gateway.rssi || 0),
             snr: parseFloat(gateway.snr || 0),
             frequency: parseInt(originalPayload.txInfo?.frequency || 0),
-            spreading_factor: parseInt(originalPayload.dr || 0), // Using DR instead of SF
+            spreading_factor: parseInt(originalPayload.dr || 0),
+            
+            // Status flags
             sensor_status: Boolean(originalPayload.object?.sensor_status),
-            interrupt_status: Boolean(originalPayload.object?.interrupt_status)
+            interrupt_status: Boolean(originalPayload.object?.interrupt_status),
+            
+            // Frame counter and port
+            frame_counter: parseInt(originalPayload.fCnt || 0),
+            port: parseInt(originalPayload.fPort || 0),
+            
+            // ADR status
+            adr_enabled: Boolean(originalPayload.adr),
+            
+            // Bandwidth
+            bandwidth: parseInt(originalPayload.txInfo?.modulation?.lora?.bandwidth || 0)
         },
         // Tags object (metadata for filtering and grouping)
         {
+            // Device info
             device: String(originalPayload.deviceInfo?.deviceName || ""),
             device_eui: String(originalPayload.deviceInfo?.devEui || ""),
+            device_addr: String(originalPayload.devAddr || ""),
+            device_class: String(originalPayload.deviceInfo?.deviceClassEnabled || ""),
+            device_profile: String(originalPayload.deviceInfo?.deviceProfileName || ""),
+            
+            // Application info
             application: String(originalPayload.deviceInfo?.applicationName || ""),
-            gateway: String(gateway.metadata?.gateway_id || ""),
+            application_id: String(originalPayload.deviceInfo?.applicationId || ""),
+            
+            // Gateway info
+            gateway: String(gateway.metadata?.gateway_name || ""),
             gateway_id: String(gateway.gatewayId || ""),
+            gateway_hash: String(gateway.metadata?.gateway_id || ""),
+            
+            // Network info
             region: String(gateway.metadata?.region_common_name || ""),
-            network: String(gateway.metadata?.network || "")
+            network: String(gateway.metadata?.network || ""),
+            tenant: String(originalPayload.deviceInfo?.tenantName || ""),
+            tenant_id: String(originalPayload.deviceInfo?.tenantId || "")
         }
     ];
     
     // Set measurement name for MetSci LDDS75 sensors
     msg.measurement = "ldds75_metsci";
     
-    // Add timestamp if not present
+    // Add timestamp if not present (convert to nanoseconds for InfluxDB)
     if (!msg.payload[0].timestamp) {
-        msg.payload[0].timestamp = new Date(originalPayload.time).getTime() * 1000000; // Convert to nanoseconds for InfluxDB
+        msg.payload[0].timestamp = new Date(originalPayload.time).getTime() * 1000000;
     }
     
     // Log the attempt for debugging
@@ -675,7 +714,6 @@ try {
 } catch(err) {
     node.error("LDDS75 Processing Error: " + err.message);
     node.error("Failed payload: " + JSON.stringify(msg.payload, null, 2));
-    // Add status node indication
     node.status({fill:"red", shape:"dot", text:"Processing Error"});
     return null;
 }
@@ -683,43 +721,50 @@ try {
 
 Make sure you drag the wire from the correct connector on the Switch node (the top one, but you can hover over the node to see which connector is which) to the next node in the flow.  In this case, that'll be our LDDS75 Function node.
 
-5. Add an **InfluxDB out** node to the Function node to store the data in InfluxDB.
+#### 6. InfluxDB out
+
+Add an **InfluxDB out** node to the Function node to store the data in InfluxDB.
     - Double-click the node to configure it.
     - Name the node `Local InfluxDB`
     - Click the `+` icon next to the "Server" field to create a new InfluxDB server configuration
-    - Fill in the configuration:
+    - Fill in the InfluxDB server properties:
    ```
-   Name: Local InfluxDB
+   Name: [your org name, copy this from your credentials file]
    Version: 2.0
    URL: http://localhost:8086
    Token: [paste in your InfluxDB token from your credentials file]
+   Leave other settings as is
    ```
     - `Add` to save the server configuration
-    - Now, in the InfluxDB Out node configuration:
+   
+   Now, in the InfluxDB Out node configuration:
     ```
-    Organization: [your org name, copy this from your credentials file]
-    Bucket: sensors [also in the credentials file]
-    Measurement: [leave blank]
-    Time precision: `Nanoseconds` 
+   Name: Local InfluxDB
+   Server: [should be the server you just set up]
+   Organization: [your org name, copy this from your credentials file]
+   Bucket: sensors [also in the credentials file]
+   Measurement: [leave blank]
+   Time precision: `Nanoseconds` 
      ```
 
 ![Configuring the InfluxDB out node](/images/tutorial-extras/004-images/node-red-influxdb-out-node-configure.png)
  
- Click `Done` to save the node.
-
-7. If you haven't already, connect the nodes by dragging a wire from one node to the other.
-   - MetSci LDDS75 Input → Parse JSON → Switch → LDDS75 Function → InfluxDB out
+ Click `Done` to save the node, then click `Deploy` in the top-right.
 
 ![Connecting the nodes](/images/tutorial-extras/004-images/node-red-ldds-basic-flow-no-debug.png)
 
-8. Now, the pro move here is to add in Debug nodes.  It's not required, but it's what I've done.  Add a Debug node to every one our regular nodes. That way we'll see what's going through the whole flow the next time we have a packet come through.
+#### 7. Debug
+
+Now, the pro move here is to add in Debug nodes.  It's not required, but it's what I've done.  Add a Debug node to every one our regular nodes. That way we'll see what's going through the whole flow the next time we have a packet come through.
 
 For all of those:
 ```
 - Set Output to `msg.payload`
 - Name it something descriptive
 ```
-9. Deploy and test:
+
+#### 8. Deploy and test
+
 With your flow set up, click `Deploy` in the top-right. 
 
 ![Deploying the flow](/images/tutorial-extras/004-images/node-red-flow-with-debug-deploy.png)
@@ -743,7 +788,9 @@ This modular structure makes it easy to add more sensors later. You can see I've
 
 ### B. InfluxDB Check
 
-Let's check our InfluxDB to see if the data made it there.  Go to `http://your-pi:8086` and sign in with the credentials from your installation.  Then go to `Data Explorer` and run a query for `ldds75` by pasting in the query below and hitting "Submit".  Hit the `View Raw Data` button (not circled in the image).  You should see your data there.
+Let's check our InfluxDB to see if the data made it there.  Go to `http://your-pi:8086` and sign in with the credentials from your installation.  
+
+Go to `Data Explorer` (the graphy icon on the left menu) and run a query for `ldds75` by pasting in the query below and hitting "Submit".  Hit the `View Raw Data` button (not circled in the image).  You should see your data there.
 
 ![InfluxDB query](/images/tutorial-extras/004-images/influxdb-data-explorer.png)
 
@@ -753,21 +800,21 @@ Here are two script queries you can run to see the data.  First, let's check dis
 from(bucket: "sensors")
   |> range(start: -24h)
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
-  |> filter(fn: (r) => r["device"] == "LDDS 2")
+  |> filter(fn: (r) => r["device"] == "LDDS 3 [your device name]")
   |> filter(fn: (r) => r["_field"] == "distance")
 ```
 
-Here's a more complex query to see specific data from our device, including the gateway and region as well as the distance and RSSI fields.
+Here's a more complex query to see specific data from our device, including the gateway and region as well as the distance and RSSI fields.  Make sure to fill in the gateway and region with your own values.
 ```sql
 from(bucket: "sensors")
   |> range(start: -24h)
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
-  |> filter(fn: (r) => r["gateway"] == "sweet-sage-pike")
-  |> filter(fn: (r) => r["region"] == "US915")
+  |> filter(fn: (r) => r["gateway"] == "giant-swollen-rhino" [YOUR LOCAL GATEWAY NAME]")
+  |> filter(fn: (r) => r["region"] == "US915" [YOUR REGION])
   |> filter(fn: (r) => r["_field"] == "distance" or r["_field"] == "rssi")
 ```
 :::tip
-This is a fairly simple setup, but you may still have problems.  We're nerds, things never work right the first time, and that's OK.  By far the fastest way to debug on your own is to feed in messages from InfluxDB, Node-RED debug, and drop screenshots into ChatGPT.  
+This is a fairly simple setup, but you may still have problems.  We're nerds, usually don't work right the first time, and that's OK.  By far the fastest way to debug on your own is to feed in messages from Node-RED debug and InfluxDB,  and drop screenshots into ChatGPT/Cursor/Grok etc.  
 :::
 
 ### C. Grafana Dashboards
@@ -906,7 +953,12 @@ Using the steps above, I've added in a Milesight AM319, including a route, polic
 
 Just so you could see some real change,I closed up all the windows & doors in my office and did burpees until the CO2 went up.  You can also see where we dropped a couple of packets.  The AM319 fires a huge packet every minute, so it's easy to see where the packets are dropped.
 
-So...YOU can see this data on your local network, but how do you share it with Mom so she can worry about the rising CO2 levels in your office? 
+:::tip Download My Node-RED Flow
+Want to skip the manual setup? You can download the complete LDDS75 flow [here](/flows/MetSci-LDDS75-flow.json) and import it directly into Node-RED. Just remember to:
+1. Configure your InfluxDB credentials
+2. Update any device-specific information
+3. Deploy the flow after importing
+:::
 
 ---
 
