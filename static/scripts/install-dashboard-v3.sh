@@ -1,6 +1,9 @@
 #!/bin/bash
 # This script is designed to be run on a Raspberry Pi with a fresh install of Raspberry Pi OS Lite (64-bit).
-# It will install Node-RED, InfluxDB, and Grafana, and configure them to work together.
+# It will install Node-RED, InfluxDB, and Grafana, and configure them to work together for a non-technical user.
+# This includes installing the InfluxDB nodes for Node-RED, and configuring Grafana to use the InfluxDB database.
+# At the end, the script should print out all the credentials for the user as well as saving them to a local file.
+# Prior to running this script, a "secure-pi.sh" script should be run to harden the Pi and prepare it for the dashboard.
 # Use at your own risk, and be ready to wipe your Pi and start over if it doesn't work. Yeehaw!
 
 #----------------------------------------------------------------------
@@ -13,7 +16,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.5.1"  
+VERSION="1.5.2"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -214,144 +217,68 @@ EOL
 
 ##############################################################################
 # generate_credentials
-# Asks for org/usernames, generates random passwords, writes them to .env and
-# a local credentials file for reference.
+# Generates secure credentials for all services
 ##############################################################################
 generate_credentials() {
+    show_progress "2" "Generating credentials"
     echo "Generating secure credentials..."
     
-    # Ask for organization name
-    DEFAULT_ORG="Your Org"
+    # Prompt for organization name
     echo "What is your organization name? This will be used in Grafana and InfluxDB."
-    echo "The default is '${DEFAULT_ORG}'"
+    echo "The default is 'Your Org'"
     read -p "Do you need to change it? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        read -p "Enter your organization name (letters, numbers, and dashes only): " INFLUXDB_ORG
-        # Remove spaces & special chars, convert to lowercase
-        INFLUXDB_ORG=$(echo "$INFLUXDB_ORG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
-        if [ -z "$INFLUXDB_ORG" ]; then
-            INFLUXDB_ORG=$DEFAULT_ORG
-            echo "Using default organization: $DEFAULT_ORG"
-        fi
+        read -p "Enter your organization name (letters, numbers, and dashes only): " ORG_INPUT
+        INFLUXDB_ORG=$(echo "$ORG_INPUT" | sed 's/[^a-zA-Z0-9-]/-/g')
     else
-        INFLUXDB_ORG=$DEFAULT_ORG
+        INFLUXDB_ORG="Your Org"
     fi
     
-    # Helper function to pick random name from array
-    get_random_name() {
-        local arr=("$@")
-        echo "${arr[RANDOM % ${#arr[@]}]}"
-    }
+    # Random username generation from arrays
+    NODERED_NAMES=("neo" "morpheus" "trinity" "tank" "dozer" "apoc" "switch" "cypher")
+    INFLUXDB_NAMES=("ewok" "wookie" "jedi" "padawan" "rebel" "pilot" "trooper" "droid")
+    GRAFANA_NAMES=("stilgar" "paul" "leto" "gurney" "duncan" "thufir" "jessica" "chani")
     
-    # Generate default usernames
-    DEFAULT_NODERED_USER=$(get_random_name "${NODERED_NAMES[@]}")
-    DEFAULT_INFLUXDB_USER=$(get_random_name "${INFLUXDB_NAMES[@]}")
-    DEFAULT_GRAFANA_USER=$(get_random_name "${GRAFANA_NAMES[@]}")
-    
-    # Node-RED username
-    echo "The default username for Node-RED is '${DEFAULT_NODERED_USER}'"
+    # Generate random usernames
+    NODERED_USERNAME=${NODERED_NAMES[$RANDOM % ${#NODERED_NAMES[@]}]}
+    echo "The default username for Node-RED is '${NODERED_USERNAME}'"
     read -p "Is this username OK? (y/n) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        while true; do
-            read -p "Enter new Node-RED username (anything but 'admin'): " NODERED_USERNAME
-            if [ "$NODERED_USERNAME" != "admin" ]; then
-                break
-            else
-                echo "Please choose a different username."
-            fi
-        done
-    else
-        NODERED_USERNAME=$DEFAULT_NODERED_USER
+        read -p "Enter your preferred username for Node-RED: " NODERED_USERNAME
     fi
     
-    # InfluxDB username
-    echo "The default username for InfluxDB is '${DEFAULT_INFLUXDB_USER}'"
+    INFLUXDB_USERNAME=${INFLUXDB_NAMES[$RANDOM % ${#INFLUXDB_NAMES[@]}]}
+    echo "The default username for InfluxDB is '${INFLUXDB_USERNAME}'"
     read -p "Is this username OK? (y/n) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        while true; do
-            read -p "Enter new InfluxDB username (anything but 'admin'): " INFLUXDB_USERNAME
-            if [ "$INFLUXDB_USERNAME" != "admin" ]; then
-                break
-            else
-                echo "Please choose a different username."
-            fi
-        done
-    else
-        INFLUXDB_USERNAME=$DEFAULT_INFLUXDB_USER
+        read -p "Enter your preferred username for InfluxDB: " INFLUXDB_USERNAME
     fi
     
-    # Grafana username
-    echo "The default username for Grafana is '${DEFAULT_GRAFANA_USER}'"
+    GRAFANA_USERNAME=${GRAFANA_NAMES[$RANDOM % ${#GRAFANA_NAMES[@]}]}
+    echo "The default username for Grafana is '${GRAFANA_USERNAME}'"
     read -p "Is this username OK? (y/n) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        while true; do
-            read -p "Enter new Grafana username (anything but 'admin'): " GRAFANA_USERNAME
-            if [ "$GRAFANA_USERNAME" != "admin" ]; then
-                break
-            else
-                echo "Please choose a different username."
-            fi
-        done
-    else
-        GRAFANA_USERNAME=$DEFAULT_GRAFANA_USER
+        read -p "Enter your preferred username for Grafana: " GRAFANA_USERNAME
     fi
     
-    # Generate random passwords
-    NODERED_PASSWORD=$(openssl rand -base64 24)
-    INFLUXDB_PASSWORD=$(openssl rand -base64 24)
-    GRAFANA_PASSWORD=$(openssl rand -base64 24)
+    # Generate secure passwords and tokens
+    NODERED_PASSWORD=$(openssl rand -base64 32)
+    
+    # Install node-red-admin and generate hash
+    if ! command -v node-red-admin > /dev/null; then
+        sudo npm install -g node-red-admin
+    fi
+    NODERED_HASH=$(node-red-admin hash-pw <<< "${NODERED_PASSWORD}" | tail -n1)
+    
+    INFLUXDB_PASSWORD=$(openssl rand -base64 32)
     INFLUXDB_TOKEN=$(openssl rand -base64 32)
+    GRAFANA_PASSWORD=$(openssl rand -base64 32)
     
-    # Write to local credentials file
-    cat > "$CREDS_FILE" << EOL
-MeteoScientific Dashboard Credentials
-====================================
-Generated on: $(date)
-
-Node-RED:
-Username: $NODERED_USERNAME
-Password: $NODERED_PASSWORD
-
-InfluxDB:
-Username: $INFLUXDB_USERNAME
-Password: $INFLUXDB_PASSWORD
-Organization: $INFLUXDB_ORG
-Bucket: sensors
-Token: $INFLUXDB_TOKEN
-
-Grafana:
-Username: $GRAFANA_USERNAME
-Password: $GRAFANA_PASSWORD
-
-Save these credentials and delete this file!
-EOL
-
-    # Write to environment file
-    sudo mkdir -p /etc/metsci-dashboard
-    sudo chmod 700 /etc/metsci-dashboard
-    
-    sudo tee "$ENV_FILE" > /dev/null << EOL
-# MeteoScientific Dashboard Environment
-NODERED_USERNAME=$NODERED_USERNAME
-NODERED_PASSWORD=$NODERED_PASSWORD
-INFLUXDB_USERNAME=$INFLUXDB_USERNAME
-INFLUXDB_PASSWORD=$INFLUXDB_PASSWORD
-INFLUXDB_TOKEN=$INFLUXDB_TOKEN
-INFLUXDB_ORG=$INFLUXDB_ORG
-INFLUXDB_BUCKET=sensors
-GRAFANA_USERNAME=$GRAFANA_USERNAME
-GRAFANA_PASSWORD=$GRAFANA_PASSWORD
-EOL
-
-    sudo chmod 600 "$ENV_FILE"
-    sudo chown root:root "$ENV_FILE"
-
     echo "✓ Credentials generated and stored"
-    print_install_summary
 }
 
 ##############################################################################
@@ -417,111 +344,109 @@ check_requirements() {
 }
 
 ##############################################################################
+# system_prep
+# Updates system and installs prerequisites
+##############################################################################
+system_prep() {
+    show_progress "1" "Updating system"
+    echo "Updating system packages..."
+    
+    # Update package lists and upgrade existing packages
+    sudo apt-get update && sudo apt-get upgrade -y || error_exit "System update failed"
+    
+    echo "Installing prerequisites..."
+    sudo apt-get install -y \
+        curl \
+        jq \
+        gnupg \
+        apt-transport-https \
+        ca-certificates \
+        build-essential \
+        git || error_exit "Failed to install prerequisites"
+        
+    echo "✓ System prepared"
+}
+
+##############################################################################
 # install_nodejs
-# Installs Node.js (v20.x) via NodeSource, cleans up partial installs first.
+# Installs Node.js from NodeSource
 ##############################################################################
 install_nodejs() {
-    show_progress "4" "Installing Node.js"
+    show_progress "2" "Installing Node.js"
     echo "Installing Node.js..."
     
-    # Clean up any failed installations (from v1)
-    sudo apt-get remove -y nodejs npm || true
-    sudo apt-get autoremove -y
-    sudo rm -rf /etc/apt/sources.list.d/nodesource.list*
+    # Add NodeSource repository
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || \
+        error_exit "Failed to add NodeSource repository"
     
-    # Add NodeSource repository (from v1)
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || error_exit "Failed to add NodeSource repository"
-    
-    # Install Node.js (from v1)
+    # Install Node.js
     sudo apt-get install -y nodejs || error_exit "Failed to install Node.js"
     
-    # Update npm to latest version (from v1)
-    sudo npm install -g npm@latest || error_exit "Failed to update npm"
+    # Verify installation
+    NODE_VERSION=$(node -v)
+    NPM_VERSION=$(npm -v)
     
-    echo "✓ Node.js v$(node --version) (npm $(npm --version)) installed successfully"
+    if [[ -z "$NODE_VERSION" || -z "$NPM_VERSION" ]]; then
+        error_exit "Node.js installation verification failed"
+    fi
+    
+    echo "✓ Node.js $NODE_VERSION (npm $NPM_VERSION) installed successfully"
 }
 
 ##############################################################################
 # install_nodered
-# Installs Node-RED and configures InfluxDB integration
+# Installs Node-RED (base installation only)
 ##############################################################################
 install_nodered() {
-    show_progress "5" "Installing Node-RED"
+    show_progress "3" "Installing Node-RED"
     echo "Installing Node-RED..."
     
-    # Use official Node-RED install script with all required flags
-    bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) \
+    # Install Node-RED using official script
+    sudo -u $SUDO_USER bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) \
         --confirm-install \
-        --confirm-pi \
-        --nodered-user "$SUDO_USER" \
-        --confirm-root || error_exit "Failed to install Node-RED"
+        --confirm-pi || error_exit "Failed to install Node-RED"
     
-    # Enable and start the service
+    # Enable and start service
     sudo systemctl enable nodered.service
     sudo systemctl start nodered.service
     
-    # Wait for Node-RED to start
+    # Wait for Node-RED to start and verify
     echo "Waiting for Node-RED to start..."
     for i in {1..30}; do
-        if curl -s http://localhost:1880/ > /dev/null; then
+        if curl -sI http://localhost:1880 | grep -q "200 OK"; then
+            echo "✓ Node-RED is responding"
             break
         fi
-        echo "Waiting for Node-RED... ($i/30)"
+        if [ $i -eq 30 ]; then
+            error_exit "Node-RED failed to start"
+        fi
+        echo "Waiting... ($i/30)"
         sleep 2
     done
     
-    # Install InfluxDB nodes after Node-RED and InfluxDB are installed
-    echo "Installing InfluxDB nodes for Node-RED..."
-    cd /home/$SUDO_USER/.node-red || error_exit "Failed to change directory"
-    npm install node-red-contrib-influxdb || error_exit "Failed to install InfluxDB nodes"
-    
-    # Create default InfluxDB configuration node
-    cat > /home/$SUDO_USER/.node-red/flows.json << EOL
-[
-    {
-        "id": "influxdb-config",
-        "type": "influxdb",
-        "hostname": "localhost",
-        "port": "8086",
-        "protocol": "http",
-        "database": "sensors",
-        "name": "InfluxDB Connection",
-        "influxdbVersion": "2.0",
-        "url": "http://localhost:8086",
-        "token": "${INFLUXDB_TOKEN}",
-        "org": "${INFLUXDB_ORG}",
-        "bucket": "sensors"
-    }
-]
-EOL
-    
-    # Set proper ownership
-    sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
-    
-    # Restart Node-RED to load new nodes and flow
-    sudo systemctl restart nodered.service
-    
-    echo "✓ Node-RED installed and configured with InfluxDB integration"
+    echo "✓ Node-RED installed successfully"
 }
 
 ##############################################################################
 # install_influxdb
-# Installs and configures InfluxDB v2
+# Installs and configures InfluxDB
 ##############################################################################
 install_influxdb() {
-    show_progress "6" "Installing InfluxDB"
+    show_progress "4" "Installing InfluxDB"
     echo "Installing InfluxDB..."
     
-    # Import InfluxData GPG key
-    curl -s https://repos.influxdata.com/influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg >/dev/null
-    
     # Add InfluxDB repository
-    echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdb.list
+    wget -qO - https://repos.influxdata.com/influxdb.key | sudo apt-key add - || \
+        error_exit "Failed to add InfluxDB key"
     
-    # Install InfluxDB
-    sudo apt-get update && sudo apt-get install -y influxdb2 influxdb2-cli || error_exit "Failed to install InfluxDB"
+    echo "deb https://repos.influxdata.com/debian stable main" | \
+        sudo tee /etc/apt/sources.list.d/influxdb.list
     
-    # Start InfluxDB service
+    # Update and install
+    sudo apt-get update
+    sudo apt-get install -y influxdb2 || error_exit "Failed to install InfluxDB"
+    
+    # Enable and start service
     sudo systemctl enable influxdb
     sudo systemctl start influxdb
     
@@ -529,26 +454,82 @@ install_influxdb() {
     echo "Waiting for InfluxDB to start..."
     for i in {1..30}; do
         if curl -s http://localhost:8086/health | grep -q "ready"; then
-            echo "InfluxDB is responding to health checks. Waiting additional time for full initialization..."
-            sleep 5
+            echo "✓ InfluxDB is responding"
             break
         fi
-        echo "Waiting for InfluxDB... ($i/30)"
+        if [ $i -eq 30 ]; then
+            error_exit "InfluxDB failed to start"
+        fi
+        echo "Waiting... ($i/30)"
         sleep 2
     done
     
-    # Setup initial user and organization
-    echo "Setting up InfluxDB..."
+    # Run initial setup
     influx setup \
         --org "${INFLUXDB_ORG}" \
         --bucket "sensors" \
         --username "${INFLUXDB_USERNAME}" \
         --password "${INFLUXDB_PASSWORD}" \
         --token "${INFLUXDB_TOKEN}" \
-        --force || error_exit "Failed to setup InfluxDB"
-        
-    # Verify setup
-    verify_influxdb "${INFLUXDB_ORG}" "${INFLUXDB_USERNAME}"
+        --force || error_exit "Failed to configure InfluxDB"
+    
+    echo "✓ InfluxDB installed and configured"
+}
+
+##############################################################################
+# configure_nodered_influx
+# Installs and configures InfluxDB nodes for Node-RED
+##############################################################################
+configure_nodered_influx() {
+    show_progress "5" "Configuring Node-RED for InfluxDB"
+    echo "Installing InfluxDB nodes for Node-RED..."
+    
+    # Change to Node-RED directory
+    cd /home/$SUDO_USER/.node-red || error_exit "Failed to access Node-RED directory"
+    
+    # Install InfluxDB nodes as the correct user
+    sudo -u $SUDO_USER npm install node-red-contrib-influxdb || \
+        error_exit "Failed to install InfluxDB nodes"
+    
+    # Create settings.js with InfluxDB configuration
+    cat > /home/$SUDO_USER/.node-red/settings.js << EOL
+module.exports = {
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: "${NODERED_USERNAME}",
+            password: "${NODERED_HASH}",
+            permissions: "*"
+        }]
+    },
+    functionGlobalContext: {
+        influxdb: {
+            url: 'http://localhost:8086',
+            token: '${INFLUXDB_TOKEN}',
+            org: '${INFLUXDB_ORG}',
+            bucket: 'sensors'
+        }
+    }
+}
+EOL
+    
+    # Set proper ownership
+    sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.node-red
+    
+    # Restart Node-RED
+    sudo systemctl restart nodered.service
+    
+    # Verify Node-RED is still responding after restart
+    for i in {1..30}; do
+        if curl -s http://localhost:1880/ > /dev/null; then
+            echo "✓ Node-RED restarted successfully with InfluxDB nodes"
+            break
+        fi
+        if [ $i -eq 30 ]; then
+            error_exit "Node-RED failed to restart after InfluxDB configuration"
+        fi
+        sleep 2
+    done
 }
 
 ##############################################################################
@@ -556,25 +537,19 @@ install_influxdb() {
 # Installs and configures Grafana
 ##############################################################################
 install_grafana() {
-    show_progress "7" "Installing Grafana"
+    show_progress "6" "Installing Grafana"
     echo "Installing Grafana..."
     
-    # Stop any existing Grafana service
-    sudo systemctl stop grafana-server || true
+    # Add Grafana repository and key
+    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add - || \
+        error_exit "Failed to add Grafana key"
     
-    # Add Grafana GPG key
-    curl -fsSL https://packages.grafana.com/gpg.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/grafana.gpg
-    
-    # Add Grafana repository
-    echo "deb [signed-by=/etc/apt/trusted.gpg.d/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | \
+    echo "deb https://packages.grafana.com/oss/deb stable main" | \
         sudo tee /etc/apt/sources.list.d/grafana.list
     
-    # Install Grafana
-    sudo apt-get update && sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
-    
-    # Create required directories with proper permissions
-    sudo mkdir -p /var/lib/grafana
-    sudo chown -R grafana:grafana /var/lib/grafana
+    # Update and install Grafana
+    sudo apt-get update
+    sudo apt-get install -y grafana || error_exit "Failed to install Grafana"
     
     # Configure Grafana
     sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
@@ -589,26 +564,75 @@ org_role = Viewer
 [feature_toggles]
 publicDashboards = true
 EOL
-
-    # Set proper permissions
-    sudo chown -R grafana:grafana /etc/grafana/grafana.ini
-    sudo chmod 640 /etc/grafana/grafana.ini
     
-    # Start Grafana
-    sudo systemctl daemon-reload
+    # Auto-provision InfluxDB data source
+    sudo mkdir -p /etc/grafana/provisioning/datasources
+    sudo tee /etc/grafana/provisioning/datasources/influxdb.yml > /dev/null << EOL
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://localhost:8086
+    jsonData:
+      version: Flux
+      organization: ${INFLUXDB_ORG}
+      defaultBucket: sensors
+    secureJsonData:
+      token: ${INFLUXDB_TOKEN}
+EOL
+    
+    # Set proper permissions
+    sudo chown -R grafana:grafana /etc/grafana
+    
+    # Enable and start Grafana
     sudo systemctl enable grafana-server
     sudo systemctl start grafana-server
     
-    # Wait for Grafana to start
-    echo "Waiting for Grafana to start..."
+    # Verify Grafana is running
     for i in {1..45}; do
         if curl -s http://localhost:3000/api/health | grep -q "ok"; then
             echo "✓ Grafana is responding"
             break
         fi
+        if [ $i -eq 45 ]; then
+            error_exit "Grafana failed to start"
+        fi
         echo "Waiting for Grafana... ($i/45)"
         sleep 2
     done
+}
+
+##############################################################################
+# verify_full_stack
+# Comprehensive verification of the entire stack
+##############################################################################
+verify_full_stack() {
+    show_progress "7" "Verifying full stack integration"
+    echo "Performing final integration checks..."
+    
+    # Verify Node-RED and InfluxDB nodes
+    if ! curl -s http://localhost:1880/nodes | grep -q "node-red-contrib-influxdb"; then
+        error_exit "InfluxDB nodes not properly installed in Node-RED"
+    fi
+    
+    # Verify InfluxDB organization and bucket
+    if ! influx org list | grep -q "${INFLUXDB_ORG}"; then
+        error_exit "InfluxDB organization verification failed"
+    fi
+    
+    if ! influx bucket list | grep -q "sensors"; then
+        error_exit "InfluxDB bucket verification failed"
+    fi
+    
+    # Verify Grafana can reach InfluxDB
+    if ! curl -s -u "${GRAFANA_USERNAME}:${GRAFANA_PASSWORD}" \
+        http://localhost:3000/api/datasources/proxy/1/health | grep -q "ready"; then
+        error_exit "Grafana cannot connect to InfluxDB"
+    fi
+    
+    echo "✓ Full stack verification complete"
 }
 
 ##############################################################################
@@ -739,12 +763,17 @@ print_completion() {
 
 ##############################################################################
 # check_security_setup
-# Checks if secure-pi.sh has been run
+# Verifies secure-pi.sh has been run and sets up correct user context
 ##############################################################################
 check_security_setup() {
+    echo "Checking security configuration..."
+    
+    # Check for metsci-service user
     if ! id metsci-service >/dev/null 2>&1; then
-        echo -e "${YELLOW}Warning: Security setup not detected. It's recommended to run secure-pi.sh first.${NC}"
-        echo "Get it from: https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/scripts/secure-pi.sh"
+        echo -e "${YELLOW}Warning: Security setup not detected${NC}"
+        echo "It's recommended to run secure-pi.sh first:"
+        echo "curl -sSL meteoscientific.com/scripts/secure-pi.sh -o secure-pi.sh"
+        echo "chmod +x secure-pi.sh && sudo ./secure-pi.sh"
         read -p "Continue anyway? (y/n) " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -842,49 +871,120 @@ EOL
 
 ##############################################################################
 # main
-# Orchestrates the entire install in a step-by-step fashion.
+# Orchestrates the entire install in a bombproof sequence
 ##############################################################################
 main() {
+    # Version and requirements banner
+    echo "MeteoScientific Dashboard Installer v1.5.2"
+    echo
+    echo "Hardware Requirements:"
+    echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
+    echo "- 32GB+ SD card recommended"
+    echo
+    
+    # Check if running as root
+    if [ "$EUID" -ne 0 ]; then 
+        error_exit "Please run as root (use sudo)"
+    fi
+    
+    # 1. Verify security setup and user context
     check_security_setup
-    show_progress 1 "Checking system requirements"
-    check_requirements
     
-    show_progress 2 "Installing prerequisites"
-    install_prerequisites
+    # 2. Quick system update check (even though secure-pi should have done this)
+    echo "Verifying system is up to date..."
+    sudo apt-get update > /dev/null
     
-    show_progress 3 "Gathering user preferences"
+    # 3. Generate credentials before installation
     generate_credentials
     
-    echo
-    echo "All required information collected. Beginning installation..."
-    echo "This may take several minutes. You can monitor progress in: $LOG_FILE"
-    echo
+    # 4. Install Node.js (if not already installed)
+    if ! command -v node > /dev/null || ! node -v | grep -q "v20"; then
+        show_progress "1" "Installing Node.js v20"
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        echo "✓ Node.js $(node -v) installed"
+    else
+        echo "✓ Node.js $(node -v) already installed"
+    fi
     
-    show_progress 4 "Installing Node.js"
-    install_nodejs
+    # 5. Install base Node-RED
+    show_progress "2" "Installing Node-RED"
+    sudo -u $SUDO_USER bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) \
+        --confirm-install \
+        --confirm-pi \
+        --nodered-user "metsci-service" \
+        --confirm-root || error_exit "Failed to install Node-RED"
     
-    show_progress 5 "Installing Node-RED"
-    install_nodered
+    sudo systemctl enable nodered.service
+    sudo systemctl start nodered.service
     
-    show_progress 6 "Installing InfluxDB"
+    # Verify Node-RED is running
+    for i in {1..30}; do
+        if curl -s http://localhost:1880/ > /dev/null; then
+            echo "✓ Node-RED is running"
+            break
+        fi
+        sleep 2
+    done
+    
+    # 6. Install and configure InfluxDB
+    show_progress "3" "Installing InfluxDB"
     install_influxdb
     
-    show_progress 7 "Installing Grafana"
+    # Verify InfluxDB is running and configured
+    verify_influxdb_setup "${INFLUXDB_ORG}" "${INFLUXDB_USERNAME}"
+    
+    # 7. Install Node-RED InfluxDB nodes (only after InfluxDB is verified)
+    show_progress "4" "Installing InfluxDB nodes for Node-RED"
+    configure_nodered_influx
+    
+    # 8. Install and configure Grafana
+    show_progress "5" "Installing Grafana"
     install_grafana
     
-    show_progress 8 "Optimizing system configuration"
-    configure_memory_limits
-    configure_log_rotation
+    # 9. Final integration verification
+    show_progress "6" "Verifying full stack"
+    verify_full_stack
     
-    show_progress 9 "Starting and verifying services"
-    start_services
-    verify_services
+    # 10. Display credentials and completion message
+    echo
+    echo "======= MeteoScientific Demo Dashboard ========"
+    echo
+    echo "Installation completed successfully!"
+    echo
+    echo "1. Node-RED Credentials"
+    echo "   - Username: ${NODERED_USERNAME}"
+    echo "   - Password: ${NODERED_PASSWORD}"
+    echo
+    echo "2. InfluxDB Credentials"
+    echo "   - Username: ${INFLUXDB_USERNAME}"
+    echo "   - Password: ${INFLUXDB_PASSWORD}"
+    echo "   - Organization: ${INFLUXDB_ORG}"
+    echo "   - Bucket: sensors"
+    echo "   - Token: ${INFLUXDB_TOKEN}"
+    echo
+    echo "3. Grafana Credentials"
+    echo "   - Username: ${GRAFANA_USERNAME}"
+    echo "   - Password: ${GRAFANA_PASSWORD}"
+    echo
+    echo "⚠️  IMPORTANT: Save these credentials and delete the credentials file!"
+    echo "   (${CREDS_FILE})"
+    echo
+    echo "Services are accessible at:"
+    echo "   Node-RED: http://$(hostname -I | awk '{print $1}'):1880"
+    echo "   InfluxDB: http://$(hostname -I | awk '{print $1}'):8086"
+    echo "   Grafana:  http://$(hostname -I | awk '{print $1}'):3000"
+    echo
+    echo "For troubleshooting, check the log at: ${LOG_FILE}"
+    echo "=============================================="
+    echo
     
-    # Print the installation summary with all credentials
-    print_install_summary
+    # Save credentials to file
+    save_credentials
     
-    print_completion
+    # Offer to show the installation log
+    show_install_log
 }
 
-# Run the main function
+# Start the installation
 main
