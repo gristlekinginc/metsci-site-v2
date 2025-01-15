@@ -13,7 +13,7 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 # Version
-VERSION="1.5.9"
+VERSION="1.6.0"
 
 # File paths
 CREDS_FILE="/home/$SUDO_USER/metsci-credentials.txt"
@@ -59,8 +59,7 @@ show_progress() {
 # Check Functions
 #----------------------------------------------------------------------
 check_requirements() {
-    echo "Checking system requirements..."
-    
+     
     # Check if running as root
     if [ "$EUID" -ne 0 ]; then 
         error_exit "Please run as root (use sudo)"
@@ -86,7 +85,7 @@ check_requirements() {
     if [ "$total_mem" -lt 1024 ]; then
         error_exit "Insufficient memory. 1GB minimum required, 4GB recommended."
     elif [ "$total_mem" -lt 4096 ]; then
-        echo -e "${YELLOW}Warning: Less than 4GB RAM detected. Performance may be impacted.${NC}"
+        echo -e "${YELLOW}Warning: Less than 4GB RAM detected.  Fine for most people.  If you're running 50 sensors firing every minute, level up to 8 GB RAM.${NC}"
         echo "Current memory: ${total_mem}MB"
         echo "Recommended: 4096MB"
         echo
@@ -256,12 +255,24 @@ install_nodered() {
     # Make it executable
     sudo chmod +x /home/metsci-service/update-nodejs-and-nodered.sh
     
-    # Run official installer with our parameters
+    # Run official installer with correct parameters
     sudo -u metsci-service /home/metsci-service/update-nodejs-and-nodered.sh \
         --confirm-install \
         --confirm-pi \
-        --confirm-root \
-        --nodered-user "metsci-service" || error_exit "Failed to install Node-RED"
+        --confirm-root || error_exit "Failed to install Node-RED"
+    
+    # Modify service file to use metsci-service user
+    sudo sed -i 's/User=pi/User=metsci-service/' /lib/systemd/system/nodered.service
+    
+    # Update working directory in service file
+    sudo sed -i 's|WorkingDirectory=/home/pi|WorkingDirectory=/home/metsci-service|' /lib/systemd/system/nodered.service
+    
+    # Reload systemd to pick up changes
+    sudo systemctl daemon-reload
+    
+    # Create Node-RED directory if it doesn't exist
+    sudo mkdir -p /home/metsci-service/.node-red
+    sudo chown -R metsci-service:metsci-service /home/metsci-service/.node-red
     
     # Enable and start service
     sudo systemctl enable nodered.service
@@ -684,9 +695,9 @@ generate_credentials() {
     DEFAULT_ORG="MeteoScientific"
     echo "What is your organization name? This will be used in Grafana and InfluxDB."
     echo "The default is '${DEFAULT_ORG}'"
-    read -p "Do you need to change it? (y/n) " -n 1 -r
+    read -p "Would you like to keep the default name? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         read -p "Enter your organization name (letters, numbers, and dashes only): " INFLUXDB_ORG
         # Remove spaces and special characters, convert to lowercase
         INFLUXDB_ORG=$(echo "$INFLUXDB_ORG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
@@ -698,13 +709,13 @@ generate_credentials() {
         INFLUXDB_ORG=$DEFAULT_ORG
     fi
     
-    # Generate random usernames and offer to customize
+    # Generate random usernames and offer to change
     NODERED_USERNAME=$(get_random_name "${NODERED_NAMES[@]}")
     echo
     echo "Node-RED username will be: $NODERED_USERNAME"
-    read -p "Would you like to choose a different username? (y/n) " -n 1 -r
+    read -p "Would you like to keep this username? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         read -p "Enter Node-RED username (letters and numbers only): " custom_name
         if [[ $custom_name =~ ^[a-zA-Z0-9]+$ ]]; then
             NODERED_USERNAME=$custom_name
@@ -716,9 +727,9 @@ generate_credentials() {
     INFLUXDB_USERNAME=$(get_random_name "${INFLUXDB_NAMES[@]}")
     echo
     echo "InfluxDB username will be: $INFLUXDB_USERNAME"
-    read -p "Would you like to choose a different username? (y/n) " -n 1 -r
+    read -p "Would you like to keep this username? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         read -p "Enter InfluxDB username (letters and numbers only): " custom_name
         if [[ $custom_name =~ ^[a-zA-Z0-9]+$ ]]; then
             INFLUXDB_USERNAME=$custom_name
@@ -730,9 +741,9 @@ generate_credentials() {
     GRAFANA_USERNAME=$(get_random_name "${GRAFANA_NAMES[@]}")
     echo
     echo "Grafana username will be: $GRAFANA_USERNAME"
-    read -p "Would you like to choose a different username? (y/n) " -n 1 -r
+    read -p "Would you like to keep this username? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         read -p "Enter Grafana username (letters and numbers only): " custom_name
         if [[ $custom_name =~ ^[a-zA-Z0-9]+$ ]]; then
             GRAFANA_USERNAME=$custom_name
