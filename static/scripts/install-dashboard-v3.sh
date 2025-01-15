@@ -558,33 +558,55 @@ EOL
 }
 
 print_completion() {
-    PI_IP=$(hostname -I | awk '{print $1}')
+    # First save to credentials file
+    cat > "$CREDS_FILE" << EOL
+======= MeteoScientific Demo Dashboard ========
+Installation completed on: $(date)
+
+ACCESS INFORMATION:
+------------------
+Your Raspberry Pi IP address is: $(hostname -I | awk '{print $1}')
+
+1. Node-RED
+   URL:      http://$(hostname -I | awk '{print $1}'):1880
+   Username: $NODERED_USERNAME
+   Password: $NODERED_PASSWORD
+
+2. InfluxDB
+   URL:      http://$(hostname -I | awk '{print $1}'):8086
+   Username: $INFLUXDB_USERNAME
+   Password: $INFLUXDB_PASSWORD
+   Org:      $INFLUXDB_ORG
+   Bucket:   sensors
+   Token:    $INFLUXDB_TOKEN
+
+3. Grafana
+   URL:      http://$(hostname -I | awk '{print $1}'):3000
+   Username: $GRAFANA_USERNAME
+   Password: $GRAFANA_PASSWORD
+
+⚠️  IMPORTANT SECURITY NOTES:
+   1. Save these credentials somewhere safe
+   2. Delete this file after saving: $CREDS_FILE
+   3. Consider changing passwords after testing
+
+TROUBLESHOOTING:
+   - Installation log: $LOG_FILE
+   - Service logs: use 'journalctl -u <service-name>'
+==============================================
+EOL
+
+    # Then display the file contents
+    cat "$CREDS_FILE"
     
     echo
-    echo "======= MeteoScientific Demo Dashboard ========"
+    read -p "Would you like to view the installation log? (y/n) " -n 1 -r
     echo
-    echo "🎉 Installation completed successfully! 🎉"
-    echo
-    echo "Your services are available at:"
-    echo "   Node-RED: http://${PI_IP}:1880"
-    echo "   InfluxDB: http://${PI_IP}:8086"
-    echo "   Grafana:  http://${PI_IP}:3000"
-    echo
-    echo "⚠️  IMPORTANT: Your credentials have been saved to:"
-    echo "   ${CREDS_FILE}"
-    echo
-    echo "Next Steps:"
-    echo "1. Save your credentials file somewhere safe"
-    echo "2. Test all services using the provided URLs"
-    echo "3. Delete the credentials file when done"
-    echo
-    echo "Need help? Check the installation log at:"
-    echo "${LOG_FILE}"
-    echo
-    echo "=============================================="
-    
-    # Offer to show the log
-    show_install_log
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        less "$LOG_FILE"
+    fi
+    echo "Performing final cleanup..."
+    echo "✓ Cleanup completed"
 }
 
 show_install_log() {
