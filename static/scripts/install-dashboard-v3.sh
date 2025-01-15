@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.5.2"  
+VERSION="1.5.3"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
 echo
 echo "Hardware Requirements:"
@@ -216,12 +216,86 @@ EOL
 }
 
 ##############################################################################
+# install_nodejs_and_npm
+# Installs Node.js and npm, ensuring both are present
+##############################################################################
+install_nodejs_and_npm() {
+    show_progress "1" "Installing Node.js and npm"
+    
+    # Add NodeSource repository
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || \
+        error_exit "Failed to add NodeSource repository"
+    
+    # Install Node.js and npm
+    sudo apt-get install -y nodejs npm || error_exit "Failed to install Node.js and npm"
+    
+    # Verify installations
+    node -v || error_exit "Node.js installation failed"
+    npm -v || error_exit "npm installation failed"
+    
+    echo "✓ Node.js $(node -v) and npm $(npm -v) installed"
+}
+
+##############################################################################
+# install_nodered
+# Downloads and installs Node-RED
+##############################################################################
+install_nodered() {
+    show_progress "2" "Installing Node-RED"
+    
+    # Download the Node-RED install script
+    echo "Downloading Node-RED installer..."
+    curl -fsSL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered \
+        -o /tmp/nodered-install.sh || error_exit "Failed to download Node-RED installer"
+    
+    # Make it executable
+    chmod +x /tmp/nodered-install.sh
+    
+    # Run the installer
+    sudo -u $SUDO_USER /tmp/nodered-install.sh --confirm-install --confirm-pi || \
+        error_exit "Failed to install Node-RED"
+    
+    # Clean up
+    rm -f /tmp/nodered-install.sh
+    
+    # Enable and start the service
+    sudo systemctl enable nodered.service
+    sudo systemctl start nodered.service
+    
+    # Verify Node-RED is running
+    for i in {1..30}; do
+        if curl -s http://localhost:1880/ > /dev/null; then
+            echo "✓ Node-RED is running"
+            break
+        fi
+        if [ $i -eq 30 ]; then
+            error_exit "Node-RED failed to start"
+        fi
+        sleep 2
+    done
+}
+
+##############################################################################
 # generate_credentials
 # Generates secure credentials for all services
 ##############################################################################
 generate_credentials() {
     show_progress "2" "Generating credentials"
     echo "Generating secure credentials..."
+    
+    # Ensure npm and node-red-admin are installed before generating hashes
+    if ! command -v npm > /dev/null; then
+        error_exit "npm not found. Please ensure Node.js and npm are installed first."
+    fi
+    
+    # Install node-red-admin globally
+    echo "Installing node-red-admin..."
+    sudo npm install -g node-red-admin || error_exit "Failed to install node-red-admin"
+    
+    # Verify node-red-admin installation
+    if ! command -v node-red-admin > /dev/null; then
+        error_exit "node-red-admin installation failed"
+    fi
     
     # Prompt for organization name
     echo "What is your organization name? This will be used in Grafana and InfluxDB."
@@ -269,9 +343,6 @@ generate_credentials() {
     NODERED_PASSWORD=$(openssl rand -base64 32)
     
     # Install node-red-admin and generate hash
-    if ! command -v node-red-admin > /dev/null; then
-        sudo npm install -g node-red-admin
-    fi
     NODERED_HASH=$(node-red-admin hash-pw <<< "${NODERED_PASSWORD}" | tail -n1)
     
     INFLUXDB_PASSWORD=$(openssl rand -base64 32)
@@ -365,66 +436,6 @@ system_prep() {
         git || error_exit "Failed to install prerequisites"
         
     echo "✓ System prepared"
-}
-
-##############################################################################
-# install_nodejs
-# Installs Node.js from NodeSource
-##############################################################################
-install_nodejs() {
-    show_progress "2" "Installing Node.js"
-    echo "Installing Node.js..."
-    
-    # Add NodeSource repository
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || \
-        error_exit "Failed to add NodeSource repository"
-    
-    # Install Node.js
-    sudo apt-get install -y nodejs || error_exit "Failed to install Node.js"
-    
-    # Verify installation
-    NODE_VERSION=$(node -v)
-    NPM_VERSION=$(npm -v)
-    
-    if [[ -z "$NODE_VERSION" || -z "$NPM_VERSION" ]]; then
-        error_exit "Node.js installation verification failed"
-    fi
-    
-    echo "✓ Node.js $NODE_VERSION (npm $NPM_VERSION) installed successfully"
-}
-
-##############################################################################
-# install_nodered
-# Installs Node-RED (base installation only)
-##############################################################################
-install_nodered() {
-    show_progress "3" "Installing Node-RED"
-    echo "Installing Node-RED..."
-    
-    # Install Node-RED using official script
-    sudo -u $SUDO_USER bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) \
-        --confirm-install \
-        --confirm-pi || error_exit "Failed to install Node-RED"
-    
-    # Enable and start service
-    sudo systemctl enable nodered.service
-    sudo systemctl start nodered.service
-    
-    # Wait for Node-RED to start and verify
-    echo "Waiting for Node-RED to start..."
-    for i in {1..30}; do
-        if curl -sI http://localhost:1880 | grep -q "200 OK"; then
-            echo "✓ Node-RED is responding"
-            break
-        fi
-        if [ $i -eq 30 ]; then
-            error_exit "Node-RED failed to start"
-        fi
-        echo "Waiting... ($i/30)"
-        sleep 2
-    done
-    
-    echo "✓ Node-RED installed successfully"
 }
 
 ##############################################################################
@@ -894,38 +905,14 @@ main() {
     echo "Verifying system is up to date..."
     sudo apt-get update > /dev/null
     
-    # 3. Generate credentials before installation
+    # Install Node.js and npm first
+    install_nodejs_and_npm
+    
+    # Then generate credentials (now that we have npm and can install node-red-admin)
     generate_credentials
     
-    # 4. Install Node.js (if not already installed)
-    if ! command -v node > /dev/null || ! node -v | grep -q "v20"; then
-        show_progress "1" "Installing Node.js v20"
-        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-        sudo apt-get install -y nodejs
-        echo "✓ Node.js $(node -v) installed"
-    else
-        echo "✓ Node.js $(node -v) already installed"
-    fi
-    
-    # 5. Install base Node-RED
-    show_progress "2" "Installing Node-RED"
-    sudo -u $SUDO_USER bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered) \
-        --confirm-install \
-        --confirm-pi \
-        --nodered-user "metsci-service" \
-        --confirm-root || error_exit "Failed to install Node-RED"
-    
-    sudo systemctl enable nodered.service
-    sudo systemctl start nodered.service
-    
-    # Verify Node-RED is running
-    for i in {1..30}; do
-        if curl -s http://localhost:1880/ > /dev/null; then
-            echo "✓ Node-RED is running"
-            break
-        fi
-        sleep 2
-    done
+    # Install Node-RED
+    install_nodered
     
     # 6. Install and configure InfluxDB
     show_progress "3" "Installing InfluxDB"
