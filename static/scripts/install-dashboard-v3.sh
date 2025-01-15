@@ -16,9 +16,8 @@ NC='\033[0m' # No Color
 #----------------------------------------------------------------------
 # Script Version Info
 #----------------------------------------------------------------------
-VERSION="1.5.3"  
+VERSION="1.5.4"  
 echo "MeteoScientific Dashboard Installer v$VERSION"
-echo
 echo "Hardware Requirements:"
 echo "- Raspberry Pi 4 (4GB+ RAM recommended)"
 echo "- 32GB+ SD card recommended"
@@ -222,12 +221,19 @@ EOL
 install_nodejs_and_npm() {
     show_progress "1" "Installing Node.js and npm"
     
-    # Add NodeSource repository
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || \
-        error_exit "Failed to add NodeSource repository"
+    # Remove any existing conflicting packages
+    sudo apt-get remove -y nodejs npm || true
+    sudo apt-get autoremove -y
     
-    # Install Node.js and npm
-    sudo apt-get install -y nodejs npm || error_exit "Failed to install Node.js and npm"
+    # Clean apt cache
+    sudo apt-get clean
+    sudo apt-get update
+    
+    # Add NodeSource repository
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    
+    # Install Node.js (which includes npm)
+    sudo apt-get install -y --no-install-recommends nodejs || error_exit "Failed to install Node.js"
     
     # Verify installations
     node -v || error_exit "Node.js installation failed"
@@ -280,24 +286,15 @@ install_nodered() {
 # Generates secure credentials for all services
 ##############################################################################
 generate_credentials() {
+    # Must run this AFTER Node.js/npm installation
+    if ! command -v node > /dev/null || ! command -v npm > /dev/null; then
+        error_exit "Node.js and npm must be installed before generating credentials"
+    }
+    
     show_progress "2" "Generating credentials"
     echo "Generating secure credentials..."
     
-    # Ensure npm and node-red-admin are installed before generating hashes
-    if ! command -v npm > /dev/null; then
-        error_exit "npm not found. Please ensure Node.js and npm are installed first."
-    fi
-    
-    # Install node-red-admin globally
-    echo "Installing node-red-admin..."
-    sudo npm install -g node-red-admin || error_exit "Failed to install node-red-admin"
-    
-    # Verify node-red-admin installation
-    if ! command -v node-red-admin > /dev/null; then
-        error_exit "node-red-admin installation failed"
-    fi
-    
-    # Prompt for organization name
+    # Prompt for organization name first
     echo "What is your organization name? This will be used in Grafana and InfluxDB."
     echo "The default is 'Your Org'"
     read -p "Do you need to change it? (y/n) " -n 1 -r
@@ -314,7 +311,7 @@ generate_credentials() {
     INFLUXDB_NAMES=("ewok" "wookie" "jedi" "padawan" "rebel" "pilot" "trooper" "droid")
     GRAFANA_NAMES=("stilgar" "paul" "leto" "gurney" "duncan" "thufir" "jessica" "chani")
     
-    # Generate random usernames
+    # Generate random usernames with confirmation
     NODERED_USERNAME=${NODERED_NAMES[$RANDOM % ${#NODERED_NAMES[@]}]}
     echo "The default username for Node-RED is '${NODERED_USERNAME}'"
     read -p "Is this username OK? (y/n) " -n 1 -r
@@ -339,10 +336,12 @@ generate_credentials() {
         read -p "Enter your preferred username for Grafana: " GRAFANA_USERNAME
     fi
     
-    # Generate secure passwords and tokens
-    NODERED_PASSWORD=$(openssl rand -base64 32)
+    # Install node-red-admin globally
+    echo "Installing node-red-admin..."
+    sudo npm install -g node-red-admin || error_exit "Failed to install node-red-admin"
     
-    # Install node-red-admin and generate hash
+    # Generate passwords and hashes
+    NODERED_PASSWORD=$(openssl rand -base64 32)
     NODERED_HASH=$(node-red-admin hash-pw <<< "${NODERED_PASSWORD}" | tail -n1)
     
     INFLUXDB_PASSWORD=$(openssl rand -base64 32)
@@ -908,7 +907,7 @@ main() {
     # Install Node.js and npm first
     install_nodejs_and_npm
     
-    # Then generate credentials (now that we have npm and can install node-red-admin)
+    # Then generate credentials (now that we have npm)
     generate_credentials
     
     # Install Node-RED
