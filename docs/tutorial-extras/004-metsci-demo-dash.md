@@ -100,7 +100,7 @@ During the installation you'll get a few questions and warnings.
 If you have a 4GB RAM Pi, you'll see a warning message about performance.  This is just to clarify that if you want to run a shitload of sensors frequently you'll probablly be better with an 8GB RAM Pi.  For most people, **4GB is fine** and **8GB is overkill**.
 :::
 
-The script will set up your "Organization" name (used in the database).  The default is `Your Org`, which is kind of boring, so I recommend you change it to something more exciting.  This is mostly a structural thing, so just use something descriptive.
+The script will set up your "Organization" name (used in the database).  The default is `MeteoScientific`, feel free to change that if you'd like.  This is mostly a structural thing, so just use something descriptive.
 
 It'll also set up a bunch of random sci-fi usernames for the various services.  
 
@@ -119,11 +119,11 @@ After installation, visit your shiny new setups:
 **DON'T skip copying down your credentials** (instructions are at the end of the script) and then deleting that file.  
 
 ```bash
-cat /home/demo/metsci-credentials.txt
+cat /home/<YOUR-USER>/metsci-credentials.txt
 ```
 That will print out your credentials, which you'll need to use later.  Save those somewhere safe, then delete the file with:
 ```bash
-rm -rf /home/demo/metsci-credentials.txt
+rm -rf /home/<YOUR-USER>/metsci-credentials.txt
 ```
 
 ### B. Integrate External SSD 
