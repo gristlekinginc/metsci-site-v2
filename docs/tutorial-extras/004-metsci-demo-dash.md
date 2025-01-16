@@ -61,7 +61,9 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 ---
 ## 1. **Setting Up Your Rasbperry Pi**
 ### A. Basic Setup
-Rather than re-writing (and constantly updating) this part, I'm going to suggest you [follow the official docs](https://www.raspberrypi.com/software/) for the first part of this and load **Raspberry Pi OS Lite (64-bit)**.  The basic flow is to write (or "flash") the OS onto an SD card using your computer, then plug the SD card into your Pi.  
+Rather than re-writing (and constantly updating) this part, I'm going to suggest you [follow the official docs](https://www.raspberrypi.com/software/) for the first part of this and load **Raspberry Pi OS Lite (64-bit)**.  If you've never done it before, that's ok. 
+
+The basic flow is to write (or "flash") the OS onto an SD card using your computer, then plug the SD card into your Pi.  After that you'll find the Pi on your local network and you can SSH in.  All of those things have lots of tutorials on the internet already.  
 
 :::tip
 Starting with a fresh OS install is recommended to avoid conflicts with existing packages.
