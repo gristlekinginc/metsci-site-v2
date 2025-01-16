@@ -7,13 +7,19 @@ title: MetSci Demo Dashboard
 
 Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor.
 
-This'll be something you can share with your friends to let them know when the rain barrel is full (or if you're Joey's friends, when the sauna is hot)!  I know, I know, you can use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
+You don't actually have to be a nerd to do this; as long as you can follow directions, you can do this.
 
-Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but then...you probably wouldn't need this tutorial if you can do that.
+When you're done, this'll be something you can share with your friends to let them know when the rain barrel is full (or if you're Joey's friends, when the sauna is hot)!  
+
+I know, I know, you could use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
+
+Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but...if that's you, you don't need this tutorial.
+
+I like to think of this as the first step on a long trail of IoT magic.  First one's free...
 
 My goal here is to enable you to build your own "no-subscription" public or private dashboards for under US$150 (not including the sensors).    
 
-You'll need hardware for this, make sure you have the following on hand:
+You'll need hardware for this. Make sure you have the following on hand:
 
 ### Hardware
  - [Rasbperry Pi 4 with 4 or 8 GB RAM](https://amzn.to/3DAVCnO), about $60. 
