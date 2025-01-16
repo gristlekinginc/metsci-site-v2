@@ -145,6 +145,16 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
     }),
+  scripts: [
+    {
+      src: 'https://www.googletagmanager.com/gtag/js?id=G-VNEKDSD64E',
+      async: true,
+    },
+    {
+      src: '/js/ga.js',  // We'll create this file
+      async: true,
+    },
+  ],
 };
 
 export default config;

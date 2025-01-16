@@ -56,7 +56,7 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 
 5. **Local Integration Testing:** Node-RED flows, integrate InfluxDB, create Grafana dashboards.
 
-7. **Final Security Review:** Audit, test, and verify.
+6. **System Maintenance & Troubleshooting:** Keep it rolling smooth, yo.
 
 ---
 ## 1. **Setting Up Your Rasbperry Pi**
@@ -482,7 +482,7 @@ Nice work!  We've now set a `Global Application` to make sure only services with
 I know it's hard to see it, but we're making progress here.  
 
 ---
-## 3. **Setting Up Your LDDS 75 Sensor**
+## 4. **Setting Up Your LDDS 75 Sensor**
 
 Whether this is your first device ever or your 100th, now is a good time to think about how you're going to structure your data.  I've written a [separate tutorial just on structuring data](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md). If you've never thought about this before, it's a good idea to read through that.  You can also just YOLO and follow along, trusting that my data structure is good enough for you.  
 

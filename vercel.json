@@ -19,5 +19,12 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/helium-lns",
+      "destination": "/?ref=helium-lns",
+      "permanent": false
+    }
   ]
 } 
