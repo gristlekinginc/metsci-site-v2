@@ -1,9 +1,7 @@
 ---
 sidebar_position: 4
-title: DRAFT - MetSci Demo Dashboard 
+title: MetSci Demo Dashboard 
 ---
-
-![Draft warning](/images/draft-warning.png)
 
 # Build a Custom Dashboard
 
@@ -968,10 +966,119 @@ Want to skip the manual setup? You can download the complete LDDS75 flow [here](
 
 ---
 
-## 6. **Final Security Review**
-   - Audit configurations
-   - Test authentication
-   - Verify secure access
+## 6. Home Assistant Integration
+
+Now, I'm assuming if you're reading this that you're already running [Home Assistant](https://www.home-assistant.io/) on another device.  If you're not, or "Home Assistant" is a foreign term to you, I'd skip this section for now and come back when you're tired of telling everyone to look at your rainwater tank levels. 
+
+Installing and configuring HA is (WAY!) beyond the scope of this tutorial, but for those of you who already have it running and want to pipe in data from your shiny new MetSci dashboard, here are two options:
+
+#### 1. Via Node-RED (Recommended)
+This method provides real-time updates and more flexibility:
+
+1. Install the Home Assistant nodes in Node-RED on your MetSci Pi:
+   ```bash
+   cd ~/.node-red
+   npm install node-red-contrib-home-assistant-websocket
+   ```
+
+2. In Node-RED, add and configure the `home-assistant` config node:
+   - Protocol: `http` or `https` (depending on your HA setup)
+   - Base URL: `http://YOUR_HA_IP:8123` (or your external URL)
+   - Access Token: Create a Long-Lived Access Token in HA
+     (HA Profile → Long-Lived Access Tokens → Create Token)
+
+3. Add a `call-service` node after your LDDS75 Function node:
+   ```javascript
+   Domain: sensor
+   Service: set_state
+   Entity ID: sensor.water_level
+   Data: {
+     state: msg.payload[0].distance,
+     attributes: {
+       unit_of_measurement: "mm",
+       friendly_name: "Water Level",
+       device_class: "distance",
+       battery_level: msg.payload[0].battery
+     }
+   }
+   ```
+
+#### 2. Via InfluxDB
+This method requires exposing InfluxDB securely to your network:
+
+1. First, configure InfluxDB to accept remote connections. On your MetSci Pi:
+   ```bash
+   sudo nano /etc/influxdb/config.toml
+   ```
+   Add or modify:
+   ```toml
+   [http]
+     bind-address = "0.0.0.0:8086"
+   ```
+
+2. Update your firewall to allow HA access:
+   ```bash
+   sudo ufw allow from YOUR_HA_IP to any port 8086
+   ```
+
+3. In Home Assistant's `configuration.yaml`, add:
+   ```yaml
+   influxdb:
+     api_version: 2
+     ssl: false
+     host: YOUR_METSCI_PI_IP
+     port: 8086
+     token: YOUR_INFLUXDB_TOKEN
+     organization: MeteoScientific
+     bucket: sensors
+     queries:
+       - name: Water Level
+         unit_of_measurement: "mm"
+         measurement: "ldds75_metsci"
+         field: "distance"
+         where: 'device = ''LDDS 3'''
+         device_class: "distance"
+   ```
+
+4. Restart Home Assistant to apply changes
+
+:::warning Security Considerations
+When connecting services across devices:
+1. Use strong, unique passwords and tokens
+2. Consider setting up a VPN if accessing over the internet
+3. Use SSL/TLS when possible
+4. Limit firewall rules to specific IPs
+5. Monitor logs for unauthorized access attempts
+:::
+
+#### Example Lovelace Card
+Add this to your Lovelace dashboard in Home Assistant:
+```yaml
+type: vertical-stack
+cards:
+  - type: gauge
+    name: Water Level
+    entity: sensor.water_level
+    min: 0
+    max: 8000
+    severity:
+      green: 0
+      yellow: 6000
+      red: 7000
+  - type: history-graph
+    title: Water Level History
+    entities:
+      - entity: sensor.water_level
+        name: Level
+```
+
+:::tip
+The Node-RED method is recommended because:
+- Only requires one port forwarded (HA's port)
+- Keeps InfluxDB secure behind your firewall
+- Provides real-time updates
+- Allows for data transformation before sending
+:::
 
 
 ## 7. System Maintenance & Troubleshooting
@@ -979,7 +1086,7 @@ Want to skip the manual setup? You can download the complete LDDS75 flow [here](
 ### A. Credentials Management
 Your credentials are stored in several locations:
 1. Node-RED: `~/.node-red/settings.js`
-2. InfluxDB: `/etc/influxdb/config.toml`
+2. InfluxDB: `/var/lib/influxdb/influxd.bolt` (and `/var/lib/influxdb/engine/`)
 3. Grafana: `/etc/grafana/grafana.ini`
 4. Installation credentials: Generated in `~/metsci-credentials.txt`
 
@@ -1001,7 +1108,7 @@ mkdir -p $BACKUP_DIR
 cp -r ~/.node-red/* $BACKUP_DIR/node-red/
 
 # Backup service configs
-sudo cp /etc/influxdb/config.toml $BACKUP_DIR/
+sudo cp -r /var/lib/influxdb $BACKUP_DIR/influxdb/
 sudo cp /etc/grafana/grafana.ini $BACKUP_DIR/
 
 # Set permissions
@@ -1045,7 +1152,13 @@ Check each step:
 1. MetSci LNS → View device events in console
 2. Cloudflare → Check tunnel logs
 3. Node-RED → Check debug tab
-4. InfluxDB → Query recent data
+4. InfluxDB → Test token and query recent data:
+   ```bash
+   # Test token
+   curl -v "http://localhost:8086/api/v2/write?org=YOUR_ORG&bucket=sensors" \
+     -H "Authorization: Token YOUR_TOKEN" \
+     -d "test,host=test value=1"
+   ```
 5. Grafana → Check data source connection
 
 #### 4. Disk Space Issues
@@ -1067,6 +1180,8 @@ If something goes wrong:
 4. If all else fails, you can always reinstall the affected service
 :::
 
+
+## 8. La Ultima
 
 Last step?  Tell your friends what you did!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
 
