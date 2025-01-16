@@ -152,6 +152,12 @@ const config = {
   customFields: {
     posthogApiKey: process.env.POSTHOG_API_KEY,
   },
+  scripts: [
+    {
+      src: 'https://us.i.posthog.com/static/array.js',
+      async: true,
+    },
+  ],
 };
 
 export default config;
