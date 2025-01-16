@@ -15,7 +15,7 @@ exec 1> >(tee -a "$LOG_FILE") 2>&1
 #----------------------------------------------------------------------
 # Pre-Checks & Warnings
 #----------------------------------------------------------------------
-echo "MeteoScientific Pi Security Setup v1.2.3"
+echo "MeteoScientific Pi Security Setup v1.2.4"
 echo "This script prepares your Pi for secure dashboard installation"
 
 # Check if running as root
