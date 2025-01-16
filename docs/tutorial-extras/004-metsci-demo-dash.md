@@ -880,18 +880,20 @@ Now let's create a dashboard to visualize our LDDS75 data.
 from(bucket: "sensors")
   |> range(start: -24h)
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
-  |> filter(fn: (r) => r["device"] == "LDDS 2")
+  |> filter(fn: (r) => r["device"] == "LDDS 3 [YOUR-DEVICE-NAME]")
   |> filter(fn: (r) => r["_field"] == "distance")
 ``` 
 Now, over on the right, we're going to configure the visualization settings.
 
 The type of visualization we're going to use is a `Time Series` graph.  This is ideal for showing changes over time.
 
+![Grafana Time Series](/images/tutorial-extras/004-images/grafana-initial-setup.png)
+
+At the top right, select `Time series`.
+
 6. `Panel Options`
-   - Panel Type: Select "Time series" (this is ideal for showing changes over time)
    - Title: "Water Level"
    - Description: "Distance measurement from LDDS75 sensor"
-
 
 7. `Graph Styles`
    - Style: Line (shows continuous changes)
@@ -920,27 +922,30 @@ First, in your Pi Terminal:
 sudo nano /etc/grafana/grafana.ini
 ```
 
-Then, add in a Server block like this, **replace the domain and subdomain with your own**:
+Then, in the Server block, **replace the domain and subdomain with your own**:
 
 ```[server]
 domain = grafana.gristleking.dev
 root_url = https://grafana.gristleking.dev
 ```
+Save & close with `Ctrl+X`, then `Y`, then `Enter`.
 
 Now restart Grafana:
 ```
 sudo systemctl restart grafana-server
 ```   
 
-Back in Grafana, refresh the page, then click the Share button in the top right.  Go to the `Public Dashboard` tab
+Back in Grafana, `Save` your dashboard, refresh the page, then `Exit Edit`
+
+Click the Share button in the top right.  Go to the `Public Dashboard` tab
 
 ![Grafana Share Dashboard](/images/tutorial-extras/004-images/grafana-share-dashboard.png)
 
 Check all the boxes, then click `Generate Public URL`.  It should generate a URL like `https://grafana.gristleking.dev/d/000000002/ldds75-metsci-dashboard?orgId=1&var-device=LDDS%202`, pulling from the `[server]` block we just set up.  
 
-Copy the URL and paste it into your browser.  You should see your dashboard.
---- 
+Copy the URL and paste it into your browser.  You should see your dashboard.  Bam, you're public!
 
+--- 
 
 ### D. AM319 Teaser
 
