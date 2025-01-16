@@ -235,10 +235,27 @@ EOL
 echo -e "${GREEN}Security setup complete!${NC}"
 echo
 echo "Your Pi is now secured and ready for dashboard installation."
-echo "Next step: Run the dashboard installer script"
-echo
 echo "Summary saved to: $SUMMARY_FILE"
 echo "Logs available at: $LOG_FILE"
 echo
-echo "Please reboot before running the dashboard installer:"
-echo "    sudo reboot"
+
+# Reboot prompt
+echo -e "${YELLOW}It's recommended to reboot your Pi to ensure all changes take effect.${NC}"
+read -p "Would you like to reboot now? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "Rebooting in 5 seconds..."
+    sleep 1
+    echo "4..."
+    sleep 1
+    echo "3..."
+    sleep 1
+    echo "2..."
+    sleep 1
+    echo "1..."
+    sleep 1
+    sudo reboot
+else
+    echo "Please remember to reboot your Pi before running the dashboard installer."
+    echo "You can reboot at any time by running: sudo reboot"
+fi
