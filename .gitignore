@@ -24,9 +24,6 @@ yarn-error.log*
 
 build/
 
-# Draft Pages
-
-
 # Draft documents
 **/DRAFT--*.md
 **/draft--*.md

@@ -392,15 +392,35 @@ install_grafana() {
     # Remove any existing database to ensure clean first run
     sudo rm -f /var/lib/grafana/grafana.db
     
-    # Configure Grafana
+    # Configure Grafana with corrected security settings
     sudo tee /etc/grafana/grafana.ini > /dev/null << EOL
+[paths]
+data = /var/lib/grafana
+logs = /var/log/grafana
+plugins = /var/lib/grafana/plugins
+
 [security]
 admin_user = ${GRAFANA_USERNAME}
 admin_password = ${GRAFANA_PASSWORD}
 disable_gravatar = true
-cookie_secure = true
-strict_transport_security = true
+cookie_secure = false
+strict_transport_security = false
 allow_sign_up = false
+
+[auth]
+login_cookie_name = grafana_session
+login_maximum_inactive_lifetime_days = 7
+login_maximum_lifetime_days = 30
+disable_login_form = false
+oauth_auto_login = false
+
+[server]
+protocol = http
+domain = localhost
+http_port = 3000
+root_url = %(protocol)s://%(domain)s:%(http_port)s/
+serve_from_sub_path = true
+cookie_samesite = lax
 
 [auth.anonymous]
 enabled = true

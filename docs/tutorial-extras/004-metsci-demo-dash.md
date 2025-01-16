@@ -726,7 +726,8 @@ Make sure you drag the wire from the correct connector on the Switch node (the t
 Add an **InfluxDB out** node to the Function node to store the data in InfluxDB.
     - Double-click the node to configure it.
     - Name the node `Local InfluxDB`
-    - Click the `+` icon next to the "Server" field to create a new InfluxDB server configuration
+
+Click the `+` icon next to the "Server" field to create a new InfluxDB server configuration
     - Fill in the InfluxDB server properties:
    ```
    Name: [your org name, copy this from your credentials file]
@@ -814,7 +815,7 @@ from(bucket: "sensors")
   |> filter(fn: (r) => r["_field"] == "distance" or r["_field"] == "rssi")
 ```
 :::tip
-This is a fairly simple setup, but you may still have problems.  We're nerds, usually don't work right the first time, and that's OK.  By far the fastest way to debug on your own is to feed in messages from Node-RED debug and InfluxDB,  and drop screenshots into ChatGPT/Cursor/Grok etc.  
+This is a fairly simple setup, but you may still have problems.  We're nerds, usually don't work right the first time, and that's OK.  Check to make sure your queries in InfluxDB match your Device Names, Gateway, and Region.  If you just copy/paste exactly what I put, you're not going to see anything.By far the fastest way to debug on your own is to feed in messages from Node-RED debug and InfluxDB,  and drop screenshots into ChatGPT/Cursor/Grok etc.  
 :::
 
 ### C. Grafana Dashboards

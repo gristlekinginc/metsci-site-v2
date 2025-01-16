@@ -1,8 +1,5 @@
 // @ts-check
 
-// Load environment variables from .env file
-require('dotenv').config(); // This line loads the environment variables from your .env file
-
 import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
@@ -148,16 +145,6 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
     }),
-
-  customFields: {
-    posthogApiKey: process.env.POSTHOG_API_KEY,
-  },
-  scripts: [
-    {
-      src: 'https://us.i.posthog.com/static/array.js',
-      async: true,
-    },
-  ],
 };
 
 export default config;
