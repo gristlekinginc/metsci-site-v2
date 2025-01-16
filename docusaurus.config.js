@@ -148,6 +148,10 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
     }),
+
+  customFields: {
+    posthogApiKey: process.env.POSTHOG_API_KEY,
+  },
 };
 
 export default config;
