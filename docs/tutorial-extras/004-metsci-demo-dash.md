@@ -13,9 +13,17 @@ When you're done, this'll be something you can share with your friends to let th
 
 I know, I know, you could use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
 
-Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but...if that's you, you probably don't need this tutorial. 
+Relax, it won't be super hard.  We'll use a few scripts to make installing things secure and easy, so they just "work".  
 
 My goal here is to enable a non-technical person to build your own "no-subscription" public or private dashboards for about $200, most of which you'll spend on equipment you'll use in every other IoT project you do.  
+
+IoT stuff has been super fun for me to explore, and I'm pumped to share it with you.  This is pretty much a love letter to you from me about IoT.  
+
+Final note: This tutorial was made possible by a generous grant from the Helium Foundation's IOTWG; huge thanks to them for the support.
+
+Enjoy!
+
+### Get After It
 
 Make sure you have the following on hand:
 
@@ -31,16 +39,16 @@ Make sure you have the following on hand:
     - [Segger J-Link EDU Mini](https://www.sparkfun.com/products/24078) - $60 on Sparkfun
  - 2 x [USB A to USB C cables](https://amzn.to/4aoqS5N) (connecting the Pi to the SD card and the Bus Pirate to your computer)
 
-:::note
-The Pi, SD, SSD, and USB cables are Amazon affiliate links.  If you use those I'll probably be able to pay my annual $12 domain name bill with the commissions.
-:::
+:::tip
+If you want a fancy case for your Pi (NOT needed), this is what I use: [FLIRC case](https://amzn.to/3E9OEpM) for Raspberry Pi 4B, about $16
+::: 
 
 #### Sensor, $60-80
 - Dragino LDDS 75 sensor.  You can buy one at [RobotShop](https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz) for $60-80.
 
-
-:::tip
-If you want a fancy case for your Pi (NOT needed), this is what I use: [FLIRC case](https://amzn.to/3E9OEpM) for Raspberry Pi 4B, about $16
+:::note
+1. The Pi, SD, SSD, and USB cables are Amazon affiliate links.  If 300 of you use those I'll probably be able to pay half my annual $12 domain name bill with the commissions.
+2. I'm doing this whole thing on a Mac.  If you're on Windows, there'll be a couple commands that are slightly different, usually stuff like using `CMD` instead of `CTRL`.  I'll try to call them out as we go.
 :::
 
 ### Not-Hardware
@@ -58,7 +66,7 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 
 1. **Set Up Your Rasbperry Pi:** Basic setup and security
 
-2. **Install Services:** Node-RED, InfluxDB, Grafana, and external SSD.
+2. **Install Services:** Node-RED, InfluxDB, Grafana, integrate external SSD.
 
 3. **Cloudflare:** Set up tunnels, tokens, routes, and policies.
 
@@ -79,7 +87,8 @@ The basic flow is to write (or "flash") the OS onto an SD card using your comput
 Starting with a fresh OS install is recommended to avoid conflicts with existing packages.
 :::
 
-Connect your Pi (Ethernet/LAN cable strongly preferred over WiFi) and search for the Pi on your local network.  SSH in, then update/upgrade with 
+Once you've set up your Pi, connect it to your local network (Ethernet/LAN cable strongly preferred over WiFi).  SSH in using Terminal, then update/upgrade with:
+
 ```bash
 sudo apt update && sudo apt dist-upgrade -y && sudo apt autoremove -y
 ```
