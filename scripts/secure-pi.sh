@@ -38,10 +38,15 @@ fi
 
 # Check required tools
 echo "Checking for required tools..."
-for tool in nc netstat curl sudo python3; do
+REQUIRED_TOOLS="netcat curl sudo python3"
+for tool in $REQUIRED_TOOLS; do
     if ! command -v $tool >/dev/null 2>&1; then
         echo "Installing $tool..."
-        sudo apt-get update && sudo apt-get install -y $tool
+        if [ "$tool" = "netcat" ]; then
+            sudo apt-get update && sudo apt-get install -y netcat-traditional
+        else
+            sudo apt-get update && sudo apt-get install -y $tool
+        fi
     fi
 done
 
@@ -202,7 +207,7 @@ fi
 #----------------------------------------------------------------------
 # Verify critical services
 sudo systemctl restart ssh
-if ! nc -z localhost 22; then
+if ! netcat -z localhost 22; then
     echo -e "${RED}ERROR: SSH is not accessible! Reverting changes...${NC}"
     sudo ufw disable
     sudo systemctl stop fail2ban
