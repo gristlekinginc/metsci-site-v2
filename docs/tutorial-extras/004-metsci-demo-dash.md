@@ -38,6 +38,7 @@ Make sure you have the following on hand:
     - Cheapie [Amazon Kit](https://www.amazon.com/dp/B07VNVVXW6?ref=ppx_pop_mob_ap_share) (thanks to GreyHat for the rec) $14
     - [Segger J-Link EDU Mini](https://www.sparkfun.com/products/24078) - $60 on Sparkfun
  - 2 x [USB A to USB C cables](https://amzn.to/4aoqS5N) (connecting the Pi to the SD card and the Bus Pirate to your computer)
+ - [Dupont wires](https://amzn.to/4h0Jn2w) for connecting the Bus Pirate to the sensor - $7
 
 :::tip
 If you want a fancy case for your Pi (NOT needed), this is what I use: [FLIRC case](https://amzn.to/3E9OEpM) for Raspberry Pi 4B, about $16
