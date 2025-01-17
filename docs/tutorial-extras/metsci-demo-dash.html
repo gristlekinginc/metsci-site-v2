@@ -10,7 +10,7 @@
 
 <script src="https://www.googletagmanager.com/gtag/js?id=G-VNEKDSD64E" async></script>
 <script src="/js/ga.js" async></script><link rel="stylesheet" href="/assets/css/styles.17997a2c.css">
-<script src="/assets/js/runtime~main.5144c2ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.8938b391.js" defer="defer"></script>
 <script src="/assets/js/main.bb03d458.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -19,34 +19,38 @@
 <p>You don&#x27;t actually have to be a nerd to do this; as long as you can follow directions, you can do this.</p>
 <p>When you&#x27;re done, this&#x27;ll be something you can share with your friends to let them know when the rain barrel is full (or if you&#x27;re Joey&#x27;s friends, when the sauna is hot)!</p>
 <p>I know, I know, you could use a ready-made service like <a href="https://datacake.de" target="_blank" rel="noopener noreferrer">Datacake</a> for public dashbaords, but...we&#x27;re nerds, and wherever possible we build our own things.</p>
-<p>Relax, it won&#x27;t be super hard, and I&#x27;ll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but...if that&#x27;s you, you don&#x27;t need this tutorial.</p>
-<p>I like to think of this as the first step on a long trail of IoT magic.  First one&#x27;s free...</p>
-<p>My goal here is to enable you to build your own &quot;no-subscription&quot; public or private dashboards for under US$150 (not including the sensors).</p>
-<p>You&#x27;ll need hardware for this. Make sure you have the following on hand:</p>
+<p>Relax, it won&#x27;t be super hard, and I&#x27;ll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but...if that&#x27;s you, you probablydon&#x27;t need this tutorial.</p>
+<p>I like to think of this as the first step on a long trail of IoT magic.</p>
+<p>My goal here is to enable you to build your own &quot;no-subscription&quot; public or private dashboards for about $200, most of which you&#x27;ll spend on equipment you&#x27;ll use in every other IoT project you do.</p>
+<p>Make sure you have the following on hand:</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="hardware">Hardware<a href="#hardware" class="hash-link" aria-label="Direct link to Hardware" title="Direct link to Hardware">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="core-development-hardware-150-use-this-for-your-next-50-projects">Core Development Hardware, ~$150 (use this for your next 50 projects)<a href="#core-development-hardware-150-use-this-for-your-next-50-projects" class="hash-link" aria-label="Direct link to Core Development Hardware, ~$150 (use this for your next 50 projects)" title="Direct link to Core Development Hardware, ~$150 (use this for your next 50 projects)">​</a></h4>
 <ul>
 <li><a href="https://amzn.to/3DAVCnO" target="_blank" rel="noopener noreferrer">Rasbperry Pi 4 with 4 or 8 GB RAM</a>, about $60.</li>
 <li><a href="https://amzn.to/40ha8K5" target="_blank" rel="noopener noreferrer">SD Card for Pi</a>, about $10</li>
-<li>Dragino LDDS 75 sensor.  You can buy one at <a href="https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz" target="_blank" rel="noopener noreferrer">RobotShop</a> for $60-80.</li>
 <li>External SSD for the Pi, about $30.  IoT data sets can get pretty big and you&#x27;ll want plenty of space beyond the SD card on the Pi.  SD cards can also wear out if you write to &#x27;em a bunch. Something like <a href="https://amzn.to/3PbhbNY" target="_blank" rel="noopener noreferrer">this</a> is fine.</li>
-<li>Some kind of USB-TTL adapter (the thing that allows you to communicate directly over-the-wire with the sensor)<!-- -->
+<li>USB-TTL adapter (the thing that allows you to communicate directly over-the-wire with the sensor)<!-- -->
 <ul>
-<li><a href="https://buspirate.com/" target="_blank" rel="noopener noreferrer">BusPirate</a> I used the v5 for this, but the v6 is already out!  $40-80</li>
+<li><a href="https://buspirate.com/" target="_blank" rel="noopener noreferrer">BusPirate</a>  This is what the mighty Teague uses, and I recommend it. I used the v5 for this, but the v6 is already out!  $40-80</li>
 <li>Cheapie <a href="https://www.amazon.com/dp/B07VNVVXW6?ref=ppx_pop_mob_ap_share" target="_blank" rel="noopener noreferrer">Amazon Kit</a> (thanks to GreyHat for the rec) $14</li>
 <li><a href="https://www.sparkfun.com/products/24078" target="_blank" rel="noopener noreferrer">Segger J-Link EDU Mini</a> - $60 on Sparkfun</li>
 </ul>
 </li>
+<li>2 x <a href="https://amzn.to/4aoqS5N" target="_blank" rel="noopener noreferrer">USB A to USB C cables</a> (connecting the Pi to the SD card and the Bus Pirate to your computer)</li>
 </ul>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_BuS1"><p>The Pi, SD, SSD, and USB cables are Amazon affiliate links.  If you use those I&#x27;ll probably be able to pay my annual $12 domain name bill with the commissions.</p></div></div>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="sensor-60-80">Sensor, $60-80<a href="#sensor-60-80" class="hash-link" aria-label="Direct link to Sensor, $60-80" title="Direct link to Sensor, $60-80">​</a></h4>
 <ul>
-<li>The Pi &amp; SD &amp; SSD are Amazon affiliate links, so I&#x27;ll probably be able to pay my annual $12 domain name bill with the commissions.</li>
+<li>Dragino LDDS 75 sensor.  You can buy one at <a href="https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz" target="_blank" rel="noopener noreferrer">RobotShop</a> for $60-80.</li>
 </ul>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>If you want a fancy case for your Pi (NOT needed), this is what I use: <a href="https://amzn.to/3E9OEpM" target="_blank" rel="noopener noreferrer">FLIRC case</a> for Raspberry Pi 4B, about $16</p></div></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="not-hardware">Not-Hardware<a href="#not-hardware" class="hash-link" aria-label="Direct link to Not-Hardware" title="Direct link to Not-Hardware">​</a></h3>
 <ul>
 <li>Custom domain.  For this tutorial I&#x27;ll be using mine, <code>gristleking.dev</code>.  If you don&#x27;t already have a domain, I&#x27;d <strong>strongly</strong> recommend buying one at <a href="https://cloudflare.com" target="_blank" rel="noopener noreferrer">Cloudflare</a>.  They&#x27;re about $12/year and buying it there makes everything else a little bit easier.</li>
 <li>If you have a domain already, you&#x27;ll need to set up your domain&#x27;s name servers to point to Cloudflare.</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="notes-on-what-you-need">Notes on what you &quot;Need&quot;<a href="#notes-on-what-you-need" class="hash-link" aria-label="Direct link to Notes on what you &quot;Need&quot;" title="Direct link to Notes on what you &quot;Need&quot;">​</a></h3>
-<p>You don&#x27;t actually NEED a USB-TTL adapter if you&#x27;re not going to make any changes to the sensor (like how often it reports), but it&#x27;s generally good practice to have one hanging around the work bench if you&#x27;re any kind of aspiring nerd.</p>
+<p>You don&#x27;t actually NEED a USB-TTL adapter, but it&#x27;s generally good practice to have one hanging around the work bench if you&#x27;re any kind of aspiring nerd.  You could use downlinks instead of the adapter to make changes to your sensor, but in practice I&#x27;ve found that to add both complication and time (especially if you have to wait for the next uplink &amp; you get your downlink command wrong...ask me how I know)</p>
 <p>You <em>could</em> do this without a custom domain by hosting in the cloud and managing tunnels with Cloudflare, but then you&#x27;re on the hook for cloud hosting, which is probably $6/month at the cheapest.  A domain is something like $70/year for an expensive <code>.ai</code> one and $12/year for a cheap one. Trust me, just buy a domain.</p>
 <p>Having your own domain makes part of this workflow way simpler, plus it&#x27;s just cool to have your own domain.  Ask Larry at Google or Steve at Apple.  Having a custom domain is cool.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="set-up-overview">Set Up Overview<a href="#set-up-overview" class="hash-link" aria-label="Direct link to Set Up Overview" title="Direct link to Set Up Overview">​</a></h2>
