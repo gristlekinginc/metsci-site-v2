@@ -13,32 +13,44 @@ When you're done, this'll be something you can share with your friends to let th
 
 I know, I know, you could use a ready-made service like [Datacake](https://datacake.de) for public dashbaords, but...we're nerds, and wherever possible we build our own things.
 
-Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but...if that's you, you don't need this tutorial.
+Relax, it won't be super hard, and I'll use a few scripts to make it easier for you (they make stuff happen automatically, like installing Node-RED, InfluxDB, Grafana, etc).  You can always do that on your own if you want to, but...if that's you, you probablydon't need this tutorial.
 
-I like to think of this as the first step on a long trail of IoT magic.  First one's free...
+I like to think of this as the first step on a long trail of IoT magic.  
 
-My goal here is to enable you to build your own "no-subscription" public or private dashboards for under US$150 (not including the sensors).    
+My goal here is to enable you to build your own "no-subscription" public or private dashboards for about $200, most of which you'll spend on equipment you'll use in every other IoT project you do.    
 
-You'll need hardware for this. Make sure you have the following on hand:
+Make sure you have the following on hand:
 
 ### Hardware
+
+#### Core Development Hardware, ~$150 (use this for your next 50 projects)
  - [Rasbperry Pi 4 with 4 or 8 GB RAM](https://amzn.to/3DAVCnO), about $60. 
  - [SD Card for Pi](https://amzn.to/40ha8K5), about $10 
- - Dragino LDDS 75 sensor.  You can buy one at [RobotShop](https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz) for $60-80.
  - External SSD for the Pi, about $30.  IoT data sets can get pretty big and you'll want plenty of space beyond the SD card on the Pi.  SD cards can also wear out if you write to 'em a bunch. Something like [this](https://amzn.to/3PbhbNY) is fine.
- - Some kind of USB-TTL adapter (the thing that allows you to communicate directly over-the-wire with the sensor)
-    - [BusPirate](https://buspirate.com/) I used the v5 for this, but the v6 is already out!  $40-80
+ - USB-TTL adapter (the thing that allows you to communicate directly over-the-wire with the sensor)
+    - [BusPirate](https://buspirate.com/)  This is what the mighty Teague uses, and I recommend it. I used the v5 for this, but the v6 is already out!  $40-80
     - Cheapie [Amazon Kit](https://www.amazon.com/dp/B07VNVVXW6?ref=ppx_pop_mob_ap_share) (thanks to GreyHat for the rec) $14
     - [Segger J-Link EDU Mini](https://www.sparkfun.com/products/24078) - $60 on Sparkfun
+ - 2 x [USB A to USB C cables](https://amzn.to/4aoqS5N) (connecting the Pi to the SD card and the Bus Pirate to your computer)
 
-* The Pi & SD & SSD are Amazon affiliate links, so I'll probably be able to pay my annual $12 domain name bill with the commissions.
+:::note
+The Pi, SD, SSD, and USB cables are Amazon affiliate links.  If you use those I'll probably be able to pay my annual $12 domain name bill with the commissions.
+:::
+
+#### Sensor, $60-80
+- Dragino LDDS 75 sensor.  You can buy one at [RobotShop](https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz) for $60-80.
+
+
+:::tip
+If you want a fancy case for your Pi (NOT needed), this is what I use: [FLIRC case](https://amzn.to/3E9OEpM) for Raspberry Pi 4B, about $16
+:::
 
 ### Not-Hardware
     - Custom domain.  For this tutorial I'll be using mine, `gristleking.dev`.  If you don't already have a domain, I'd **strongly** recommend buying one at [Cloudflare](https://cloudflare.com).  They're about $12/year and buying it there makes everything else a little bit easier.
     - If you have a domain already, you'll need to set up your domain's name servers to point to Cloudflare.
 
 ### Notes on what you "Need"
-You don't actually NEED a USB-TTL adapter if you're not going to make any changes to the sensor (like how often it reports), but it's generally good practice to have one hanging around the work bench if you're any kind of aspiring nerd.
+You don't actually NEED a USB-TTL adapter, but it's generally good practice to have one hanging around the work bench if you're any kind of aspiring nerd.  You could use downlinks instead of the adapter to make changes to your sensor, but in practice I've found that to add both complication and time (especially if you have to wait for the next uplink & you get your downlink command wrong...ask me how I know)
 
 You *could* do this without a custom domain by hosting in the cloud and managing tunnels with Cloudflare, but then you're on the hook for cloud hosting, which is probably $6/month at the cheapest.  A domain is something like $70/year for an expensive `.ai` one and $12/year for a cheap one. Trust me, just buy a domain. 
 
