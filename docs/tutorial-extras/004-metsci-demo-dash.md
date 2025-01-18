@@ -2,7 +2,7 @@
 sidebar_position: 4
 title: MetSci Demo Dashboard 
 ---
-![MetSci Demo Dashboard](/images/draft-warning.png)
+
 # Build a Custom Dashboard
 
 Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor.
@@ -493,7 +493,12 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
 
+:::caution
+I haven't figured out a clean way to set up Grafana to use the Cloudflare tunnel for public dashboard sharing.  Consider this next section a work in progress. 
+:::
+
 #### Grafana Application
+
 Ok, now we'll set up a Grafana Service Auth token and two Grafana Applications.  One will point to where our Grafana public dashboards are running and allow anyone to check 'em out.  The other will block acccess through the tunnel to the rest of our Grafana instance.
 
 #### Grafana Service Auth Token
@@ -557,6 +562,10 @@ Add an Application` and set it up as follows:
  Hit `Next` and scroll down to the bottom of the next page (past `CORS`, `Cookies`, and `Additional Settings`), then click `Add Application`.
 
 Nice work!  With these Applications, Policies, and Tokens set up, we've created a secure way for our Pi to both receive and transmit private & public data through a Cloudflare tunnel.
+
+:::caution
+End Grafana caution section.
+:::
 
 I know it's hard to see it, but we're making progress here.  
 
