@@ -104,10 +104,7 @@ There's nothing ultra fancy in here, just generally good Pi housekeeping.  Answe
 curl -sSL meteoscientific.com/scripts/secure-pi.sh -o secure.sh && chmod +x secure.sh && sudo ./secure.sh
 ```
 
-Once you've run it to the end, you'll see a bunch of info confirming what it did. Go ahead and reboot the Pi now.
-```bash
-sudo reboot
-```
+Once you've run it to the end, it'll ask you if you want to reboot.  Just type in `y` and hit `Enter`.
 
 
 ## 2. **Install Services (Node-RED, InfluxDB, Grafana)**
@@ -246,15 +243,13 @@ If any of these commands fail with "permission denied", your ownership isn't set
 Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel and routes to securely move data between your Pi and the internet.
 
 
-## 3. **Cloudflare:** Tunnels, Routes, and Tokens
+## 3. **Cloudflare:** Tunnels, Routes, Applications and Tokens
 
 Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different "routes" for different services, like a route for Node-RED to send data there from the MetSci LNS.  You could also setup a route for Grafana to display data from your Pi onto a public dashboard, or something directly to InfluxDB.
 
-For this tutorial, we're only going to set one route in all its glory.  It'll go from your MetSci Console to Node-RED using an http integration.  
+For this tutorial, we're going to set up two routes, one for Node-RED and one for Grafana.  
 
-We'll also use a much simpler route to display data on a publicly shared Grafana dashboard.  
-
-We're not going to setup a route for InfluxDB (because it's not needed), but the point here is to expose you a bit to what you can do with Cloudflare and routes.
+We're not going to setup a route for InfluxDB (because it's not needed).  The point here is to expose you a bit to what you can do with Cloudflare and routes.
 
 Ok, back to tunnels.  Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a "route" in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
 
@@ -392,11 +387,7 @@ Head back to the Cloudflare main menu and choose your domain, then `DNS`, then l
 
 ![Add notes to your DNS records](/images/tutorial-extras/004-images/cloudflare-dns-route-note.png)
 
-:::important
-We're going to focus solely on our `node-red.<YOUR-DOMAIN>` for the next steps in the tutorial.
-  
-The Grafana dashboard route we just set up doesn't need any of the following done to it.
-:::
+#### 1. Node-RED Application & Token
 
 Now that we have our route/sub-domain of `node-red.gristleking.dev` set up, we'll need to create three things specific for our LDDS75 MetSci LNS Application:
 
@@ -422,7 +413,7 @@ Each Cloudflare Application will need a `Service Token` and a `Cloudflare Zero T
 ```
 
 
-### G. Create A Service Token
+### G. Create A Service Token for NODE-RED
 
 In Cloudflare, back in Zero Trust, go to `Access-->Service Auth` and click `Create Service Token`.  
 
@@ -439,7 +430,10 @@ CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
 ```
 Hit the `Save` button at the bottom right.
 
+
 ### H. Add A Zero Trust Application
+
+#### Node-RED Applications
 
 With our Service Token set up, go to `Access-->Applications` and add a new Cloudflare Application.  
 
@@ -449,11 +443,13 @@ Select `Self Hosted`
 
 #### Application Details 
 
-We're going to set up 2 Applications to start.  One is a "global" applications that references all tokens for Node-RED. 
+We're going to set up 3 Applications to start.  Two are for NOD-RED, we'll start with those:
 
-The other is a specific application that references the `ldds75` token and restricts access to the `node-red/metsci-ldds75-data` route.
+ - a "global" applications that references all tokens for Node-RED. 
+ - a specific application that references the `ldds75` token and restricts access to the `node-red/metsci-ldds75-data` route.
 
-Let's start with the global application. 
+#### Global Node-RED Application
+Let's start with the global Node-RED application. 
 
 Set the Application name to `Node-RED` and set the `Session Duration` to `24 hours`.  Then set the subdomain to `node-red`, the `domain` to `<YOUR-DOMAIN>.com`, and the `path` to `*`.
 
@@ -496,6 +492,83 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 ![Configure rules for your Zero Trust policy](/images/tutorial-extras/004-images/cloudflare-set-service-token-rule.png)
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
+
+#### Grafana Application
+Ok, now we'll set up a Grafana Service Auth token and two Grafana Applications.  One will point to where our Grafana public dashboards are running and allow anyone to check 'em out.  The other will block acccess through the tunnel to the rest of our Grafana instance.
+
+#### Grafana Service Auth Token
+`Access-->Service Auth` and click `Create Service Token`.  
+
+Service Token Name: `grafana admin`
+Service Token Duration: `Non-expiring`
+
+Save the `Access ID` and `Access Secret` in a secure place in case you decide to open up some part of your Grafana admin side later (like the Grafana API).  What you save should look like this:
+
+```
+CF-Access-Client-Id: 5xxxxxxxxxxxxxxxxxxxxxxxx3.access
+
+CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
+```
+
+
+#### Public Grafana Application
+Use the same process as the Node-RED application, although this time we'll use two separate `Applications` for public and private access.  
+
+![Configure Grafana Application](/images/tutorial-extras/004-images/cloudflare-grafana-application.png)
+
+Set the first one (public access) as follows:
+
+ - `Self hosted`
+ - Application name: `Grafana Public Dashboards`
+ - Session duration: `24 hours`
+ - Subdomain: `grafana`
+ - Domain: `<YOUR-DOMAIN>.com`
+ - Path: `/public-dashboards/*`
+
+ Give it a Policy name of `Grafana Public` and set the Action to `Allow`.
+
+ In `Configure Rules` select `Include`:
+ - `Everyone`
+ - Value will automatically fill in as `Everyone`
+
+ Saving that will bring you back to the *Applications* page.  
+
+Now we'll add the second Grafana Application that blocks access to the rest of your Grafana instance.  
+
+Go to `Access -->Applications`
+
+Add an Application` and set it up as follows:
+
+ - `Self Hosted`
+ - Application name: `Grafana Admin`
+ - Session duration: `24 hours`
+ - Subdomain: `grafana`
+ - Domain: `<YOUR-DOMAIN>.com`
+ - Path: `*`
+ 
+ Scroll down and hit `Next`.
+
+ Now create the policy requring the Service Auth token.  
+ 
+ Set the policy name to `Grafana Admin` and set the Action to `Service Auth`.
+
+ In `Configure Rules` select `Any Access Service Token`.  It will automatically fill in a value of `Any non expired Service Token will be matched`.
+
+ Hit `Next` and scroll down to the bottom of the next page (past `CORS`, `Cookies`, and `Additional Settings`), then click `Add Application`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Nice work!  We've now set a `Global Application` to make sure only services with a token can use our `node-red.gristleking.dev` domain, and then a `LDDS75 Application` to set a path for using the ldds75.
 
