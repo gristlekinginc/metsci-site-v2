@@ -2,7 +2,7 @@
 sidebar_position: 4
 title: MetSci Demo Dashboard 
 ---
-
+![MetSci Demo Dashboard](/images/draft-warning.png)
 # Build a Custom Dashboard
 
 Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor.
@@ -556,21 +556,7 @@ Add an Application` and set it up as follows:
 
  Hit `Next` and scroll down to the bottom of the next page (past `CORS`, `Cookies`, and `Additional Settings`), then click `Add Application`.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Nice work!  We've now set a `Global Application` to make sure only services with a token can use our `node-red.gristleking.dev` domain, and then a `LDDS75 Application` to set a path for using the ldds75.
+Nice work!  With these Applications, Policies, and Tokens set up, we've created a secure way for our Pi to both receive and transmit private & public data through a Cloudflare tunnel.
 
 I know it's hard to see it, but we're making progress here.  
 
@@ -1021,11 +1007,13 @@ First, in your Pi Terminal:
 sudo nano /etc/grafana/grafana.ini
 ```
 
-Then, in the Server block, **replace the domain and subdomain with your own**:
+You'll see the full file, modify/add the following, **replacing the domain and subdomain with your own as appropriate**:
 
-```[server]
-domain = grafana.gristleking.dev
-root_url = https://grafana.gristleking.dev
+```
+[server]
+domain = grafana.gristleking.dev 
+root_url = https://grafana.gristleking.dev 
+
 ```
 Save & close with `Ctrl+X`, then `Y`, then `Enter`.
 
