@@ -496,7 +496,7 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
 
-#### Grafana Application
+### I. Setup Grafana Application
 
 Ok, now we'll set up a Grafana Service Auth token and a Grafana Application.  This will allow us to share our Grafana dashboards while protecting the rest of our Grafana instance.
 
@@ -518,7 +518,9 @@ CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
 
 #### Grafana Application for Access Control
 
-Use the same process as the Node-RED application.
+Use the same process as the Node-RED application.  This sets up the Cloudflare Tunnel Grafana route to only allow access to people with a valid Service Token, which should be...no one.
+
+You'll still be able to access your Grafana service on your local network, but the Cloudflare Tunnel route will block all other access.
 
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
@@ -538,6 +540,8 @@ Policy name: Grafana Access Control
 Action: Service Auth
 Session Duration: Same as application session timeout
 
+Scroll down and
+
 Configure rules:
 Include: Any Access Service Token
 Value: Any non expired Service Token will be matched
@@ -549,9 +553,12 @@ Scroll down to the bottom of the next page and click `Add Application`.
 
 Now you've set it up so that you can share a dashboard via your Cloudflare tunnel, but the rest of your Grafana instance is still protected.
 
-I know it's hard to see it, but we're making progress here.  
+:::note
+The Cloudflare Zero Trust integration with Grafana is a little odd here; you'd think you could just set an Application & Policyto allow access to your /public-dashboards path and block access to everything else like we did with Node-RED, but Policies can't be applied to paths, and Grafana is fussy with the access it requires for the /public-dashboards.  Setting it up using the `/d/*` is a decent workaround, but I'm hoping someone from Cloudflare reads this and improves their already superb service.
+:::
 
 ---
+
 ## 4. **Setting Up Your LDDS 75 Sensor**
 
 Whether this is your first device ever or your 100th, now is a good time to think about how you're going to structure your data.  I've written a [separate tutorial just on structuring data](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md). If you've never thought about this before, it's a good idea to read through that.  You can also just YOLO and follow along, trusting that my data structure is good enough for you.  
