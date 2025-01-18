@@ -363,23 +363,26 @@ You'll be taken back to the Tunnels page.  Click on the three stacked dots on th
 Now select `Public Hostname` and click `Add a public hostname`.
 
 ![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-select-add-public-hostname-for-new-route.png)
-Set it up as follows:
+
+Set it up as follows, noting the new addition of a `Path` using `d/*` to allow access to the Grafana dashboard.
+
 ```
 -Subdomain: grafana
 -Domain: <YOUR-DOMAIN>.com
+-Path: d/*
 -Type: HTTP
 -URL: localhost:3000
 ```
 
 It should look like this when you're done.  
 
-![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/cloudflare-add-new-public-hostname.png)
+![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/cloudflare-add-public-hostname-grafana.png)
 
 Click `Save hostname`.
 
 You can now see both your public hostnames for your tunnel.  Cool, right?
 
-![Confirm both your public hostnames](/images/tutorial-extras/004-images/cloudflare-public-hostnames-are-set-up.png)
+![Confirm both your public hostnames](/images/tutorial-extras/004-images/cloudflare-both-public-hostnames-added.png)
 
 
 ### F. Check Your Subdomain in Cloudflare
@@ -493,15 +496,12 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
 
-:::caution
-I haven't figured out a clean way to set up Grafana to use the Cloudflare tunnel for public dashboard sharing.  Consider this next section a work in progress. 
-:::
-
 #### Grafana Application
 
-Ok, now we'll set up a Grafana Service Auth token and two Grafana Applications.  One will point to where our Grafana public dashboards are running and allow anyone to check 'em out.  The other will block acccess through the tunnel to the rest of our Grafana instance.
+Ok, now we'll set up a Grafana Service Auth token and a Grafana Application.  This will allow us to share our Grafana dashboards while protecting the rest of our Grafana instance.
 
 #### Grafana Service Auth Token
+
 `Access-->Service Auth` and click `Create Service Token`.  
 
 Service Token Name: `grafana admin`
@@ -516,56 +516,38 @@ CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
 ```
 
 
-#### Public Grafana Application
-Use the same process as the Node-RED application, although this time we'll use two separate `Applications` for public and private access.  
+#### Grafana Application for Access Control
 
-![Configure Grafana Application](/images/tutorial-extras/004-images/cloudflare-grafana-application.png)
+Use the same process as the Node-RED application.
 
-Set the first one (public access) as follows:
+```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
- - `Self hosted`
- - Application name: `Grafana Public Dashboards`
- - Session duration: `24 hours`
- - Subdomain: `grafana`
- - Domain: `<YOUR-DOMAIN>.com`
- - Path: `/public-dashboards/*`
+```
+Application name: `Grafana Access Control`
+Session Duration: `24 hours`
+Subdomain: `grafana`
+Domain: `<YOUR-DOMAIN>.com`
+Path: `login`
+```
 
- Give it a Policy name of `Grafana Public` and set the Action to `Allow`.
+Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  
 
- In `Configure Rules` select `Include`:
- - `Everyone`
- - Value will automatically fill in as `Everyone`
+Add a policy with the following:
+```
+Policy name: Grafana Access Control
+Action: Service Auth
+Session Duration: Same as application session timeout
 
- Saving that will bring you back to the *Applications* page.  
+Configure rules:
+Include: Any Access Service Token
+Value: Any non expired Service Token will be matched
+```
 
-Now we'll add the second Grafana Application that blocks access to the rest of your Grafana instance.  
+![Grafana Access Control Application](/images/tutorial-extras/004-images/cloudflare-grafana-access-control.png)
 
-Go to `Access -->Applications`
+Scroll down to the bottom of the next page and click `Add Application`.
 
-Add an Application` and set it up as follows:
-
- - `Self Hosted`
- - Application name: `Grafana Admin`
- - Session duration: `24 hours`
- - Subdomain: `grafana`
- - Domain: `<YOUR-DOMAIN>.com`
- - Path: `*`
- 
- Scroll down and hit `Next`.
-
- Now create the policy requring the Service Auth token.  
- 
- Set the policy name to `Grafana Admin` and set the Action to `Service Auth`.
-
- In `Configure Rules` select `Any Access Service Token`.  It will automatically fill in a value of `Any non expired Service Token will be matched`.
-
- Hit `Next` and scroll down to the bottom of the next page (past `CORS`, `Cookies`, and `Additional Settings`), then click `Add Application`.
-
-Nice work!  With these Applications, Policies, and Tokens set up, we've created a secure way for our Pi to both receive and transmit private & public data through a Cloudflare tunnel.
-
-:::caution
-End Grafana caution section.
-:::
+Now you've set it up so that you can share a dashboard via your Cloudflare tunnel, but the rest of your Grafana instance is still protected.
 
 I know it's hard to see it, but we're making progress here.  
 
@@ -1023,6 +1005,9 @@ You'll see the full file, modify/add the following, **replacing the domain and s
 domain = grafana.gristleking.dev 
 root_url = https://grafana.gristleking.dev 
 
+[security]
+allow_embedding = true
+
 ```
 Save & close with `Ctrl+X`, then `Y`, then `Enter`.
 
@@ -1037,9 +1022,9 @@ Click the Share button in the top right.  Go to the `Public Dashboard` tab
 
 ![Grafana Share Dashboard](/images/tutorial-extras/004-images/grafana-share-dashboard.png)
 
-Check all the boxes, then click `Generate Public URL`.  It should generate a URL like `https://grafana.gristleking.dev/d/000000002/ldds75-metsci-dashboard?orgId=1&var-device=LDDS%202`, pulling from the `[server]` block we just set up.  
+Check all the boxes, then click `Generate Public URL`.  It should generate a URL like `https://grafana.<YOUR-DOMAIN>>.dev/d/000000002/ldds75-metsci-dashboard?orgId=1&var-device=LDDS%202`.
 
-Copy the URL and paste it into your browser.  You should see your dashboard.  Bam, you're public!
+Copy the URL and paste it into your browser, or share it with your Mom.  Now everybody can see how much water is in your tank.  Bam, you're public!
 
 --- 
 
