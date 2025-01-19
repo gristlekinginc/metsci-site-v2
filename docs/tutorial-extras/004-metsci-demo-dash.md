@@ -249,9 +249,7 @@ Nice work, you've set up the major components of your dashboard.  Now let's set 
 
 Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different public hostnames for different services, like `node-red.gristleking.dev` for Node-RED and `grafana.gristleking.dev` for Grafana.  We'll use those to connect our Pi to the internet in a secure way.
 
-Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little plastic straws that carry separate types of information to different places.  Each straw is a public hostname in the tunnel, and within those straws you'll split it out further into different Applications that manage the data from different types of sensors. 
-
-For this tutorial, we're going to set up two public hostnames, one for Node-RED and one for Grafana. 
+Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of individual pipes that carry separate types of information to different places.  Each individualpipe is a public hostname in the tunnel, and within those pipes you'll split it out even further into different Applications that manage the data from different types of sensors. 
 
 ### A. Set Up Zero Trust
 
@@ -265,7 +263,7 @@ If you haven't set up Zero Trust yet, you may not see "Zero Trust" in your menu.
 
 ![Cloudflare Zero Trust](/images/tutorial-extras/004-images/set-up-zero-trust.png)
 
-Once you have it, you'll see it in your **main** (not your domain) Cloudflare menu, like this.
+Once you have it, you'll see it in your **Main** (not your domain) Cloudflare menu, like this.
 
 ![Cloudflare Zero Trust](/images/tutorial-extras/004-images/go-to-zero-trust.png)
 
@@ -345,19 +343,21 @@ That should give you something like this:
 
 You can use `CTRL-C` to get back to a prompt.
 
-### E. Setting Up Applications
-
 Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
 ![Cloudflare tunnel configured](/images/tutorial-extras/004-images/cloudflare-next-after-installing-connector.png)
 
+### E. Setting Up Public Hostnames
+
+With our tunnel set up, now we'll create our Public Hostnames (subdomains), starting with Node-RED.
+
 #### 1. Node-RED
 
-Now we'll set up the Node-RED application.  Add `node-red` in the Subdomain field and choose your domain. I'm using `gristleking.dev` for this tutorial.  Throughout the tutorial, wherever you see `gristleking.dev`, replace it with your own domain.
+Add `node-red` in the Subdomain field, then choose your domain. I'm using `gristleking.dev` for this tutorial.  Throughout the tutorial, wherever you see `gristleking.dev`, replace it with your own domain.
 
-For Type choose `HTTP`, then set the URL to `localhost:1880`.
+For Type choose `HTTP`, then set the URL to `localhost:1880`, which is the port Node-RED runs on.
 
-Then the blue `Save tunnel` button at the bottom right. 
+Now hit the blue `Save tunnel` button at the bottom right. 
 
 ![Configure your initial public hostname](/images/tutorial-extras/004-images/cloudflare-initial-tunnel-setup-route-setup.png)
 
@@ -393,14 +393,19 @@ You can now see both your public hostnames for your tunnel.  Cool, right?
 ![Confirm both your public hostnames](/images/tutorial-extras/004-images/cloudflare-both-public-hostnames-added.png)
 
 
+#### 3. Document Your Public Hostnames
+
 Head back to the Cloudflare main menu and choose your domain, then `DNS`, then look for the subdomain you just set up.  I usually add a note to mine, something like `this is for Node-RED for the MetSci Demo Dash project`, just so future me has a clue as to what's going on. 
 
 ![Add notes to your DNS records](/images/tutorial-extras/004-images/cloudflare-dns-route-note.png)
 
-### F. Application & Token Setup
+### F. Zero Trust Token & Application Setup
+
+With our public hostnames set up we'll need to protect them so that not every jackass and their brother and drop into our Node-RED or Grafana instances.  We'll do that with Cloudflare's Zero Trust.
+
 #### 1. Node-RED
 
-Now that we have our public hostnames setup, we'll need to create Applications and Tokens to help control access to each.  In general, we don't want the public to have access to our Node-RED instance, but we do want to share our Grafana dashboard with the public.  
+For each public hostname, we'll create Applications and Tokens to manage access for them.  In general, we don't want the public to have access to our Node-RED instance, but we do want to share our Grafana dashboard with the public.  
 
 Let's start with the Node-RED Application and Token, focusing on what we'll need for the LDDS75.
 
@@ -418,12 +423,11 @@ Remember, a `MetSci Application` is a group of sensors that share the same data 
 
 A `Cloudflare Application` is used to manage a Zero Trust setup.  In our case, we'll use `Service Tokens` as a gatekeeper ("No token no entry") as well as a routing requirement, i.e the LDDS75 token will give you access to the whole LDDS75 path.
 
-
-#### 2. Node-RED Service Token
+#### 2. Create Service Tokens
 
 In Cloudflare, back in Zero Trust, go to `Access-->Service Auth` and click `Create Service Token`.  
 
-Name your token something descriptive (I'll use `ldds75`) and set the duration to `Non-expiring`.
+We'll start with a Service Token for Node-RED.  Name your token something descriptive (I'll use `ldds75`) and set the duration to `Non-expiring`.
 
 ![Add a Service Token in Zero Trust](/images/tutorial-extras/004-images/cloudflare-configure-service-auth-token-ldds75.png)
 
@@ -436,32 +440,35 @@ CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
 ```
 Hit the `Save` button at the bottom right.
 
+Using that same process of `Access-->Service Auth-->Create Service Token`, create another Service Token for Grafana.  I'll use `grafana-admin`.  When you're finished, you'll have two Service Tokens, like this:
 
-### H. Add A Zero Trust Application
+![Two Service Tokens](/images/tutorial-extras/004-images/cloudflare-service-tokens-created.png)
+
+
+### H. Zero Trust Applications
+
+We're going to set up 4 Applications.  Two for NOD-RED, and two for Grafana.  They'll do slightly different things, but the process of setting them up is the same.
 
 #### Node-RED Applications
 
-With our Service Token set up, go to `Access-->Applications` and add a new Cloudflare Application.  
+Go to `Access-->Applications` and add a new Cloudflare Application.  
 
 ![Add a Zero Trust Application](/images/tutorial-extras/004-images/zero-trust-applications.png)
 
 Select `Self Hosted`
 
-#### Application Details 
+In Node-RED, we don't want any public access, so we'll set up a global gatekeeper and then something to allow our MetSci LDDS75 data to pass through.
 
-We're going to set up 3 Applications to start.  Two are for NOD-RED, we'll start with those:
-
- - a "global" applications that references all tokens for Node-RED. 
- - a specific application that references the `ldds75` token and restricts access to the `node-red/metsci-ldds75-data` path.
-
-#### Global Node-RED Application
+#### Node-RED Application - Global
 Let's start with the global Node-RED application. 
 
 Set the Application name to `Node-RED` and set the `Session Duration` to `24 hours`.  Then set the subdomain to `node-red`, the `domain` to `<YOUR-DOMAIN>.com`, and the `path` to `*`.
 
 ![Add a global application](/images/tutorial-extras/004-images/cloudflare-global-application.png)
 
-Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  Here we'll set up a Policy rule that requires anything using this Application to have a valid token.
+Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  Here we'll set up a Policy rule that requires anything using this Application to have a valid token.  
+
+#### Policy Rule - Global
 
 Set the policy name to `Node-RED` and set the Action to `Service Auth`, leave the duration as is.
 
@@ -471,13 +478,15 @@ Scroll down a bit until you see `Configure rules`.  On the Selector choose `Any 
 
 Hit `Next` and scroll down to the bottom of the next page (past `CORS`, `Cookies`, and `Additional Settings`), then click `Add Application`.
 
-#### LDDS75 Application
+#### Node-RED Application - LDDS75
 
-Now you'll create the LDDS75 Application.  Hit the `Add Application`, then `Self Hosted` (just like last time), then give it a descriptive name like `ldds75`.  
+Now you'll create the LDDS75 Application, which will only apply to our LDDS75 data.  Hit the `Add Application`, then `Self Hosted` (just like last time), then give it a descriptive name like `ldds75`.  
 
 Leave the session duration at `24 hours` then enter the subdomain, domain, and path it'll use.
 
-In this case, use `node-red`.`gristleking.dev`/`metsci-ldds75-data`.  We'll use that path later when we set up our Node-RED flow.
+In this case, use `node-red` . `gristleking.dev` / `metsci-ldds75-data`. 
+
+We'll use the `metsci-ldds75-data` path later when we set up our Node-RED flow.
 
 ![Configure Zero Trust Appication](/images/tutorial-extras/004-images/cloudflare-configure-application-details.png)
 
@@ -485,9 +494,9 @@ Scroll down past `Application Appearances` and `Tags` etc to the bottom.
 
 Click `Next` to proceed to the `Policies` section.  
 
-#### Policy Rule
+#### Policy Rule - LDDS75
 
-We'll use the same `Service Auth` policy as the global application, but this time we'll restrict it to the `ldds75` token.
+We'll use the same `Service Auth` policy as the global application, but this time we'll restrict it to the `ldds75` token we've set up.
 
 Set the policy name to `ldds75` and set the Action to `Allow`, leave the duration as is.
 
@@ -497,33 +506,15 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 
 ![Configure rules for your Zero Trust policy](/images/tutorial-extras/004-images/cloudflare-set-service-token-rule.png)
 
-Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right to finish setting up your Zero Trust Application.
+Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right and you're done with the Node-RED Applications.
 
 ### I. Setup Grafana Application
 
-Ok, now we'll set up a Grafana Service Auth token and a Grafana Application.  This will allow us to share our Grafana dashboards while protecting the rest of our Grafana instance.
+Ok, now we'll set up the Grafana Applications.  Unlike Node-RED where we're blocking ALL access to the public, this time we want to block access to the Grafana admin side but allow public access to specific Grafana dashboards.  
 
-#### Grafana Service Auth Token
+Since you've already set up two Applications, I'll go a little faster.
 
-`Access-->Service Auth` and click `Create Service Token`.  
-
-Service Token Name: `grafana admin`
-Service Token Duration: `Non-expiring`
-
-Save the `Access ID` and `Access Secret` in a secure place in case you decide to open up some part of your Grafana admin side later (like the Grafana API).  What you save should look like this:
-
-```
-CF-Access-Client-Id: xxxxxxxxxxxxxxxxxxxxxxxxx.access
-
-CF-Access-Client-Secret: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-
-#### Grafana Application for Access Control
-
-Use the same process as the Node-RED application.  We'll set up two Cloudflare Applications, one for access control and one for the Grafana dashboard.
-
-Ok, you've done this before, so I'll go a little faster:
+#### Grafana Access Control Application & Policy
 
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
@@ -552,13 +543,12 @@ Value: Any non expired Service Token will be matched
 
 ![Grafana Access Control Application](/images/tutorial-extras/004-images/cloudflare-grafana-access-control.png)
 
-Scroll down to the bottom of the next page and click `Add Application`.
+Scroll down to the bottom of the next page and click `Add Application`.  You don't need to set up a specific Service Auth token for this, you just need to require that A service token is needed to access anything in Grafana except the stuff required for public dashboards.  We'll set those up next.
 
-#### Grafana Dashboard Application
+#### Grafana Public Dashboard Application & Policy
 
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
-![Add a Grafana Public Access Application](/images/tutorial-extras/004-images/cloudflare-grafana-public-access-domains.png)
 ```
 Application name: `Grafana Public Access`
 Session Duration: `24 hours`
@@ -568,6 +558,8 @@ Path: `public*`
 ```
 
 Then add two more domains, with two different paths:
+
+![Add a Grafana Public Access Application](/images/tutorial-extras/004-images/cloudflare-grafana-public-access-domains.png)
 
 ```
 - Subdomain: `grafana`
