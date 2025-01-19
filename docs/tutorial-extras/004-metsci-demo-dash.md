@@ -340,7 +340,7 @@ That should give you something like this:
 
 You can use `CTRL-C` on a Mac to stop the output; it won't stop the tunnel.
 
-### E. Setting Up Routes
+### E. Setting Up Applications
 
 Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
@@ -593,7 +593,7 @@ Include: Everyone
 Value: Everyone (will fill in automatically)
 ```
 
-Now you've set it up so that you can share a dashboard via your Cloudflare tunnel, but the rest of your Grafana instance is still protected.
+Now you've set it up so that you can share a dashboard via your Cloudflare tunnel, but the rest of your Grafana instance is still protected.  Big thanks to **Chaika** over on the Cloudflare Discord for walking me through the Grafana dashboard setup!
 
 ---
 
@@ -1079,7 +1079,7 @@ By now you'll have at least a couple of packets coming through the tunnel, so yo
 
 Liquid level sensing is simple, but generally not that exciting, so...
 
-Using the steps above, I've added in a Milesight AM319, including a route, policy, and application in Cloudflare and a second dashboard.  This is what it looks like with some live data:
+Using the steps above, I've added in a Milesight AM319, including an Applicaton and Policy in Cloudflare and a second dashboard.  This is what it looks like with some live data:
 
 ![Grafana AM319 Dashboard](/images/tutorial-extras/004-images/grafana-am319-burpees.png)
 
