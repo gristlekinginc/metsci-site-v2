@@ -553,9 +553,9 @@ Scroll down to the bottom of the next page and click `Add Application`.
 
 #### Grafana Dashboard Application
 
-
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
+![Add a Grafana Public Access Application](/images/tutorial-extras/004-images/cloudflare-grafana-public-access-domains.png)
 ```
 Application name: `Grafana Public Access`
 Session Duration: `24 hours`
@@ -594,10 +594,6 @@ Value: Everyone (will fill in automatically)
 ```
 
 Now you've set it up so that you can share a dashboard via your Cloudflare tunnel, but the rest of your Grafana instance is still protected.
-
-:::note
-The Cloudflare Zero Trust integration with Grafana is a little odd here; you'd think you could just set an Application & Policyto allow access to your /public-dashboards path and block access to everything else like we did with Node-RED, but Policies can't be applied to paths, and Grafana is fussy with the access it requires for the /public-dashboards.  Setting it up using the `/d/*` is a decent workaround, but I'm hoping someone from Cloudflare reads this and improves their already superb service.
-:::
 
 ---
 
