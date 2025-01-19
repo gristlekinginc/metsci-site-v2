@@ -5,10 +5,6 @@ title: MetSci Demo Dashboard
 
 # Build a Custom Dashboard
 
-:::warning
-This is a working document.  I'll continue to update and improve it.  If this is your first time mucking about with IoT, I'd come back a bit later when I have a fully polished tutorial.  If you're more of a FAAFO type, you'll probably be fine, and I'm guessing the Cloudflare setup will be the most interesting for you.
-:::
-
 Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor.
 
 **You don't actually have to be a nerd to do this.** As long as you can get the hardware listed below, follow directions, and copy/paste, you're going to end up with a working dashboard.
