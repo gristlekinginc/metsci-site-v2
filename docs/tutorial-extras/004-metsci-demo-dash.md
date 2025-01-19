@@ -5,6 +5,10 @@ title: MetSci Demo Dashboard
 
 # Build a Custom Dashboard
 
+:::warning
+This is a working document.  I'll continue to update and improve it.  If this is your first time mucking about with IoT, I'd come back a bit later when I have a fully polished tutorial.  If you're more of a FAAFO type, you'll probably be fine, and I'm guessing the Cloudflare setup will be the most interesting for you.
+:::
+
 Ok nerds, let's do something rad with [Helium](https://www.helium.com/) and build a dashboard for a sensor.
 
 **You don't actually have to be a nerd to do this.** As long as you can get the hardware listed below, follow directions, and copy/paste, you're going to end up with a working dashboard.
@@ -394,7 +398,7 @@ Head back to the Cloudflare main menu and choose your domain, then `DNS`, then l
 ![Add notes to your DNS records](/images/tutorial-extras/004-images/cloudflare-dns-route-note.png)
 
 ### F. Application & Token Setup
-#### 1. Node-RED Application & Token
+#### 1. Node-RED
 
 Now that we have our public hostnames setup, we'll need to create Applications and Tokens to help control access to each.  In general, we don't want the public to have access to our Node-RED instance, but we do want to share our Grafana dashboard with the public.  
 
@@ -412,27 +416,14 @@ Now, the use of the word "Application" can be a bit confusing here, as we have b
 
 Remember, a `MetSci Application` is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one `Cloudflare Application`.  
 
-A `Cloudflare Application` is used to manage a Zero Trust setup.  In our case, we'll use `Service Tokens` as a basic requirement ("No token no entry") as well as a routing requirement, i.e the LDDS75 token will give you access to the whole LDDS75 path.
-
-If we quickly zoom out, one way to visualize it is like this:
-
-```
-\ sensor -- sensor -- sensor -- sensor /
- \ ------- MetSci Application ------- /
-  \ ------- HTTP Integration ------- /
-   \ ------- Cloudflare Tunnel ---- /
-    \ ---- Cloudflare Subdomain -- /
-     \ ------- Service Token ---- / <--We are here
-      \  Zero Trust Application  /
-       \ ----- Raspberry Pi --- /
-```
+A `Cloudflare Application` is used to manage a Zero Trust setup.  In our case, we'll use `Service Tokens` as a gatekeeper ("No token no entry") as well as a routing requirement, i.e the LDDS75 token will give you access to the whole LDDS75 path.
 
 
-### G. Create A Service Token for NODE-RED
+#### 2. Node-RED Service Token
 
 In Cloudflare, back in Zero Trust, go to `Access-->Service Auth` and click `Create Service Token`.  
 
-Name your token something descriptive (I'm using `ldds75`) and set the duration to `Non-expiring`.
+Name your token something descriptive (I'll use `ldds75`) and set the duration to `Non-expiring`.
 
 ![Add a Service Token in Zero Trust](/images/tutorial-extras/004-images/cloudflare-configure-service-auth-token-ldds75.png)
 
