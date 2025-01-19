@@ -19,8 +19,6 @@ My goal here is to enable a non-technical person to build your own "no-subscript
 
 IoT stuff has been super fun for me to explore, and I'm pumped to share it with you.  This is pretty much a love letter to you from me about IoT.  
 
-Final note: This tutorial was made possible by a generous grant from the Helium Foundation's IOTWG; huge thanks to them for the support.
-
 Enjoy!
 
 ### Get After It
@@ -1313,3 +1311,4 @@ If something goes wrong:
 
 Last step?  Tell your friends what you did!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
 
+This tutorial was made possible by a generous grant from the Helium Foundation's IOTWG; huge thanks to them for the support.
