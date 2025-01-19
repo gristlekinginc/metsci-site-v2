@@ -69,7 +69,7 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 
 2. **Install Services:** Node-RED, InfluxDB, Grafana, integrate external SSD.
 
-3. **Cloudflare:** Set up tunnels, tokens, routes, and policies.
+3. **Cloudflare:** Set up tunnels, tokens, applications, and policies.
 
 4. **Sensor:** Get the sensor sending data through MetSci
 
@@ -240,20 +240,20 @@ rm /mnt/ssd/test.txt
 
 If any of these commands fail with "permission denied", your ownership isn't set correctly.
 
-Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel and routes to securely move data between your Pi and the internet.
+Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel to securely move data between your Pi and the internet.
 
 
-## 3. **Cloudflare:** Tunnels, Routes, Applications and Tokens
+## 3. **Cloudflare:** Tunnels, Applications, and Tokens
 
-Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different "routes" for different services, like a route for Node-RED to send data there from the MetSci LNS.  You could also setup a route for Grafana to display data from your Pi onto a public dashboard, or something directly to InfluxDB.
+Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different public hostnames for different services, like one for Node-RED to send data there from the MetSci LNS.  You could also setup a public hostname for Grafana to display data from your Pi onto a public dashboard, or something directly to InfluxDB.
 
-For this tutorial, we're going to set up two routes, one for Node-RED and one for Grafana.  
+For this tutorial, we're going to set up two public hostnames, one for Node-RED and one for Grafana.  
 
-We're not going to setup a route for InfluxDB (because it's not needed).  The point here is to expose you a bit to what you can do with Cloudflare and routes.
+We're not going to set one up for InfluxDB (because it's not needed).  The point here is to expose you a bit to what you can do with Cloudflare.
 
-Ok, back to tunnels.  Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a "route" in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
+Ok, back to tunnels.  Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a public hostname in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
 
-Within a route, each sensor type you set up in MetSci will need its own token to keep the http integration secure.  
+Within a public hostname, each sensor type you set up in MetSci will need its own token to keep the http integration secure.  
 
 To start this off, login to [Cloudflare](https://www.cloudflare.com/). I'm assuming you've already set up your domain with Cloudflare, so when you log in you'll see something like this:
 
@@ -346,7 +346,7 @@ Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
 ![Cloudflare tunnel configured](/images/tutorial-extras/004-images/cloudflare-next-after-installing-connector.png)
 
-#### 1. Node-RED Route
+#### 1. Node-RED
 
 Add `node-red` in the Subdomain field, choose your domain (I'm using `gristleking.dev`)
 
@@ -358,7 +358,7 @@ Then the blue `Save tunnel` button at the bottom right.
 
 You'll be taken back to the Tunnels page.  Click on the three stacked dots on the right side of the row for your tunnel, then click `Configure`.
 
-![Adding a new route to a Cloudflare Tunnel](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
+![Adding a new public hostname to a Cloudflare Tunnel](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
 
 Now select `Public Hostname` and click `Add a public hostname`.
 
@@ -392,7 +392,7 @@ Head back to the Cloudflare main menu and choose your domain, then `DNS`, then l
 
 #### 1. Node-RED Application & Token
 
-Now that we have our route/sub-domain of `node-red.gristleking.dev` set up, we'll need to create three things specific for our LDDS75 MetSci LNS Application:
+Now that we have our sub-domain of `node-red.gristleking.dev` set up, we'll need to create three things specific for our LDDS75 MetSci LNS Application:
 
 ```
 1. A Service Token
@@ -409,7 +409,7 @@ Each Cloudflare Application will need a `Service Token` and a `Cloudflare Zero T
  \ ------- MetSci Application ------- /
   \ ------- HTTP Integration ------- /
    \ ------- Cloudflare Tunnel ---- /
-    \ ------ Cloudflare Route ---- /
+    \ ---- Cloudflare Subdomain -- /
      \ ------- Service Token ---- / <--We are here
       \  Zero Trust Application  /
        \ ----- Raspberry Pi --- /
@@ -449,7 +449,7 @@ Select `Self Hosted`
 We're going to set up 3 Applications to start.  Two are for NOD-RED, we'll start with those:
 
  - a "global" applications that references all tokens for Node-RED. 
- - a specific application that references the `ldds75` token and restricts access to the `node-red/metsci-ldds75-data` route.
+ - a specific application that references the `ldds75` token and restricts access to the `node-red/metsci-ldds75-data` path.
 
 #### Global Node-RED Application
 Let's start with the global Node-RED application. 
@@ -510,17 +510,17 @@ Service Token Duration: `Non-expiring`
 Save the `Access ID` and `Access Secret` in a secure place in case you decide to open up some part of your Grafana admin side later (like the Grafana API).  What you save should look like this:
 
 ```
-CF-Access-Client-Id: 5xxxxxxxxxxxxxxxxxxxxxxxx3.access
+CF-Access-Client-Id: xxxxxxxxxxxxxxxxxxxxxxxxx.access
 
-CF-Access-Client-Secret: ffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx2
+CF-Access-Client-Secret: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 
 #### Grafana Application for Access Control
 
-Use the same process as the Node-RED application.  This sets up the Cloudflare Tunnel Grafana route to only allow access to people with a valid Service Token, which should be...no one.
+Use the same process as the Node-RED application.  We'll set up two Cloudflare Applications, one for access control and one for the Grafana dashboard.
 
-You'll still be able to access your Grafana service on your local network, but the Cloudflare Tunnel route will block all other access.
+Ok, you've done this before, so I'll go a little faster:
 
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
@@ -529,14 +529,14 @@ Application name: `Grafana Access Control`
 Session Duration: `24 hours`
 Subdomain: `grafana`
 Domain: `<YOUR-DOMAIN>.com`
-Path: `login`
+Path: `*`
 ```
 
 Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  
 
 Add a policy with the following:
 ```
-Policy name: Grafana Access Control
+Policy name: Service Auth
 Action: Service Auth
 Session Duration: Same as application session timeout
 
@@ -550,6 +550,48 @@ Value: Any non expired Service Token will be matched
 ![Grafana Access Control Application](/images/tutorial-extras/004-images/cloudflare-grafana-access-control.png)
 
 Scroll down to the bottom of the next page and click `Add Application`.
+
+#### Grafana Dashboard Application
+
+
+```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
+
+```
+Application name: `Grafana Public Access`
+Session Duration: `24 hours`
+Subdomain: `grafana`
+Domain: `<YOUR-DOMAIN>.com`
+Path: `public*`
+```
+
+Then add two more domains, with two different paths:
+
+```
+- Subdomain: `grafana`
+- Domain: `<YOUR-DOMAIN>.com`
+- Path: `public-dashboards*`
+```
+and
+```
+- Subdomain: `grafana`
+- Domain: `<YOUR-DOMAIN>.com`
+- Path: `api/public*`
+```
+
+Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  
+
+Add a policy with the following:
+```
+Policy name: Bypass
+Action: Bypass
+Session Duration: Same as application session timeout
+
+Scroll down and
+
+Configure rules:
+Include: Everyone
+Value: Everyone (will fill in automatically)
+```
 
 Now you've set it up so that you can share a dashboard via your Cloudflare tunnel, but the rest of your Grafana instance is still protected.
 
