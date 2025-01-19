@@ -243,25 +243,21 @@ Nice work, you've set up the major components of your dashboard.  Now let's set 
 
 ## 3. **Cloudflare:** Tunnels, Applications, and Tokens
 
-Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different public hostnames for different services, like one for Node-RED to send data there from the MetSci LNS.  You could also setup a public hostname for Grafana to display data from your Pi onto a public dashboard, or something directly to InfluxDB.
+Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different public hostnames for different services, like `node-red.gristleking.dev` for Node-RED and `grafana.gristleking.dev` for Grafana.  We'll use those to connect our Pi to the internet in a secure way.
 
-For this tutorial, we're going to set up two public hostnames, one for Node-RED and one for Grafana.  
+Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little plastic straws that carry separate types of information to different places.  Each straw is a public hostname in the tunnel, and within those straws you'll split it out further into different Applications that manage the data from different types of sensors. 
 
-We're not going to set one up for InfluxDB (because it's not needed).  The point here is to expose you a bit to what you can do with Cloudflare.
+For this tutorial, we're going to set up two public hostnames, one for Node-RED and one for Grafana. 
 
-Ok, back to tunnels.  Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of little straws that carry separate types of information.  Each straw is a public hostname in the tunnel, and within those straws you'll have different types of data (from different types of sensors) moving through.  Each type of data needs to get authenticated before it can get sent through the straw; it needs a token to authenticate it.
-
-Within a public hostname, each sensor type you set up in MetSci will need its own token to keep the http integration secure.  
+### A. Set Up Zero Trust
 
 To start this off, login to [Cloudflare](https://www.cloudflare.com/). I'm assuming you've already set up your domain with Cloudflare, so when you log in you'll see something like this:
 
 ![Cloudflare Dashboard](/images/tutorial-extras/004-images/cloudflare-dashboard.png)
 
-### A. Set Up Zero Trust
+You'll need to set up your Zero Trust account in Cloudflare (relax, it's free).  
 
-You'll need to set up your Zero Trust account in Cloudflare (yes, you can use the free option.)  
-
-If you haven't set up Zero Trust yet, you may not see "Zero Trust" in your menu.  If that's the case, navigate to your domain name, look for `Access` in the left menu, then hit the `Launch Zero Trust` blue button on the right, then click it and set up ZT.
+If you haven't set up Zero Trust yet, you may not see "Zero Trust" in your menu.  If that's the case, navigate to your domain name, look for `Access` in the left menu, then hit the `Launch Zero Trust` blue button on the right, then click it and set up Zero Trust.
 
 ![Cloudflare Zero Trust](/images/tutorial-extras/004-images/set-up-zero-trust.png)
 
@@ -273,25 +269,32 @@ With Zero Trust on and ready to go, let's set up the Pi.
 
 ### B. Prepare Your Pi for Cloudflare
 
-In the Pi terminal, install Cloudflare Tunnel. As always, kick things off with a system update:
+In the Pi terminal, install Cloudflare Tunnel.  It's good practice when you're adding anything to your Pi to kick things off with a system update:
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
-Next, download the Cloudflare binary to the Pi.  I'm running a Pi 4B with 64-bit ARM architecture (use `uname -m` to check yours if you're unsure)
+
+Now that the Pi is cleaned & ready, download the Cloudflare binary to the Pi.  I'm running a Pi 4B with 64-bit ARM architecture (use `uname -m` to check yours if you're unsure), so here's the command I'm using:
+
 ```bash
 wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared
 ```
+
 That may take a few minutes depending on your connection speed.
 
 When it's done, let's do a few nerdy things (making the binary executable, moving it to a system path, then verifying the installation).
+
 Make it executable:
 ```bash
 chmod +x cloudflared
 ```
+
 Move it to a system directory:
 ```bash
 sudo mv cloudflared /usr/local/bin/cloudflared
 ```
+
 Verify the installation:
 ```bash
 cloudflared --version
@@ -309,16 +312,16 @@ Back in your Cloudflare account, in Zero Trust, go to `Networks --> Tunnels --> 
 
 ![Zero Trust Network Tunnels](/images/tutorial-extras/004-images/zero-trust-networks-tunnels.png)
 
-On the next page (not shown here), select `Cloudflared`, **NOT** `WARP Connector`, then choose a tunnel name.
+On the next page (not shown here), select `Cloudflared`, **NOT** `WARP Connector`, then choose a tunnel name.  I'll use `metsci-demo` for mine.
 
 ![Name your Cloudflare tunnel](/images/tutorial-extras/004-images/choose-tunnel-name.png)
 
-Save it and you'll be taken to the Configure page.  Go down to `Install and Run Connector` and copy the one on the right.
+Save the tunnel and you'll be taken to the `Configure` page.  Look for the `Install and Run Connector` section and copy the command on the right.
 
 ![Install and run connector](/images/tutorial-extras/004-images/install-and-run-connector.png)
 
 ### D. Add The Tunnel To Your Raspberry Pi
-We've already installed Cloudflare on our Pi, so on your Pi just run the command they gave us:
+Back on your Pi, run the command they gave us:
 
 `sudo cloudflared service install super-duper-alpha-numeric-string`
 
@@ -336,7 +339,7 @@ That should give you something like this:
 
 ![Cloudflare tunnel running on Pi](/images/tutorial-extras/004-images/cloudflare-tunnel-running.png)
 
-You can use `CTRL-C` on a Mac to stop the output; it won't stop the tunnel.
+You can use `CTRL-C` to get back to a prompt.
 
 ### E. Setting Up Applications
 
@@ -346,7 +349,7 @@ Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
 #### 1. Node-RED
 
-Add `node-red` in the Subdomain field, choose your domain (I'm using `gristleking.dev`)
+Now we'll set up the Node-RED application.  Add `node-red` in the Subdomain field and choose your domain. I'm using `gristleking.dev` for this tutorial.  Throughout the tutorial, wherever you see `gristleking.dev`, replace it with your own domain.
 
 For Type choose `HTTP`, then set the URL to `localhost:1880`.
 
@@ -358,21 +361,24 @@ You'll be taken back to the Tunnels page.  Click on the three stacked dots on th
 
 ![Adding a new public hostname to a Cloudflare Tunnel](/images/tutorial-extras/004-images/cloudflare-add-route-to-tunnel.png)
 
-Now select `Public Hostname` and click `Add a public hostname`.
+Now we'll set up the Grafana public hostname.
+
+#### 2. Grafana
+
+Select `Public Hostname` and click `Add a public hostname`.
 
 ![Add a new public hostname](/images/tutorial-extras/004-images/cloudflare-select-add-public-hostname-for-new-route.png)
 
-Set it up as follows, noting the new addition of a `Path` using `d/*` to allow access to the Grafana dashboard.
+Set it up the same way you did for Ned-RED, just subbing in `grafana` and the correct port as follows:
 
 ```
 -Subdomain: grafana
 -Domain: <YOUR-DOMAIN>.com
--Path: d/*
 -Type: HTTP
 -URL: localhost:3000
 ```
 
-It should look like this when you're done.  
+It should look like this:  
 
 ![Add the hostname and post for Grafana](/images/tutorial-extras/004-images/cloudflare-add-public-hostname-grafana.png)
 
@@ -383,20 +389,26 @@ You can now see both your public hostnames for your tunnel.  Cool, right?
 ![Confirm both your public hostnames](/images/tutorial-extras/004-images/cloudflare-both-public-hostnames-added.png)
 
 
-### F. Check Your Subdomain in Cloudflare
 Head back to the Cloudflare main menu and choose your domain, then `DNS`, then look for the subdomain you just set up.  I usually add a note to mine, something like `this is for Node-RED for the MetSci Demo Dash project`, just so future me has a clue as to what's going on. 
 
 ![Add notes to your DNS records](/images/tutorial-extras/004-images/cloudflare-dns-route-note.png)
 
+### F. Application & Token Setup
 #### 1. Node-RED Application & Token
 
-Now that we have our sub-domain of `node-red.gristleking.dev` set up, we'll need to create three things specific for our LDDS75 MetSci LNS Application:
+Now that we have our public hostnames setup, we'll need to create Applications and Tokens to help control access to each.  In general, we don't want the public to have access to our Node-RED instance, but we do want to share our Grafana dashboard with the public.  
+
+Let's start with the Node-RED Application and Token, focusing on what we'll need for the LDDS75.
+
+We'll need three things for this
 
 ```
 1. A Service Token
 2. A Zero Trust Application
 3. An HTTP Integration in MetSci
 ```
+
+Now, the use of the word "Application" can be a bit confusing here, as we have both Cloudflare Applications and MetSci Applications.  
 
 Remember, a `MetSci Application` is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one `Cloudflare Application`.  
 
@@ -534,8 +546,8 @@ Scroll down to the bottom and click `Next` to proceed to the `Policies` section.
 
 Add a policy with the following:
 ```
-Policy name: Service Auth
-Action: Service Auth
+Policy name: Token Auth
+Action: Allow
 Session Duration: Same as application session timeout
 
 Scroll down and
