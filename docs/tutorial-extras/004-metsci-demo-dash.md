@@ -412,7 +412,9 @@ Now, the use of the word "Application" can be a bit confusing here, as we have b
 
 Remember, a `MetSci Application` is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one `Cloudflare Application`.  
 
-Each Cloudflare Application will need a `Service Token` and a `Cloudflare Zero Trust Application` to secure the data flow between the MetSci LNS and the Pi.  If we quickly zoom out, one way to visualize it is like this:
+A `Cloudflare Application` is used to manage a Zero Trust setup.  In our case, we'll use `Service Tokens` as a basic requirement ("No token no entry") as well as a routing requirement, i.e the LDDS75 token will give you access to the whole LDDS75 path.
+
+If we quickly zoom out, one way to visualize it is like this:
 
 ```
 \ sensor -- sensor -- sensor -- sensor /
