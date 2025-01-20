@@ -1,6 +1,4 @@
-This is a tutorial walking non-technical users through the process of integrating a custom Chirpstack LNS called MeteoScientific or MetSci with Node-RED, InfluxDB and Grafana using Cloudflare tunneles and display the collected sensor information in a public dashboard.
-
-The tutorial is written for a Raspberry Pi 4B running Raspberry Pi OS.
+This is a tutorial website teaching non-technical people how to use a custom Chirpstack LNS called MeteoScientific or MetSci.
 
 This tutorial is published using Docusaurus, Github Actions and Vercel.
 
