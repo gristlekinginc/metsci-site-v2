@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.meteoscientific.com/blog</id>
     <title>MetSci Blog</title>
-    <updated>2024-08-10T00:00:00.000Z</updated>
+    <updated>2030-01-02T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://www.meteoscientific.com/blog"/>
     <subtitle>MetSci Blog</subtitle>
@@ -11,13 +11,13 @@
         <title type="html"><![CDATA[Read This First]]></title>
         <id>https://www.meteoscientific.com/blog/welcome</id>
         <link href="https://www.meteoscientific.com/blog/welcome"/>
-        <updated>2024-08-10T00:00:00.000Z</updated>
+        <updated>2030-01-02T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[LoRaWAN sensors on Helium can be used for an awful lot of things, and in this blog we use AI (plus Nik at MetSci) to write about exploring some of the possible use cases.]]></summary>
         <content type="html"><![CDATA[<p>LoRaWAN sensors on <a href="https://www.helium.com/" target="_blank" rel="noopener noreferrer">Helium</a> can be used for an awful lot of things, and in this blog we use AI (plus Nik at MetSci) to write about exploring some of the possible use cases.</p>
 <p>If this is your first time at the MetSci (short for MeteoScientific) site and you just want to try using things and muddling through, head over to the <a href="https://console.meteoscientific.com/front/login" target="_blank" rel="noopener noreferrer">Console</a>, sign up for an account and get going.</p>
 <p>Oh, you actually want to read the blog, and you'd like to know a little more?  Cool!</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="author-stuff">Author Stuff<a href="https://www.meteoscientific.com/blog/welcome#author-stuff" class="hash-link" aria-label="Direct link to Author Stuff" title="Direct link to Author Stuff">​</a></h2>
-<p>If you see that an author is just MetSci, it's a straight ChatGPT-written piece.  If the author is <strong>also</strong> Nik, you know there was some human redacting.  If it's <strong>only</strong> Nik, it's a fully human-written piece.</p>
+<p>If you see that an author is just MetSci, you're reading a guided LLM piece.  If the author is <strong>also</strong> Nik, you know there was some human redacting.  If it's <strong>only</strong> Nik, it's a fully human-written piece.</p>
 <p>You should consider this blog a general exploration of using the Helium LoRaWAN, not an exhaustive resource for every possible application.  Go get 'em, tigers!</p>]]></content>
         <author>
             <name>Nik Hawks</name>
@@ -25,6 +25,69 @@
         </author>
         <category label="welcome" term="welcome"/>
         <category label="pinned" term="pinned"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[How the U.S. Government Uses LoRaWAN]]></title>
+        <id>https://www.meteoscientific.com/blog/2025/01/20/How_the_US_Government_Uses_LoRaWAN</id>
+        <link href="https://www.meteoscientific.com/blog/2025/01/20/How_the_US_Government_Uses_LoRaWAN"/>
+        <updated>2025-01-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Back in 2022, Mike Harttree, an IoT Architect at Cisco, gave a talk at the LoRa Alliance's annual conference about how the U.S. government is using LoRaWAN to enhance operational efficiency and tackle long-standing logistical challenges.]]></summary>
+        <content type="html"><![CDATA[<p>Back in 2022, Mike Harttree, an IoT Architect at Cisco, <a href="https://youtu.be/Gglwe9sKpCA?si=9IS_YBpHCynIk2dT" target="_blank" rel="noopener noreferrer">gave a talk at the LoRa Alliance's annual conference</a> about how the U.S. government is using LoRaWAN to enhance operational efficiency and tackle long-standing logistical challenges.</p>
+<p>With all the current fuss about Meshtastic and LoRa, I thought it'd be a good idea to review what has already been done.  Some of this is super basic (replacing fuel stick measurements with digital ones), but after all, that's what IoT is about; digitizing the measurements of our world.</p>
+<p>It doesn't have to be fancy, it just has to work.</p>
+<p><strong>Introduction</strong><br>
+<!-- -->The U.S. government has begun leveraging LoRaWAN technology to enhance operational efficiency and tackle long-standing logistical challenges. In a recent talk, Cisco's U.S. government IoT engineer detailed how LoRaWAN solutions are addressing critical needs in areas like military aviation and asset tracking. Here's a summary of how LoRaWAN is making an impact.</p>
+<hr>
+<p><strong>Cisco's Role in the LoRaWAN Ecosystem</strong><br>
+<!-- -->Cisco has positioned itself as a significant player in the LoRaWAN space, with over 480 global customers deploying their gateways, routers, and software. The company's offerings include:</p>
+<ol>
+<li>
+<p><strong>Industrial Asset Vision</strong>: An all-in-one cloud-based LoRaWAN solution integrating Cisco sensors, gateways, and network servers for seamless deployment.</p>
+</li>
+<li>
+<p><strong>Customizable Enterprise Solutions</strong>: Cisco collaborates with Actility and WMW to offer flexible deployments for sensitive use cases, including on-premises Docker-based configurations for government applications.</p>
+</li>
+</ol>
+<hr>
+<p><strong>Solving Data Sovereignty and Security Challenges</strong><br>
+<!-- -->In the U.S., government data must comply with strict sovereignty and security regulations, often necessitating that all data remain within national borders. Cisco addresses these requirements by:</p>
+<ul>
+<li>Deploying Docker containers for network and application servers on government-approved private clouds like AWS GovCloud and Microsoft Azure for secure, localized data processing.</li>
+<li>Ensuring the solutions meet certifications up to top-secret classification.</li>
+</ul>
+<hr>
+<p><strong>LoRaWAN in Military Aviation</strong><br>
+<!-- -->Cisco's solutions are being implemented in U.S. military aviation to digitize processes and improve operational readiness. Key insights include:</p>
+<ul>
+<li><strong>Aircraft Readiness Challenges</strong>: The U.S. military aims for 80% aircraft readiness, but current rates are well below that for both legacy (F-22) and modern (F-35) fighter jets. LoRaWAN technology helps streamline maintenance and resource allocation.</li>
+<li><strong>Fuel Truck Monitoring</strong>: Previously reliant on manual measurements with sticks, jet fuel levels are now digitized with LoRaWAN sensors, ensuring accurate data and reducing errors.</li>
+<li><strong>Asset Tracking</strong>: From nitrogen carts to fuel trucks, LoRaWAN devices help locate critical resources and prevent logistical disputes between branches like the Navy and Marines.</li>
+</ul>
+<hr>
+<p><strong>Improving Safety and Efficiency</strong><br>
+<!-- -->LoRaWAN is also being used to enhance safety and situational awareness:</p>
+<ul>
+<li><strong>Tracking Personnel</strong>: Sensors help locate personnel in challenging conditions, such as Marines operating in low visibility.</li>
+<li><strong>Monitoring Equipment</strong>: Vehicles, doors, and other assets are being digitized to ensure they are always accounted for.</li>
+</ul>
+<hr>
+<p><strong>Why LoRaWAN is Effective for Government Use Cases</strong><br>
+<!-- -->Cisco's LoRaWAN deployments for the U.S. government underscore the technology's adaptability and scalability. Its ability to operate on-premises, comply with stringent security standards, and integrate with existing infrastructure makes it an ideal choice for mission-critical applications.</p>
+<hr>
+<p><strong>Takeaways</strong><br>
+<!-- -->By digitizing processes and providing secure, localized solutions, LoRaWAN is enhancing military readiness, safety, and resource management. As adoption continues to grow, its role in ensuring mission-critical efficiency will only expand.</p>]]></content>
+        <author>
+            <name>MeteoScientific</name>
+            <uri>https://github.com/meteoscientific/</uri>
+        </author>
+        <author>
+            <name>Nik Hawks</name>
+            <uri>https://gristleking.com/</uri>
+        </author>
+        <category label="lorawan" term="lorawan"/>
+        <category label="government" term="government"/>
+        <category label="military" term="military"/>
+        <category label="aviation" term="aviation"/>
     </entry>
     <entry>
         <title type="html"><![CDATA[Maximizing Efficiency and Safety with LoRaWAN - A New Edge for Commercial Building Framing]]></title>
@@ -181,8 +244,8 @@ Unstable atmosphere: <a href="https://www.britannica.com/science/unstable-atmosp
     </entry>
     <entry>
         <title type="html"><![CDATA[All About Valley Microclimates]]></title>
-        <id>https://www.meteoscientific.com/blog/2023/08/15/</id>
-        <link href="https://www.meteoscientific.com/blog/2023/08/15/"/>
+        <id>https://www.meteoscientific.com/blog/2023/08/15/All_About_Valley_Microclimates</id>
+        <link href="https://www.meteoscientific.com/blog/2023/08/15/All_About_Valley_Microclimates"/>
         <updated>2023-08-15T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[A microclimate is the climate of a small, specific area, such as a valley. The microclimate of a valley can be different from the climate of the surrounding region, due to the way that the valley’s shape and other factors influence the movement of air and the amount of sunlight it receives.]]></summary>
         <content type="html"><![CDATA[<p>A microclimate is the climate of a small, specific area, such as a valley. The microclimate of a valley can be different from the climate of the surrounding region, due to the way that the valley’s shape and other factors influence the movement of air and the amount of sunlight it receives.</p>

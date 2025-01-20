@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[9773],{5361:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/weather-sounding","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

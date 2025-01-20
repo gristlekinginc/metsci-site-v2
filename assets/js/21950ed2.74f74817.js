@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[3745],{7107:e=>{e.exports=JSON.parse('{"label":"aviation","permalink":"/blog/tags/aviation","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
