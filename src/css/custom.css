@@ -45,40 +45,114 @@
 
  /* Centered Button Styles */
 .centered-button-container {
-  text-align: center; /* Center the button container */
-  margin: 20px 0; /* Add spacing above and below */
-}
-
-.custom-button {
-  display: inline-block;
-  padding: 12px 24px;
-  font-size: 18px; /* Slightly larger font size */
-  font-weight: bold;
   text-align: center;
+  margin: 10px auto;  /* Reduced margin */
+  display: flex;
+  justify-content: center;
+  align-items: center;  /* Added vertical alignment */
+}
+
+/* Style Read More button */
+.docusaurus-mt-lg a[aria-label^="Read more about"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  font-size: 18px;
+  font-weight: bold;
   text-decoration: none;
-  color: white; /* Button text color */
-  background-color: var(--ifm-color-primary-light); /* Light blue */
-  border: 2px solid var(--ifm-color-primary); /* Blue border */
-  border-radius: 8px; /* More rounded corners */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow */
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  color: white;
+  background-color: var(--ifm-color-primary-light);
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2),
+              0 0 1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.custom-button:hover {
-  background-color: var(--ifm-color-primary); /* Darker blue on hover */
-  transform: scale(1.05); /* Slightly enlarge on hover */
+.docusaurus-mt-lg a[aria-label^="Read more about"]:hover {
+  background-color: var(--ifm-color-primary);
+  transform: translateY(-1px);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2),
+              0 0 2px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
 }
 
-.custom-button:active {
-  background-color: var(--ifm-color-primary-dark); /* Even darker blue */
-  transform: scale(1); /* Reset size on click */
+.docusaurus-mt-lg a[aria-label^="Read more about"]:active {
+  background-color: var(--ifm-color-primary-dark);
+  transform: translateY(0);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-[data-theme='dark'] .custom-button {
-  background-color: var(--ifm-color-primary-darker); /* Darker blue for dark mode */
+/* Dark mode adjustments */
+[data-theme='dark'] .docusaurus-mt-lg a[aria-label^="Read more about"] {
+  background-color: var(--ifm-color-primary-darker);
+  border-color: #fff;
+}
+
+[data-theme='dark'] .docusaurus-mt-lg a[aria-label^="Read more about"]:hover {
+  background-color: var(--ifm-color-primary-darkest);
+}
+
+/* Target blog post titles on the listing page */
+.blog-list-page article header h2 {
+  font-size: 1.5rem;  /* Smaller font size */
+  margin-bottom: 0.5rem;  /* Reduce space below title */
+}
+
+/* Change the link color for blog titles */
+.blog-list-page article header h2 a {
+  color: var(--ifm-color-emphasis-900);  /* Use theme's dark color instead of blue */
+}
+
+/* Optional: Change hover color if you want */
+.blog-list-page article header h2 a:hover {
+  color: var(--ifm-color-primary);  /* Use theme's primary color on hover */
+  text-decoration: none;  /* Remove underline on hover if you prefer */
+}
+
+/* New download button styling */
+.download-button {
+  display: inline-flex;  /* Changed to inline-flex */
+  align-items: center;   /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+  padding: 6px 12px;    /* Reduced padding */
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+  background-color: var(--ifm-color-primary-light);
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2),
+              0 0 1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  margin: 0;            /* Removed margin */
+  min-width: 120px;     /* Slightly smaller min-width */
+}
+
+.download-button:hover {
+  background-color: var(--ifm-color-primary);
+  transform: translateY(-1px);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2),
+              0 0 2px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
   color: white;
 }
 
-[data-theme='dark'] .custom-button:hover {
-  background-color: var(--ifm-color-primary-darkest); /* Standout darker blue */
+.download-button:active {
+  background-color: var(--ifm-color-primary-dark);
+  transform: translateY(0);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode for download button */
+[data-theme='dark'] .download-button {
+  background-color: var(--ifm-color-primary-darker);
+  border-color: #fff;
+}
+
+[data-theme='dark'] .download-button:hover {
+  background-color: var(--ifm-color-primary-darkest);
+  color: white;
 }

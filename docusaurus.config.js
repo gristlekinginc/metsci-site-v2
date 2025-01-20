@@ -31,11 +31,14 @@ const config = {
           editUrl: 'https://github.com/gristlekinginc/metsci-site-v2/tree/main/', 
         },
         blog: {
-          path: './blog', 
+          path: './blog',
           routeBasePath: 'blog',
           showReadingTime: true,
           blogSidebarCount: 'ALL',
           blogSidebarTitle: 'All Blog Posts',
+          sortPosts: 'descending',
+          postsPerPage: 'ALL',
+          blogListComponent: '@theme/BlogListPage',
         },
         theme: {
           customCss: './src/css/custom.css',

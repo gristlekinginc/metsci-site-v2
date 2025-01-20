@@ -1077,7 +1077,11 @@ Using the steps above, I've added in a Milesight AM319, including an Applicaton 
 Just so you could see some real change,I closed up all the windows & doors in my office and did burpees until the CO2 went up.  You can also see where we dropped a couple of packets.  The AM319 fires a huge packet every minute, so it's easy to see where the packets are dropped.
 
 :::tip Download My Node-RED Flow
-Want to skip the manual setup? You can download the complete LDDS75 flow [here](/flows/MetSci-LDDS75-flow.json) and import it directly into Node-RED. Just remember to:
+Want to skip the manual setup? You can download the complete LDDS75 flow here and import it directly into Node-RED.
+<div className="centered-button-container">
+  <a href="/flows/MetSci-LDDS75-flow.json" className="download-button" download>Download  LDDS75 Flow</a>
+</div>
+After downloading:
 1. Configure your InfluxDB credentials
 2. Update any device-specific information
 3. Deploy the flow after importing

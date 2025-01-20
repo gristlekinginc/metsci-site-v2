@@ -136,4 +136,15 @@ plumbing:
   label: Plumbing
   description: Articles covering the installation and maintenance of water, sewage, and drainage systems in buildings.
 
+military:
+  label: Military
+  description: Posts related to military applications, including technology, logistics, and innovation.
+
+government:
+  label: Government
+  description: Articles discussing government-related initiatives, regulations, and technology applications.
+
+aviation:
+  label: Aviation
+  description: Topics centered around aviation, including military and civilian aircraft, logistics, and operational improvements.
 
