@@ -104,6 +104,10 @@ curl -sSL meteoscientific.com/scripts/secure-pi.sh -o secure.sh && chmod +x secu
 
 Once you've run it to the end, it'll ask you if you want to reboot.  Just type in `y` and hit `Enter`.
 
+If you want to make your Pi significantly more protected, set up keys instead of passwords.  Doing that is beyond the scope of this tutorial and is well covered on the interwebz in general.  I'd [start here](https://pimylifeup.com/raspberry-pi-ssh-keys/) if you need help (or have ChatGPT walk you through it).
+
+Let's move on to installing the services we need.
+
 
 ## 2. **Install Services (Node-RED, InfluxDB, Grafana)**
 
@@ -372,7 +376,7 @@ Set the policy name to `ldds75` and set the Action to `Allow`, leave the duratio
 
 Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then select the Service Token you just created. 
 
-![Configure rules for your Zero Trust policy](/images/tutorial-extras/004-images/cloudflare-set-service-token-rule.png)
+![Configure Policy for your LDDS75 Zero Trust Application](/images/tutorial-extras/004-images/cloudflare-set-service-token-rule-ldds75.png)
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right and you're done with the Node-RED Applications.
 
@@ -399,7 +403,7 @@ Scroll down to the bottom and click `Next` to proceed to the `Policies` section.
 Add a policy with the following:
 ```
 Policy name: Token Auth
-Action: Allow
+Action: Service Auth
 Session Duration: Same as application session timeout
 
 Scroll down and
@@ -411,7 +415,7 @@ Value: Any non expired Service Token will be matched
 
 ![Grafana Access Control Application](/images/tutorial-extras/004-images/cloudflare-grafana-access-control.png)
 
-Scroll down to the bottom of the next page and click `Add Application`.  You don't need to set up a specific Service Auth token for this, you just need to require that A service token is needed to access anything in Grafana except the stuff required for public dashboards.  We'll set those up next.
+Scroll down to the bottom of the next page and click `Add Application`.  You don't need to set up a specific Service Auth token for this, you just need to require that any service token is needed to access Grafana except for viewing public dashboards.  We'll set that Application and Policy up next.
 
 #### Grafana Public Dashboard Application & Policy
 
@@ -518,22 +522,7 @@ You should see a success message, like this.
 
 ![Tunnel successfully installed](/images/tutorial-extras/004-images/tunnel-success.png)
 
-Double check that on your Pi with a status request: 
-
-```bash
-sudo systemctl status cloudflared
-```
-
-That should give you something like this:
-
-![Cloudflare tunnel running on Pi](/images/tutorial-extras/004-images/cloudflare-tunnel-running.png)
-
-You can use `CTRL-C` to get back to a prompt.
-
 Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
-
-![Cloudflare tunnel configured](/images/tutorial-extras/004-images/cloudflare-next-after-installing-connector.png)
-
 
 ### H. Setting Up Public Hostnames
 
