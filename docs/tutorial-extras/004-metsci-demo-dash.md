@@ -897,24 +897,44 @@ Go to `Data Explorer` (the graphy icon on the left menu) and run a query for `ld
 
 ![InfluxDB query](/images/tutorial-extras/004-images/influxdb-data-explorer.png)
 
-Here are two script queries you can run to see the data.  First, let's check distance readings from a specific device:
+Here are three script queries you can use. The first gives you the basic distance to liquid surface, which works for any size container:
 
-```sql
+```flux
 from(bucket: "sensors")
   |> range(start: -24h)
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
-  |> filter(fn: (r) => r["device"] == "LDDS 3 [your device name]")
+  |> filter(fn: (r) => r["device"] == "LDDS 3")
   |> filter(fn: (r) => r["_field"] == "distance")
+  |> keep(columns: ["_time", "_value", "device"])
+  |> yield(name: "mm_to_surface")
 ```
 
-Here's a more complex query to see specific data from our device, including the gateway and region as well as the distance and RSSI fields.  Make sure to fill in the gateway and region with your own values.
-```sql
+Here are 2 more queries I'm going to run to see my data using my barrel size (1200mm diameter, 1850mm height).  
+
+First, I'll check the current water level in gallons:
+
+```flux
 from(bucket: "sensors")
   |> range(start: -24h)
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
-  |> filter(fn: (r) => r["gateway"] == "giant-swollen-rhino" [YOUR LOCAL GATEWAY NAME]")
-  |> filter(fn: (r) => r["region"] == "US915" [YOUR REGION])
+  |> filter(fn: (r) => r["device"] == "LDDS 3")
+  |> filter(fn: (r) => r["_field"] == "distance")
+  |> map(fn: (r) => ({
+       r with _value: float(v: 3.14159) * ((600.0/1000.0) ^ 2.0) * (1850.0 - float(v: r._value))/1000.0 * 264.172
+     }))
+  |> keep(columns: ["_time", "_value", "device"])
+  |> yield(name: "gallons")
+```
+
+Here's a more complex query to see specific data from our device, including the gateway and region as well as the distance and RSSI fields:
+```flux
+from(bucket: "sensors")
+  |> range(start: -24h)
+  |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
+  |> filter(fn: (r) => r["gateway"] == "dancing-daffodil-cheetah")
+  |> filter(fn: (r) => r["region"] == "US915")
   |> filter(fn: (r) => r["_field"] == "distance" or r["_field"] == "rssi")
+  |> keep(columns: ["_time", "_value", "_field", "device", "gateway", "region"])
 ```
 :::tip
 This is a fairly simple setup, but you may still have problems.  We're nerds, usually don't work right the first time, and that's OK.  Check to make sure your queries in InfluxDB match your Device Names, Gateway, and Region.  If you just copy/paste exactly what I put, you're not going to see anything.By far the fastest way to debug on your own is to feed in messages from Node-RED debug and InfluxDB,  and drop screenshots into ChatGPT/Cursor/Grok etc.  
@@ -980,11 +1000,18 @@ Now let's create a dashboard to visualize our LDDS75 data.
 
 ```flux
 from(bucket: "sensors")
-  |> range(start: -24h)
+  |> range(start: -4h)
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
-  |> filter(fn: (r) => r["device"] == "LDDS 3 [YOUR-DEVICE-NAME]")
+  |> filter(fn: (r) => r["device"] == "LDDS 3")
   |> filter(fn: (r) => r["_field"] == "distance")
+  |> map(fn: (r) => ({
+       r with _value: float(v: 3.14159) * ((600.0/1000.0) ^ 2.0) * (1850.0 - float(v: r._value))/1000.0 * 264.172
+     }))
+  |> keep(columns: ["_time", "_value", "device"])
+  |> last()
+  |> yield(name: "gallons")
 ``` 
+
 Now, over on the right, we're going to configure the visualization settings.
 
 The type of visualization we're going to use is a `Time Series` graph.  This is ideal for showing changes over time.
@@ -995,20 +1022,17 @@ At the top right, select `Time series`.
 
 6. `Panel Options`
    - Title: "Water Level"
-   - Description: "Distance measurement from LDDS75 sensor"
+   - Description: "Current water level in gallons"
 
-7. `Graph Styles`
-   - Style: Line (shows continuous changes)
-   - Line width: 2
-   - Fill opacity: 20 (adds a subtle fill below the line)
-   - Connect null values: Always (smooths over any gaps in data)
+7. `Value Options`
+   - Calculate: "Last *"
+   - Fields: Select "Numeric Fields" only
 
 8. `Standard Options`
-   - Unit: Length → millimeter (mm)
+   - Unit: Volume → gallons (gal)
    - Min: 0
-   - Max: 8000 
-   - Decimals: 0 (distance in mm doesn't need decimals)
-   - Display Name: `${__field.name}`
+   - Max: 100 (adjust based on your tank size)
+   - Decimals: 0 (gallons don't need decimals)
 
 9. `Thresholds`
    - Add threshold at 80% of your maximum expected water level
@@ -1016,6 +1040,10 @@ At the top right, select `Time series`.
    - Above 80%: Red (indicates barrel is getting full)
 
 10. Save your dashboard, then leave the edit window and go `Back to dashboard`.
+
+:::tip
+The `keep(columns: ["_time", "_value", "device"])` in the query is crucial - it prevents duplicate gauges by stripping unnecessary tags while maintaining the essential data for display.
+:::
 
 Now let's do a little admin work, then set up the sharing aspect.  Grafana makes this dead easy.
 
