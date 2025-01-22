@@ -687,7 +687,8 @@ install_nodered_influx_nodes() {
 # Credential Generation Functions
 get_random_name() {
     local arr=("$@")
-    echo "${arr[RANDOM % ${#arr[@]}]}"
+    local shuffled=($(printf "%s\n" "${arr[@]}" | shuf))
+    echo "${shuffled[0]}"
 }
 
 generate_credentials() {
