@@ -743,40 +743,38 @@ Search for a `function` node and add it to your workspace.
 try {
     // Log receipt of message
     node.warn("LDDS75 function processing message");
-    
+
     const originalPayload = msg.payload;
     const gateway = originalPayload.rxInfo?.[0] || {};
+
+    // Get the distance value first and validate it
+    const distance = parseInt(originalPayload.object?.distance || 0);
     
+    // Only proceed if we have a valid distance reading
+    if (!distance || distance <= 0) {
+        node.warn("Invalid distance reading: " + distance);
+        return null;
+    }
+
     // Create payload array with fields and tags objects
     msg.payload = [
-        // Fields object (numeric measurements)
         {
             // Sensor data
-            distance: parseInt(originalPayload.object?.distance || 0),
+            distance: distance,
             battery: parseFloat(originalPayload.object?.battery_voltage || 0),
             temperature: parseFloat(originalPayload.object?.temperature || 0),
-            
+
             // RF metrics
             rssi: parseInt(gateway.rssi || 0),
             snr: parseFloat(gateway.snr || 0),
             frequency: parseInt(originalPayload.txInfo?.frequency || 0),
             spreading_factor: parseInt(originalPayload.dr || 0),
-            
-            // Status flags
-            sensor_status: Boolean(originalPayload.object?.sensor_status),
-            interrupt_status: Boolean(originalPayload.object?.interrupt_status),
-            
+            bandwidth: parseInt(originalPayload.txInfo?.modulation?.lora?.bandwidth || 0),
+
             // Frame counter and port
             frame_counter: parseInt(originalPayload.fCnt || 0),
-            port: parseInt(originalPayload.fPort || 0),
-            
-            // ADR status
-            adr_enabled: Boolean(originalPayload.adr),
-            
-            // Bandwidth
-            bandwidth: parseInt(originalPayload.txInfo?.modulation?.lora?.bandwidth || 0)
+            port: parseInt(originalPayload.fPort || 0)
         },
-        // Tags object (metadata for filtering and grouping)
         {
             // Device info
             device: String(originalPayload.deviceInfo?.deviceName || ""),
@@ -784,41 +782,41 @@ try {
             device_addr: String(originalPayload.devAddr || ""),
             device_class: String(originalPayload.deviceInfo?.deviceClassEnabled || ""),
             device_profile: String(originalPayload.deviceInfo?.deviceProfileName || ""),
-            
+
             // Application info
             application: String(originalPayload.deviceInfo?.applicationName || ""),
             application_id: String(originalPayload.deviceInfo?.applicationId || ""),
-            
+
             // Gateway info
             gateway: String(gateway.metadata?.gateway_name || ""),
             gateway_id: String(gateway.gatewayId || ""),
-            gateway_hash: String(gateway.metadata?.gateway_id || ""),
-            
+
             // Network info
             region: String(gateway.metadata?.region_common_name || ""),
             network: String(gateway.metadata?.network || ""),
-            tenant: String(originalPayload.deviceInfo?.tenantName || ""),
-            tenant_id: String(originalPayload.deviceInfo?.tenantId || "")
+            tenant: String(originalPayload.deviceInfo?.tenantName || "")
         }
     ];
-    
-    // Set measurement name for MetSci LDDS75 sensors
+
+    // Set measurement name
     msg.measurement = "ldds75_metsci";
-    
-    // Add timestamp if not present (convert to nanoseconds for InfluxDB)
-    if (!msg.payload[0].timestamp) {
-        msg.payload[0].timestamp = new Date(originalPayload.time).getTime() * 1000000;
+
+    // Add timestamp (convert to nanoseconds for InfluxDB)
+    const timestamp = new Date(originalPayload.time).getTime() * 1000000;
+    if (isNaN(timestamp)) {
+        node.warn("Invalid timestamp");
+        return null;
     }
-    
-    // Log the attempt for debugging
-    node.warn("Preparing InfluxDB write for device: " + msg.payload[1].device);
-    node.warn("Distance reading: " + msg.payload[0].distance + " mm");
-    
+    msg.payload[0].timestamp = timestamp;
+
+    // Log the attempt
+    node.warn("Writing to InfluxDB - Device: " + msg.payload[1].device + ", Distance: " + distance + " mm");
+
     return msg;
-} catch(err) {
+} catch (err) {
     node.error("LDDS75 Processing Error: " + err.message);
     node.error("Failed payload: " + JSON.stringify(msg.payload, null, 2));
-    node.status({fill:"red", shape:"dot", text:"Processing Error"});
+    node.status({ fill: "red", shape: "dot", text: "Processing Error" });
     return null;
 }
 ```
