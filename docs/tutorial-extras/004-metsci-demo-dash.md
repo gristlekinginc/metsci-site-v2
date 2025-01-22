@@ -734,7 +734,8 @@ Wire the `Parse JSON` node to the `Switch` node.
 
 Add a **Function** node for the LDDS75.  Function nodes are what allow us to correctly setup the data for insertion into InfluxDB.  A JSON node cleans up the data, the Switch node routes it to the correct sensor function, and a Function node formats it for InfluxDB.
 
-Search for a `function` node and add it to your workspace.  
+Search for a `function` node and add it to your workspace.  The LDDS75 specs say it can measure from 280mm to 7500mm. You'll want to modify the following function to match your tank size.  I'm using a 1200mm diameter, 1850mm height tank.
+
     - Double-click to configure:
         - Name it `LDDS75 Function`  
         - Paste the following code into the `Message` tab of the Function node:
@@ -750,9 +751,16 @@ try {
     // Get the distance value first and validate it
     const distance = parseInt(originalPayload.object?.distance || 0);
     
-    // Only proceed if we have a valid distance reading
-    if (!distance || distance <= 0) {
-        node.warn("Invalid distance reading: " + distance);
+    // Validate distance reading (LDDS75 range: 280-7500mm for flat objects)
+    if (!distance || distance < 280 || distance > 7500) {
+        node.warn("Invalid distance reading: " + distance + "mm - outside LDDS75 range (280-7500mm)");
+        return null;
+    }
+
+    // Optional: Tank-specific validation (comment out or adjust as needed)
+    const MAX_TANK_HEIGHT = 1850; // adjust this to your tank height
+    if (distance > MAX_TANK_HEIGHT) {
+        node.warn("Reading exceeds tank height: " + distance + "mm > " + MAX_TANK_HEIGHT + "mm");
         return null;
     }
 
@@ -1306,9 +1314,7 @@ Check each step:
 Monitor disk usage:
 ```bash
 df -h
-```
-
-Check service logs taking up space:
+```Check service logs taking up space:
 ```bash
 sudo du -h /var/log | sort -rh | head -n 10
 ```
@@ -1327,3 +1333,4 @@ If something goes wrong:
 Last step?  Tell your friends what you did!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
 
 This tutorial was made possible by a generous grant from the Helium Foundation's IOTWG; huge thanks to them for the support.
+
