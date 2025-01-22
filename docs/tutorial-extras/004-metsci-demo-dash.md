@@ -96,7 +96,7 @@ sudo apt update && sudo apt dist-upgrade -y && sudo apt autoremove -y
 
 Your Pi can be made a bit more secure with a few commands.  We're going to wrap them all up into one.  This is going to get the latest security patches, make sure everything is up to date, then set some basic firewall rules. 
 
-There's nothing ultra fancy in here, just generally good Pi housekeeping.  Answer `y` when it asks you about the SSH port. 
+There's nothing ultra fancy in here, just generally good Pi housekeeping.
 
 ```bash 
 curl -sSL meteoscientific.com/scripts/secure-pi.sh -o secure.sh && chmod +x secure.sh && sudo ./secure.sh
