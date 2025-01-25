@@ -1098,7 +1098,7 @@ Check all the boxes, then click `Generate Public URL`.  It should generate a URL
 Copy the URL and paste it into your browser, or share it with your Mom.  Now everybody can see how much water is in your tank.  Bam, you're public!
 
 --- 
-### D. Next Steps
+### D. Fun with Monitoring & Triggers
 
 We're now finished with the bulk of this tutorial.  You've got a dashboard, you've got data flowing into InfluxDB, and you've got a way to share it with the world.  From here, you can add more sensors, build more complex dashboards, or string together new Node-RED flows to trigger alerts or other actions.  Following are a few examples of what you could do next.
 
