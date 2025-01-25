@@ -1,6 +1,6 @@
 [
     {
-        "id": "027908751f6277f8",
+        "id": "0f4f141a23c8f09d",
         "type": "tab",
         "label": "Flow 1",
         "disabled": false,
@@ -8,54 +8,54 @@
         "env": []
     },
     {
-        "id": "d1c4b1351d312895",
+        "id": "587d71c18aacc256",
         "type": "http in",
-        "z": "027908751f6277f8",
+        "z": "0f4f141a23c8f09d",
         "name": "MetSci LDDS75 Input",
         "url": "/metsci-ldds75-data",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 160,
+        "x": 140,
         "y": 60,
         "wires": [
             [
-                "4d9224c659b4ddb5",
-                "b4650265d05fbe80"
+                "f7b81162326292e3",
+                "3ab8b0b1f80df403"
             ]
         ]
     },
     {
-        "id": "4d9224c659b4ddb5",
+        "id": "f7b81162326292e3",
         "type": "http response",
-        "z": "027908751f6277f8",
-        "name": "http response",
+        "z": "0f4f141a23c8f09d",
+        "name": "https response",
         "statusCode": "",
         "headers": {},
-        "x": 400,
-        "y": 120,
+        "x": 360,
+        "y": 20,
         "wires": []
     },
     {
-        "id": "b4650265d05fbe80",
+        "id": "3ab8b0b1f80df403",
         "type": "json",
-        "z": "027908751f6277f8",
+        "z": "0f4f141a23c8f09d",
         "name": "Parse JSON",
         "property": "payload",
         "action": "obj",
         "pretty": false,
-        "x": 430,
-        "y": 60,
+        "x": 410,
+        "y": 100,
         "wires": [
             [
-                "98d9a80b293a28ab"
+                "c7391f35d82584b9"
             ]
         ]
     },
     {
-        "id": "98d9a80b293a28ab",
+        "id": "c7391f35d82584b9",
         "type": "switch",
-        "z": "027908751f6277f8",
+        "z": "0f4f141a23c8f09d",
         "name": "Route by Device Type",
         "property": "payload.deviceInfo.deviceProfileName",
         "propertyType": "msg",
@@ -77,52 +77,84 @@
         "checkall": "true",
         "repair": false,
         "outputs": 3,
-        "x": 660,
-        "y": 60,
+        "x": 640,
+        "y": 100,
         "wires": [
             [
-                "9075d5fa4e0118d6"
+                "372b22567a9595f1"
             ],
             [],
             []
         ]
     },
     {
-        "id": "9075d5fa4e0118d6",
+        "id": "372b22567a9595f1",
         "type": "function",
-        "z": "027908751f6277f8",
+        "z": "0f4f141a23c8f09d",
         "name": "LDDS75 Function",
-        "func": "try {\n    // Log receipt of message\n    node.warn(\"LDDS75 function processing message\");\n    \n    const originalPayload = msg.payload;\n    const gateway = originalPayload.rxInfo?.[0] || {};\n    \n    // Create payload array with fields and tags objects\n    msg.payload = [\n        // Fields object (numeric measurements)\n        {\n            distance: parseInt(originalPayload.object?.distance || 0),\n            battery: parseFloat(originalPayload.object?.battery_voltage || 0),\n            temperature: parseFloat(originalPayload.object?.temperature || 0),\n            rssi: parseInt(gateway.rssi || 0),\n            snr: parseFloat(gateway.snr || 0),\n            frequency: parseInt(originalPayload.txInfo?.frequency || 0),\n            spreading_factor: parseInt(originalPayload.dr || 0), // Using DR instead of SF\n            sensor_status: Boolean(originalPayload.object?.sensor_status),\n            interrupt_status: Boolean(originalPayload.object?.interrupt_status)\n        },\n        // Tags object (metadata for filtering and grouping)\n        {\n            device: String(originalPayload.deviceInfo?.deviceName || \"\"),\n            device_eui: String(originalPayload.deviceInfo?.devEui || \"\"),\n            application: String(originalPayload.deviceInfo?.applicationName || \"\"),\n            gateway: String(gateway.metadata?.gateway_id || \"\"),\n            gateway_id: String(gateway.gatewayId || \"\"),\n            region: String(gateway.metadata?.region_common_name || \"\"),\n            network: String(gateway.metadata?.network || \"\")\n        }\n    ];\n    \n    // Set measurement name for MetSci LDDS75 sensors\n    msg.measurement = \"ldds75_metsci\";\n    \n    // Add timestamp if not present\n    if (!msg.payload[0].timestamp) {\n        msg.payload[0].timestamp = new Date(originalPayload.time).getTime() * 1000000; // Convert to nanoseconds for InfluxDB\n    }\n    \n    // Log the attempt for debugging\n    node.warn(\"Preparing InfluxDB write for device: \" + msg.payload[1].device);\n    node.warn(\"Distance reading: \" + msg.payload[0].distance + \" mm\");\n    \n    return msg;\n} catch(err) {\n    node.error(\"LDDS75 Processing Error: \" + err.message);\n    node.error(\"Failed payload: \" + JSON.stringify(msg.payload, null, 2));\n    // Add status node indication\n    node.status({fill:\"red\", shape:\"dot\", text:\"Processing Error\"});\n    return null;\n}",
+        "func": "try {\n    // Log receipt of message\n    node.warn(\"LDDS75 function processing message\");\n\n    const originalPayload = msg.payload;\n    const gateway = originalPayload.rxInfo?.[0] || {};\n\n    // Get the distance value first and validate it\n    const distance = parseInt(originalPayload.object?.distance || 0);\n    \n    // Validate distance reading (LDDS75 range: 280-7500mm for flat objects)\n    if (!distance || distance < 280 || distance > 7500) {\n        node.warn(\"Invalid distance reading: \" + distance + \"mm - outside LDDS75 range (280-7500mm)\");\n        return null;\n    }\n\n    // Optional: Tank-specific validation (comment out or adjust as needed)\n    const MAX_TANK_HEIGHT = 1850; // adjust this to your tank height\n    if (distance > MAX_TANK_HEIGHT) {\n        node.warn(\"Reading exceeds tank height: \" + distance + \"mm > \" + MAX_TANK_HEIGHT + \"mm\");\n        return null;\n    }\n\n    // Create payload array with fields and tags objects\n    msg.payload = [\n        {\n            // Sensor data\n            distance: distance,\n            battery: parseFloat(originalPayload.object?.battery_voltage || 0),\n            temperature: parseFloat(originalPayload.object?.temperature || 0),\n\n            // RF metrics\n            rssi: parseInt(gateway.rssi || 0),\n            snr: parseFloat(gateway.snr || 0),\n            frequency: parseInt(originalPayload.txInfo?.frequency || 0),\n            spreading_factor: parseInt(originalPayload.dr || 0),\n            bandwidth: parseInt(originalPayload.txInfo?.modulation?.lora?.bandwidth || 0),\n\n            // Frame counter and port\n            frame_counter: parseInt(originalPayload.fCnt || 0),\n            port: parseInt(originalPayload.fPort || 0)\n        },\n        {\n            // Device info\n            device: String(originalPayload.deviceInfo?.deviceName || \"\"),\n            device_eui: String(originalPayload.deviceInfo?.devEui || \"\"),\n            device_addr: String(originalPayload.devAddr || \"\"),\n            device_class: String(originalPayload.deviceInfo?.deviceClassEnabled || \"\"),\n            device_profile: String(originalPayload.deviceInfo?.deviceProfileName || \"\"),\n\n            // Application info\n            application: String(originalPayload.deviceInfo?.applicationName || \"\"),\n            application_id: String(originalPayload.deviceInfo?.applicationId || \"\"),\n\n            // Gateway info\n            gateway: String(gateway.metadata?.gateway_name || \"\"),\n            gateway_id: String(gateway.gatewayId || \"\"),\n\n            // Network info\n            region: String(gateway.metadata?.region_common_name || \"\"),\n            network: String(gateway.metadata?.network || \"\"),\n            tenant: String(originalPayload.deviceInfo?.tenantName || \"\")\n        }\n    ];\n\n    // Set measurement name\n    msg.measurement = \"ldds75_metsci\";\n\n    // Add timestamp (convert to nanoseconds for InfluxDB)\n    const timestamp = new Date(originalPayload.time).getTime() * 1000000;\n    if (isNaN(timestamp)) {\n        node.warn(\"Invalid timestamp\");\n        return null;\n    }\n    msg.payload[0].timestamp = timestamp;\n\n    // Log the attempt\n    node.warn(\"Writing to InfluxDB - Device: \" + msg.payload[1].device + \", Distance: \" + distance + \" mm\");\n\n    return msg;\n} catch (err) {\n    node.error(\"LDDS75 Processing Error: \" + err.message);\n    node.error(\"Failed payload: \" + JSON.stringify(msg.payload, null, 2));\n    node.status({ fill: \"red\", shape: \"dot\", text: \"Processing Error\" });\n    return null;\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 910,
-        "y": 40,
+        "x": 890,
+        "y": 80,
         "wires": [
             [
-                "a0483032f56cf5f9"
+                "8c98ead2c9e6b012",
+                "b2e55e51f9c7c472"
             ]
         ]
     },
     {
-        "id": "a0483032f56cf5f9",
+        "id": "8c98ead2c9e6b012",
         "type": "influxdb out",
-        "z": "027908751f6277f8",
-        "influxdb": "",
-        "name": "MeteoScientific",
+        "z": "0f4f141a23c8f09d",
+        "influxdb": "9b597463de9f2f55",
+        "name": "Local InfluxDB",
         "measurement": "",
         "precision": "",
         "retentionPolicy": "",
         "database": "database",
-        "precisionV18FluxV20": "ms",
+        "precisionV18FluxV20": "ns",
         "retentionPolicyV18Flux": "",
-        "org": "organisation",
-        "bucket": "bucket",
+        "org": "MeteoScientific",
+        "bucket": "sensors",
         "x": 1160,
-        "y": 100,
+        "y": 140,
         "wires": []
+    },
+    {
+        "id": "b2e55e51f9c7c472",
+        "type": "debug",
+        "z": "0f4f141a23c8f09d",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "9b597463de9f2f55",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "MeteoScientific",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://localhost:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
     }
 ]
