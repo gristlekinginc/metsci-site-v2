@@ -1315,5 +1315,7 @@ If something goes wrong:
 
 Last step?  Tell your friends what you did!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
 
+![Nik throwing the horns on a fully installed LDDS75 sensor](/images/tutorial-extras/004-images/nik-throwing-the-horns-on-a-fully-installed-ldds75-sensor-using-helium.JPG)
+
 This tutorial was made possible by a generous grant from the Helium Foundation's IOTWG; huge thanks to them for the support.
 
