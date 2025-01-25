@@ -25,9 +25,9 @@ Enjoy!
 
 Make sure you have the following on hand:
 
-### Hardware
+### A. Hardware
 
-#### Core Development Hardware, ~$150 (use this for your next 50 projects)
+#### 1. Core Development Hardware, ~$150 (use this for your next 50 projects)
  - [Rasbperry Pi 4 with 4 or 8 GB RAM](https://amzn.to/3DAVCnO), about $60. 
  - [SD Card for Pi](https://amzn.to/40ha8K5), about $10 
  - External SSD for the Pi, about $30.  IoT data sets can get pretty big and you'll want plenty of space beyond the SD card on the Pi.  SD cards can also wear out if you write to 'em a bunch. Something like [this](https://amzn.to/3PbhbNY) is fine.
@@ -42,7 +42,7 @@ Make sure you have the following on hand:
 If you want a fancy case for your Pi (NOT needed), this is what I use: [FLIRC case](https://amzn.to/3E9OEpM) for Raspberry Pi 4B, about $16
 ::: 
 
-#### Sensor, $60-80
+#### 2. Sensor, $60-80
 - Dragino LDDS 75 sensor.  You can buy one at [RobotShop](https://www.robotshop.com/products/dragino-ldds75-lorawan-distance-detection-sensor-915-mhz) for $60-80.
 
 :::note
@@ -50,18 +50,18 @@ If you want a fancy case for your Pi (NOT needed), this is what I use: [FLIRC ca
 2. I'm doing this whole thing on a Mac.  If you're on Windows, there'll be a couple commands that are slightly different, usually stuff like using `CMD` instead of `CTRL`.  I'll try to call them out as we go.
 :::
 
-### Not-Hardware
+### B. Not-Hardware
     - Custom domain.  For this tutorial I'll be using mine, `gristleking.dev`.  If you don't already have a domain, I'd **strongly** recommend buying one at [Cloudflare](https://cloudflare.com).  They're about $12/year and buying it there makes everything else a little bit easier.
     - If you have a domain already, you'll need to set up your domain's name servers to point to Cloudflare.
 
-### Notes on what you "Need"
+### C. Notes on what you "Need"
 You don't actually NEED a USB-TTL adapter, but it's generally good practice to have one hanging around the work bench if you're any kind of aspiring nerd.  You could use downlinks instead of the adapter to make changes to your sensor, but in practice I've found that to add both complication and time (especially if you have to wait for the next uplink & you get your downlink command wrong...ask me how I know)
 
 You *could* do this without a custom domain by hosting in the cloud and managing tunnels with Cloudflare, but then you're on the hook for cloud hosting, which is probably $6/month at the cheapest.  A domain is something like $70/year for an expensive `.ai` one and $12/year for a cheap one. Trust me, just buy a domain. 
 
 Having your own domain makes part of this workflow way simpler, plus it's just cool to have your own domain.  Ask Larry at Google or Steve at Apple.  Having a custom domain is cool. 
 
-## Set Up Overview
+## 1. Set Up Overview
 
 1. **Set Up Your Rasbperry Pi:** Basic setup and security
 
@@ -76,7 +76,7 @@ Having your own domain makes part of this workflow way simpler, plus it's just c
 6. **System Maintenance & Troubleshooting:** Keep it rolling smooth, yo.
 
 ---
-## 1. **Setting Up Your Rasbperry Pi**
+## 2. **Setting Up Your Rasbperry Pi**
 ### A. Basic Setup
 Rather than re-writing (and constantly updating) this part, I'm going to suggest you [follow the official docs](https://www.raspberrypi.com/software/) for the first part of this and load **Raspberry Pi OS Lite (64-bit)**.  If you've never done it before, that's ok. 
 
@@ -109,7 +109,7 @@ If you want to make your Pi significantly more protected, set up keys instead of
 Let's move on to installing the services we need.
 
 
-## 2. **Install Services (Node-RED, InfluxDB, Grafana)**
+## 3. **Install Services (Node-RED, InfluxDB, Grafana)**
 
 ### A. Service Install Script
 
@@ -245,11 +245,13 @@ If any of these commands fail with "permission denied", your ownership isn't set
 Nice work, you've set up the major components of your dashboard.  Now let's set up the Cloudflare tunnel to securely move data between your Pi and the internet.
 
 
-## 3. **Cloudflare:** Tunnels, Applications, and Tokens
+## 4. **Cloudflare:** Tunnels, Applications, and Tokens
 
 Cloudflare provides a secure connection called a "tunnel" between your Pi and the internet.  Within a tunnel will be different public hostnames for different services, like `node-red.gristleking.dev` for Node-RED and `grafana.gristleking.dev` for Grafana.  We'll use those to connect our Pi to the internet in a secure way.
 
 Think of a tunnel like a big PVC pipe that connects your Pi to the internet.  Within that pipe are lots of individual pipes that carry separate types of information to different places.  Each individualpipe is a public hostname in the tunnel, and within those pipes you'll split it out even further into different Applications that manage the data from different types of sensors. 
+
+Cloudflare changes and updates all the time, so the screenshots and instructions below may be slightly different than what you see in Cloudflare.  
 
 Before we set up the tunnel, we're going to build the access control we need to keep our Pi secure.
 
@@ -275,27 +277,27 @@ With Zero Trust on and ready to go, let's set up all the access control we need 
 
 With our public hostnames set up we'll need to protect them so that not every jackass and their brother can drop into our Node-RED or Grafana instances.  We'll do that with Cloudflare's Zero Trust.
 
-#### 1. Node-RED
-
 For each public hostname, we'll create Applications and Tokens to manage access for them.  In general, we don't want the public to have any access to our Node-RED instance, but we do want to share our Grafana dashboard with the public.  
 
 Let's start with the Node-RED Application and Token, focusing on what we'll need for the LDDS75.
 
-We'll need three things for this
+We'll need three things in order to manage access in Cloudflare Zero Trust:
 
 ```
 1. A Service Token
 2. A Zero Trust Application
-3. An HTTP Integration in MetSci
+3. A Zero Trust Policy Rule
 ```
 
-Now, the use of the word "Application" can be a bit confusing here, as we have both Cloudflare Applications and MetSci Applications.  
+:::note
+The use of the word "Application" can be a bit confusing here, as we have both Cloudflare Applications and MetSci Applications.  
 
 Remember, a `MetSci Application` is a group of sensors that share the same data structure.  If you were monitoring 30 rainwater tanks with 30 LDDS75 sensors, all of the sensors would be in one MetSci Application, which would map to one `Cloudflare Application`.  
 
-A `Cloudflare Application` is used to manage a Zero Trust setup.  In our case, we'll use `Service Tokens` as a gatekeeper ("No token no entry") as well as a routing requirement, i.e the LDDS75 token will give you access to the whole LDDS75 path.
+A `Cloudflare Application` is used to manage a Zero Trust setup.  In our case, we'll use `Service Tokens` as a gatekeeper ("No token no entry") as well as a routing requirement, where the LDDS75 token will help route all the LDDS75 data to the Node-RED instance.
+:::
 
-#### 2. Create Service Tokens
+#### 1. Create Service Tokens
 
 In Cloudflare, back in Zero Trust, go to `Access-->Service Auth` and click `Create Service Token`.  
 
@@ -329,7 +331,7 @@ Go to `Access-->Applications` and add a new Cloudflare Application.
 
 Select `Self Hosted`
 
-In Node-RED, we don't want any public access, so we'll set up a global gatekeeper and then something to allow our MetSci LDDS75 data to pass through.
+In Node-RED, we don't want any public access, so we'll set up a global gatekeeper and then a specific application to allow our MetSci LDDS75 data to pass through.
 
 #### Node-RED Application - Global
 Let's start with the global Node-RED application. 
@@ -340,7 +342,7 @@ Set the Application name to `Node-RED` and set the `Session Duration` to `24 hou
 
 Scroll down to the bottom and click `Next` to proceed to the `Policies` section.  Here we'll set up a Policy rule that requires anything using this Application to have a valid token.  
 
-#### Policy Rule - Global
+#### Node-RED Policy Rule - Global
 
 Set the policy name to `Node-RED` and set the Action to `Service Auth`, leave the duration as is.
 
@@ -366,7 +368,7 @@ Scroll down past `Application Appearances` and `Tags` etc to the bottom.
 
 Click `Next` to proceed to the `Policies` section.  
 
-#### Policy Rule - LDDS75
+#### Node-RED Policy Rule - LDDS75
 
 We'll use the same `Service Auth` policy as the global application, but this time we'll restrict it to the `ldds75` token we've set up.
 
@@ -380,13 +382,13 @@ Scroll down to `Configure rules`.  On the Selector choose `Service Token`, then 
 
 Click `Next`, then scroll through the next page, past CORS settings, Cookies settings, and Additional settings. Click `Add Application` at the bottom right and you're done with the Node-RED Applications.
 
-### D. Setup Grafana Application
+#### Grafana Applications
 
 Ok, now we'll set up the Grafana Applications.  Unlike Node-RED where we're blocking ALL access to the public, this time we want to block access to the Grafana admin side but allow public access to specific Grafana dashboards.  
 
 Since you've already set up two Applications, I'll go a little faster.
 
-#### Grafana Access Control Application & Policy
+#### Grafana Application & Policy - Access Control
 
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
@@ -417,7 +419,7 @@ Value: Any non expired Service Token will be matched
 
 Scroll down to the bottom of the next page and click `Add Application`.  You don't need to set up a specific Service Auth token for this, you just need to require that any service token is needed to access Grafana except for viewing public dashboards.  We'll set that Application and Policy up next.
 
-#### Grafana Public Dashboard Application & Policy
+#### Grafana Application & Policy - Public Access
 
 ```Zero Trust --> Access --> Applications --> Add Application --> Self Hosted```
 
@@ -460,7 +462,9 @@ Include: Everyone
 Value: Everyone (will fill in automatically)
 ```
 
-### E. Prepare Your Pi for Cloudflare
+Super, now you've set up all your Cloudflare Applications and Policies.  The "gates" are setup, so now we can set up and connect the Cloudflare Tunnel to securely move data between your Pi and the internet.
+
+### D. Prepare Your Pi for Cloudflare
 
 In the Pi terminal, install Cloudflare Tunnel.  It's good practice when you're adding anything to your Pi to kick things off with a system update:
 
@@ -497,7 +501,7 @@ That should get you here on your Pi:
 
 ![Cloudflare tunnel installed and ready to set up](/images/tutorial-extras/004-images/set-up-cloudflare-tunnel.png)
 
-### F. Create a Tunnel In Cloudflare Zero Trust
+### E. Create a Tunnel In Cloudflare Zero Trust
 
 With Cloudflare's Zero Trust on and our Pi set up, we're going to set up the actual tunnel. 
 
@@ -513,7 +517,7 @@ Save the tunnel and you'll be taken to the `Configure` page.  Look for the `Inst
 
 ![Install and run connector](/images/tutorial-extras/004-images/install-and-run-connector.png)
 
-### G. Add The Tunnel To Your Raspberry Pi
+### F. Add The Tunnel To Your Raspberry Pi
 Back on your Pi, run the command they gave us:
 
 `sudo cloudflared service install super-duper-alpha-numeric-string`
@@ -524,11 +528,11 @@ You should see a success message, like this.
 
 Hit `Next` at the bottom right of your Cloudflare Configure tunnel screen.
 
-### H. Setting Up Public Hostnames
+### G. Setting Up Public Hostnames
 
 With our tunnel set up, now we'll create our Public Hostnames (subdomains), starting with Node-RED.
 
-#### 1. Node-RED
+#### 1. Node-RED Subdomain
 
 Add `node-red` in the Subdomain field, then choose your domain. I'm using `gristleking.dev` for this tutorial.  Throughout the tutorial, wherever you see `gristleking.dev`, replace it with your own domain.
 
@@ -544,7 +548,7 @@ You'll be taken back to the Tunnels page.  Click on the three stacked dots on th
 
 Now we'll set up the Grafana public hostname.
 
-#### 2. Grafana
+#### 2. Grafana Subdomain
 
 Select `Public Hostname` and click `Add a public hostname`.
 
@@ -570,7 +574,7 @@ You can now see both your public hostnames for your tunnel.  Cool, right?
 ![Confirm both your public hostnames](/images/tutorial-extras/004-images/cloudflare-both-public-hostnames-added.png)
 
 
-#### I. Document Your Public Hostnames
+### H. Document Your Public Hostnames
 
 Head back to the Cloudflare main menu and choose your domain, then `DNS`, then look for the subdomain you just set up.  I usually add a note to mine, something like `this is for Node-RED for the MetSci Demo Dash project`, just so future me has a clue as to what's going on. 
 
@@ -580,7 +584,7 @@ Now you've set it up so that you can share a dashboard via your Cloudflare tunne
 
 ---
 
-## 4. **Setting Up Your LDDS 75 Sensor**
+## 5. **Setting Up Your LDDS 75 Sensor**
 
 Whether this is your first device ever or your 100th, now is a good time to think about how you're going to structure your data.  I've written a [separate tutorial just on structuring data](/docs/tutorial-basics/009-good-housekeeping-for-LoRaWAN-sensor-fleets.md). If you've never thought about this before, it's a good idea to read through that.  You can also just YOLO and follow along, trusting that my data structure is good enough for you.  
 
@@ -614,7 +618,7 @@ Once you've got it set up and seen a few packets come through, pull the power on
 
 ![LDDS 75 jumper](/images/tutorial-extras/004-images/ldds-75-jumper-power-off.jpeg)
 
-### C. Set Up The HTTP Integration In MetSci
+### D. Set Up The HTTP Integration In MetSci
 
 Head back over to the [MeteoScientific Console](https://console.meteoscientific.com/front/login) and in `Applications`-->`LDDS 75` (or whatever you called it), look for the `Integrations` tab.  
 
@@ -637,7 +641,7 @@ Use the `Access ID` and `Access Secret` from the Service Token you set up for th
 
 Now you've set it up so the MetSci LNS can securely send data through a Zero Trust Cloudflare tunnel to Node-RED on your Raspberry Pi.  Cool, right?
 
-Nice work!  The NSA can prolly still get in, but the rest of the screaming hordes should be kept at bay for now.
+Nice work!  The NSA can prolly still get in, but the rest of the screaming hordes should be kept at bay.
 
 :::tip Future Integrations
 For each new sensor type you add:
@@ -648,7 +652,7 @@ This maintains consistent security across all your sensor data routes.
 :::
 
 ---
-## 5. **Local Integration Setup**
+## 6. **Local Integration Setup**
 
 At the beginning of the tutorial we ran a script to set up all the services we'll need.  Now we'll go through and configure 'em.
 
@@ -905,7 +909,9 @@ Go to `Data Explorer` (the graphy icon on the left menu) and run a query for `ld
 
 ![InfluxDB query](/images/tutorial-extras/004-images/influxdb-data-explorer.png)
 
-Here are three script queries you can use. The first gives you the basic distance to liquid surface, which works for any size container:
+Here are three script queries you can use. These use my `DEVICE NAME`, in this case `LDDS 3`, so **make sure you change that to your own**.  
+
+The first query gives you the basic distance to liquid surface:
 
 ```flux
 from(bucket: "sensors")
@@ -917,9 +923,14 @@ from(bucket: "sensors")
   |> yield(name: "mm_to_surface")
 ```
 
-Here are 2 more queries I'm going to run to see my data using my barrel size (1200mm diameter, 1850mm height).  
 
-First, I'll check the current water level in gallons:
+I built 2 more queries to see my data using my barrel size (1200mm diameter, 1850mm height).  
+
+:::note
+A quick note here on metric.  I'm a slowly-converting-to-metric American, so while I'll use mm for distance, I'll convert to gallons for volume.  Sorry, old habits die hard.
+:::
+
+First, I'll check the current water volume in gallons, again using my `DEVICE NAME`, in this case `LDDS 3`:
 
 ```flux
 from(bucket: "sensors")
@@ -934,7 +945,8 @@ from(bucket: "sensors")
   |> yield(name: "gallons")
 ```
 
-Here's a more complex query to see specific data from our device, including the gateway and region as well as the distance and RSSI fields:
+Here's another query you could use that would also pull the gateway name that's receiving your data,as well as the distance and RSSI fields.  You might use this to keep track of what kind of coverage you're getting from a given gateway.
+
 ```flux
 from(bucket: "sensors")
   |> range(start: -24h)
@@ -942,10 +954,10 @@ from(bucket: "sensors")
   |> filter(fn: (r) => r["gateway"] == "dancing-daffodil-cheetah")
   |> filter(fn: (r) => r["region"] == "US915")
   |> filter(fn: (r) => r["_field"] == "distance" or r["_field"] == "rssi")
-  |> keep(columns: ["_time", "_value", "_field", "device", "gateway", "region"])
+  |> keep(columns: ["_time", "_value", "_field", "device", "gateway"])
 ```
 :::tip
-This is a fairly simple setup, but you may still have problems.  We're nerds, usually don't work right the first time, and that's OK.  Check to make sure your queries in InfluxDB match your Device Names, Gateway, and Region.  If you just copy/paste exactly what I put, you're not going to see anything.By far the fastest way to debug on your own is to feed in messages from Node-RED debug and InfluxDB,  and drop screenshots into ChatGPT/Cursor/Grok etc.  
+These are all fairly simple queries, but you may still have problems.  We're nerds, and nerd stuff usually don't work right the first time.  That's OK.  If you have problems, start by checking to make sure your queries in InfluxDB match your Device Names, Gateway, and Region.  If you just copy/paste exactly what I put, you're not going to see anything because it'll be looking for my `DEVICE NAME`, in this case `LDDS 3`.  By far the fastest way to debug on your own is to feed in messages from Node-RED debug and InfluxDB,  and drop screenshots into ChatGPT/Cursor/Grok etc.  
 :::
 
 ### C. Grafana Dashboards
@@ -965,7 +977,7 @@ Now that we have data flowing into InfluxDB, let's visualize it in Grafana! Firs
 ![Adding a new InfluxDB connection](/images/tutorial-extras/004-images/grafana-connections-influxdb.png)
 
 4. Click **Add new data source**
-5. Configure the settings:
+5. Configure the following settings, leaving everything else as is:
    
    **Basic Settings:**
    - Name: `Local InfluxDB`
@@ -1004,7 +1016,7 @@ Now let's create a dashboard to visualize our LDDS75 data.
 2. Select **New Dashboard**
 3. Click **Add visualization**
 4. Select your `Local InfluxDB` data source
-5. In the Flux Query editor, paste:
+5. In the Flux Query editor, paste the following, making sure you replace `LDDS 3` with your own device name:
 
 ```flux
 from(bucket: "sensors")
@@ -1012,12 +1024,9 @@ from(bucket: "sensors")
   |> filter(fn: (r) => r["_measurement"] == "ldds75_metsci")
   |> filter(fn: (r) => r["device"] == "LDDS 3")
   |> filter(fn: (r) => r["_field"] == "distance")
-  |> map(fn: (r) => ({
-       r with _value: float(v: 3.14159) * ((600.0/1000.0) ^ 2.0) * (1850.0 - float(v: r._value))/1000.0 * 264.172
-     }))
   |> keep(columns: ["_time", "_value", "device"])
   |> last()
-  |> yield(name: "gallons")
+  |> yield(name: "distance")
 ``` 
 
 Now, over on the right, we're going to configure the visualization settings.
@@ -1030,17 +1039,17 @@ At the top right, select `Time series`.
 
 6. `Panel Options`
    - Title: "Water Level"
-   - Description: "Current water level in gallons"
+   - Description: "Current distance to liquid surface"
 
 7. `Value Options`
    - Calculate: "Last *"
    - Fields: Select "Numeric Fields" only
 
 8. `Standard Options`
-   - Unit: Volume → gallons (gal)
+   - Unit: Distance → millimeters (mm)
    - Min: 0
-   - Max: 100 (adjust based on your tank size)
-   - Decimals: 0 (gallons don't need decimals)
+   - Max: 8500 (this is the max, adjust based on your tank size)
+   - Decimals: 0 (millimeters don't need decimals)
 
 9. `Thresholds`
    - Add threshold at 80% of your maximum expected water level
@@ -1089,10 +1098,11 @@ Check all the boxes, then click `Generate Public URL`.  It should generate a URL
 Copy the URL and paste it into your browser, or share it with your Mom.  Now everybody can see how much water is in your tank.  Bam, you're public!
 
 --- 
+### D. Next Steps
 
-### D. AM319 Teaser
+We're now finished with the bulk of this tutorial.  You've got a dashboard, you've got data flowing into InfluxDB, and you've got a way to share it with the world.  From here, you can add more sensors, build more complex dashboards, or string together new Node-RED flows to trigger alerts or other actions.  Following are a few examples of what you could do next.
 
-By now you'll have at least a couple of packets coming through the tunnel, so you should see the data in your dashboard.  If you don't, you can always check the debug panel in Node-RED to see what's gone wrong.
+#### 1. Indoor Environment Monitoring
 
 Liquid level sensing is simple, but generally not that exciting, so...
 
@@ -1115,14 +1125,11 @@ After downloading:
 
 ---
 
-## 6. Home Assistant Integration
+#### 2. Home Assistant Integration
 
-Now, I'm assuming if you're reading this that you're already running [Home Assistant](https://www.home-assistant.io/) on another device.  If you're not, or "Home Assistant" is a foreign term to you, I'd skip this section for now and come back when you're tired of telling everyone to look at your rainwater tank levels. 
+If you're using [Home Assistant](https://www.home-assistant.io/) you can use Node-RED on the Pi to pipe in data from the dashboard you just set up to Home Assistant. 
 
-Installing and configuring HA is (WAY!) beyond the scope of this tutorial, but for those of you who already have it running and want to pipe in data from your shiny new MetSci dashboard, here are two options:
-
-#### 1. Via Node-RED (Recommended)
-This method provides real-time updates and more flexibility:
+Installing and configuring HA is well beyond the scope of this tutorial, but for those of you who already have it running and want to pipe in data from your shiny new MetSci setup, here's how you can do it:
 
 1. Install the Home Assistant nodes in Node-RED on your MetSci Pi:
    ```bash
@@ -1152,43 +1159,6 @@ This method provides real-time updates and more flexibility:
    }
    ```
 
-#### 2. Via InfluxDB
-This method requires exposing InfluxDB securely to your network:
-
-1. First, configure InfluxDB to accept remote connections. On your MetSci Pi:
-   ```bash
-   sudo nano /etc/influxdb/config.toml
-   ```
-   Add or modify:
-   ```toml
-   [http]
-     bind-address = "0.0.0.0:8086"
-   ```
-
-2. Update your firewall to allow HA access:
-   ```bash
-   sudo ufw allow from YOUR_HA_IP to any port 8086
-   ```
-
-3. In Home Assistant's `configuration.yaml`, add:
-   ```yaml
-   influxdb:
-     api_version: 2
-     ssl: false
-     host: YOUR_METSCI_PI_IP
-     port: 8086
-     token: YOUR_INFLUXDB_TOKEN
-     organization: MeteoScientific
-     bucket: sensors
-     queries:
-       - name: Water Level
-         unit_of_measurement: "mm"
-         measurement: "ldds75_metsci"
-         field: "distance"
-         where: 'device = ''LDDS 3'''
-         device_class: "distance"
-   ```
-
 4. Restart Home Assistant to apply changes
 
 :::warning Security Considerations
@@ -1200,7 +1170,7 @@ When connecting services across devices:
 5. Monitor logs for unauthorized access attempts
 :::
 
-#### Example Lovelace Card
+***Example Lovelace Card***
 Add this to your Lovelace dashboard in Home Assistant:
 ```yaml
 type: vertical-stack
@@ -1209,11 +1179,11 @@ cards:
     name: Water Level
     entity: sensor.water_level
     min: 0
-    max: 8000
+    max: 2500
     severity:
       green: 0
-      yellow: 6000
-      red: 7000
+      yellow: 800
+      red: 100
   - type: history-graph
     title: Water Level History
     entities:
@@ -1221,14 +1191,27 @@ cards:
         name: Level
 ```
 
-:::tip
-The Node-RED method is recommended because:
-- Only requires one port forwarded (HA's port)
-- Keeps InfluxDB secure behind your firewall
-- Provides real-time updates
-- Allows for data transformation before sending
-:::
+#### 3. Class C Integration
 
+I've talked about how to use Class C in the [MetSci Class C via API tutorial](/docs/tutorial-extras/002-classC-kuando_busylight).  You could use that, or you can use Node-RED to pipe data from the LDDS75 to your Class C device, in my case, a Kuando Busylight.
+
+Since you've already set up Node-RED, I'll just share the flow I built for mine.
+
+<div className="centered-button-container">
+  <a href="/flows/MetSci-Busylight-Trigger-flow.json" className="download-button" download>Download Busylight Trigger Flow</a>
+</div>
+
+It'll look like this:
+
+![Node-RED Busylight Trigger](/images/tutorial-extras/004-images/node-red-busylight-trigger-flow.png)
+
+Setting that up will check the LDDS75 distance measurements in the InfluxDB every 15 minutes, then flash your Busylight red 5 times on a 1 second interval every 15 minutes when the tank is full (distance of 120mm or less) until you turn the Node-RED alert off or the tank is no longer full.  
+
+Let your imagination run wild!  You could also use this to trigger other actions, like sending an email, triggering a Home Assistant automation, or even triggering a Class C device to send a message:  
+
+```Airstrikes required on unknown vehicle parked in "MY" parking spot```  
+
+Just kidding, airstrikes triggered by a LoRaWAN device are for war, not parking violations.  But...we're American, so maybe we can make an execption. 😉
 
 ## 7. System Maintenance & Troubleshooting
 
