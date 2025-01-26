@@ -1307,7 +1307,7 @@ If something goes wrong:
 1. Check the relevant service status
 2. Review the logs
 3. Restore from backup if needed
-4. If all else fails, you can always reinstall the affected service
+4. If nothing else works, you can always reinstall the affected service
 :::
 
 
