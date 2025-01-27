@@ -1313,7 +1313,9 @@ If something goes wrong:
 
 ## 8. La Ultima
 
-Last step?  Tell your friends what you did!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
+Last step?  [Here's the dashbboard](https://grafana.meteoscientific.com/public-dashboards/e6bd9074e3ad4fad935bbcacb510059b) I built for MeteoScientific, combining the rain barrel data with weather station data.
+
+I'd love to see what you do!  Please tag us on X [MeteoScientific](https://x.com/meteoscientific) and [Gristleking](https://x.com/thegristleking) we'd love to see what you've done!
 
 ![Nik throwing the horns on a fully installed LDDS75 sensor](/images/tutorial-extras/004-images/nik-throwing-the-horns-on-a-fully-installed-ldds75-sensor-using-helium.JPG)
 
