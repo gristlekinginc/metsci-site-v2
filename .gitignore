@@ -49,3 +49,11 @@ keywords/*
 *.gguf
 
 
+
+# Virtual Environment
+venv/
+*venv/
+.env
+.venv
+env/
+ENV/
