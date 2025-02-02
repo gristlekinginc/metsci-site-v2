@@ -1,0 +1,5 @@
+# SEO Analysis Dependencies
+python-frontmatter
+markdown
+beautifulsoup4
+ollama

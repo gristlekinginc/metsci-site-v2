@@ -30,10 +30,22 @@ build/
 **/draft-*.md
 **/DRAFT-*.md
 
+
 # Additional security
 *.pem
 *.key
 config.json
 secrets.json
+
+# Private SEO Keywords
+/keywords/
+keywords/*
+!keywords/keyword_scripts/
+!keywords/keyword_README.md
+
+# LLM specific
+/keywords/models/
+.env
+*.gguf
 
 
