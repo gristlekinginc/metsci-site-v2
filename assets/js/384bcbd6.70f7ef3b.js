@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[7949],{2813:e=>{e.exports=JSON.parse('{"label":"synesthesia","permalink":"/blog/tags/synesthesia","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
