@@ -24,6 +24,9 @@ yarn-error.log*
 
 build/
 
+# Cursor 
+.cursorrules
+
 # Draft documents
 **/DRAFT--*.md
 **/draft--*.md
@@ -47,8 +50,6 @@ keywords/*
 /keywords/models/
 .env
 *.gguf
-
-
 
 # Virtual Environment
 venv/
