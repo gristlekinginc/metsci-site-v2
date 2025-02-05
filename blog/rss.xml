@@ -16,7 +16,8 @@
             <description><![CDATA[LoRaWAN sensors on Helium can be used for an awful lot of things, and in this blog we use AI (plus Nik at MetSci) to write about exploring some of the possible use cases.]]></description>
             <content:encoded><![CDATA[<p>LoRaWAN sensors on <a href="https://www.helium.com/" target="_blank" rel="noopener noreferrer">Helium</a> can be used for an awful lot of things, and in this blog we use AI (plus Nik at MetSci) to write about exploring some of the possible use cases.</p>
 <p>If this is your first time at the MetSci (short for MeteoScientific) site and you just want to try using things and muddling through, head over to the <a href="https://console.meteoscientific.com/front/login" target="_blank" rel="noopener noreferrer">Console</a>, sign up for an account and get going.</p>
-<p>Oh, you actually want to read the blog, and you'd like to know a little more?  Cool!</p>
+<p>If you'd like step-by-step instructions on how to get started, check out our <a href="https://www.meteoscientific.com/docs/tutorial-basics/intro-to-console">Tutorials</a>.
+Oh, you actually want to read the blog, and you'd like to know a little more?  Cool!</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="author-stuff">Author Stuff<a href="https://www.meteoscientific.com/blog/welcome#author-stuff" class="hash-link" aria-label="Direct link to Author Stuff" title="Direct link to Author Stuff">​</a></h2>
 <p>If you see that an author is just MetSci, you're reading a guided LLM piece.  If the author is <strong>also</strong> Nik, you know there was some human redacting.  If it's <strong>only</strong> Nik, it's a fully human-written piece.</p>
 <p>You should consider this blog a general exploration of using the Helium LoRaWAN, not an exhaustive resource for every possible application.  Go get 'em, tigers!</p>]]></content:encoded>
