@@ -7,7 +7,7 @@ tags: [lorawan, government, military, networking, synesthesia]
 Synethesia is when the expereince of one sense triggers another.  The classic example is seeing colors when hearing music, but you could taste words, smell sounds, or feel textures when you see colors. 
 
 A recent excellent [Freakonomics episode with David Eagleman](https://freakonomics.com/podcast/feeling-sound-and-hearing-color/) sparked an idea on how to combine synthestia with LoRaWAN for spatial awareness in the military context. 
-
+<!-- truncate -->
 Dr. Eagleman described the develpment of the NeoSensory vest that captured sound and converted it to vibratory feedback on the torso, allowing deaf people to hear. We're all bathed in sound, but deafness is the inability to translate it into, well, sounds we hear.
 
 By placing vibratory motors through a vest and then translating sounds into a felt experience, the brains of the users "livewired" themselves to hear sound again.  Pretty rad.
