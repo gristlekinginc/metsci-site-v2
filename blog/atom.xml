@@ -22,7 +22,7 @@ Oh, you actually want to read the blog, and you'd like to know a little more?  C
 <p>You should consider this blog a general exploration of using the Helium LoRaWAN, not an exhaustive resource for every possible application.  Go get 'em, tigers!</p>]]></content>
         <author>
             <name>Nik Hawks</name>
-            <uri>https://gristleking.com/</uri>
+            <uri>https://meteoscientific.com/</uri>
         </author>
         <category label="welcome" term="welcome"/>
         <category label="pinned" term="pinned"/>
@@ -165,7 +165,7 @@ The LPWAN field also includes cellular standards like NB-IoT and LTE-M, and prop
         </author>
         <author>
             <name>Nik Hawks</name>
-            <uri>https://gristleking.com/</uri>
+            <uri>https://meteoscientific.com/</uri>
         </author>
         <category label="lorawan" term="lorawan"/>
         <category label="global" term="global"/>
@@ -193,7 +193,7 @@ The LPWAN field also includes cellular standards like NB-IoT and LTE-M, and prop
 <p>Pretty cool use case, eh?  Keep on crushing out there, and if you need help with IoT sensors, whether it's designed, deployment, or business-fit, please reach out.</p>]]></content>
         <author>
             <name>Nik Hawks</name>
-            <uri>https://gristleking.com/</uri>
+            <uri>https://meteoscientific.com/</uri>
         </author>
         <category label="lorawan" term="lorawan"/>
         <category label="government" term="government"/>
@@ -257,7 +257,7 @@ The LPWAN field also includes cellular standards like NB-IoT and LTE-M, and prop
         </author>
         <author>
             <name>Nik Hawks</name>
-            <uri>https://gristleking.com/</uri>
+            <uri>https://meteoscientific.com/</uri>
         </author>
         <category label="lorawan" term="lorawan"/>
         <category label="government" term="government"/>
