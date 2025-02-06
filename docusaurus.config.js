@@ -5,7 +5,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'MetSci',
-  tagline: 'Integrating Sensors Into Your World',
+  tagline: 'Demystifying LoRaWAN for real-world applications',
   favicon: 'img/metsci_favicon.ico',
   url: 'https://www.meteoscientific.com',
   baseUrl: '/',
@@ -157,6 +157,17 @@ const config = {
       src: '/js/ga.js',  // We'll create this file
       async: true,
     },
+  ],
+  plugins: [
+    [
+      'posthog-docusaurus',
+      {
+        apiKey: process.env.POSTHOG_API_KEY || 'default-key',
+        appUrl: 'https://us.i.posthog.com',
+        enableInDevelopment: false,
+        enable: process.env.NODE_ENV === 'production',
+      },
+    ],
   ],
 };
 

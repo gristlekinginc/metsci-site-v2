@@ -16,6 +16,13 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
+        
+        <div className="hero__explanation" style={{ marginBottom: '2rem', maxWidth: '800px', margin: '0 auto', padding: '1rem' }}>
+          <p>
+            Whether you want to build a sensor network for your business, your city, or just around your house, we've got you covered.
+          </p>
+        </div>
+
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
@@ -33,7 +40,7 @@ export default function Home() {
   return (
     <Layout
       title={`Crush with ${siteConfig.title}`}
-      description="Heavy metal rock 'n roll sensor usage.  LFG">
+      description="Heavy metal rock 'n roll sensor usage. LFG">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
