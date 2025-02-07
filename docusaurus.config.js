@@ -158,17 +158,25 @@ const config = {
       async: true,
     },
   ],
-  plugins: [
-    [
-      'posthog-docusaurus',
-      {
-        apiKey: process.env.POSTHOG_API_KEY || 'default-key',
-        appUrl: 'https://us.i.posthog.com',
-        enableInDevelopment: false,
-        enable: process.env.NODE_ENV === 'production',
-      },
-    ],
-  ],
+  plugins: typeof process !== 'undefined' && process.env.NODE_ENV === 'production' 
+    ? [
+        [
+          "posthog-docusaurus",
+          {
+            apiKey: process.env.POSTHOG_API_KEY || 'default-key',
+            appUrl: "https://us.i.posthog.com",
+            loaded: (posthog) => {
+              posthog.register({
+                $set_once: {
+                  environment: process.env.NODE_ENV,
+                  source: window.location.hostname
+                }
+              });
+            }
+          },
+        ],
+      ]
+    : [],
 };
 
 export default config;
