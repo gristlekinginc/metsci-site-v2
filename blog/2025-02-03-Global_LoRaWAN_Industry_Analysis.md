@@ -67,7 +67,11 @@ On the ecosystem side, [Wienke Giezeman](https://www.thethingsnetwork.org/u/wien
 
 [Thomas Telkamp](https://www.linkedin.com/in/thomastelkamp/), CTO and co-foudner at Lacuna Space brought LoRaWAN into space, which was important because prior to this, if there wasn't a physical gateway on the ground, you weren't getting LoRaWAN coverage.
 
-Other thought leaders include industry engineers like [Olivier Seller](https://www.linkedin.com/in/olivier-seller-527909/?originalSubdomain=fr) (Semtech) and ecosystem advocates such as [Marc Pégulu](https://www.techtarget.com/contributor/Marc-Pegulu) (Semtech’s IoT VP) and [Amir Haleem](https://x.com/amirhaleem) (co-founder of [Helium](https://www.helium.com/), which built a crowdsourced LoRaWAN network). These individuals, among others, have guided LoRaWAN from a niche technology to a global IoT standard.
+Other thought leaders include industry engineers like [Olivier Seller](https://www.linkedin.com/in/olivier-seller-527909/?originalSubdomain=fr) (Semtech) and ecosystem advocates such as [Marc Pégulu](https://www.techtarget.com/contributor/Marc-Pegulu) (Semtech’s IoT VP) and [Amir Haleem](https://x.com/amirhaleem), co-founder of [Helium](https://www.helium.com/), which used crowdsourcing to build the largest LoRaWAN network in the world. 
+
+[Dave Kjendal](https://www.linkedin.com/in/dkjendal/), the former CTO at Senet and LoRa Alliance Technical Director and [Dave Tholl](https://www.linkedin.com/in/dave-tholl-a31252a/?originalSubdomain=ca) at Tektelic have also contributed mightily to the LoRaWAN ecosystem.
+
+These individuals, among others, have guided LoRaWAN from a niche technology to a global IoT standard.
 
 ## LoRaWAN vs. Other LPWAN Technologies
 
