@@ -65,6 +65,8 @@ On the ecosystem side, [Wienke Giezeman](https://www.thethingsnetwork.org/u/wien
 
 [Olivier Hersent](https://www.actility.com/management-team/) (Actility’s CEO) is a recognized expert who helped shape LoRaWAN’s early technical architecture. In the LoRa Alliance,former CEO [Donna Moore](https://www.linkedin.com/in/donnamoore4/) has been instrumental in driving global standardization and adoption while current CEO [Alper Yegin](https://lora-alliance.org/author/alper-yeginlora-alliance-com/), appointed in October of 2024, has a track record indicating a strategic, forward-looking approach to ecosystem development.
 
+[Thomas Telkamp](https://www.linkedin.com/in/thomastelkamp/), CTO and co-foudner at Lacuna Space brought LoRaWAN into space, which was important because prior to this, if there wasn't a physical gateway on the ground, you weren't getting LoRaWAN coverage.
+
 Other thought leaders include industry engineers like [Olivier Seller](https://www.linkedin.com/in/olivier-seller-527909/?originalSubdomain=fr) (Semtech) and ecosystem advocates such as [Marc Pégulu](https://www.techtarget.com/contributor/Marc-Pegulu) (Semtech’s IoT VP) and [Amir Haleem](https://x.com/amirhaleem) (co-founder of [Helium](https://www.helium.com/), which built a crowdsourced LoRaWAN network). These individuals, among others, have guided LoRaWAN from a niche technology to a global IoT standard.
 
 ## LoRaWAN vs. Other LPWAN Technologies
