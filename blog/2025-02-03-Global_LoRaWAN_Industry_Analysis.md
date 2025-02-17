@@ -7,7 +7,7 @@ tags: [lorawan, global, ttn, actility, semtech, helium]
 
 ## History and Evolution of LoRaWAN
 
-LoRaWAN’s technological roots [date back to 2009 in Grenoble, France](https://blog.semtech.com/a-brief-history-of-lora-three-inventors-share-their-personal-story-at-the-things-conference#:~:text=The%20story%20of%20LoRa%20began,technology%2C%20a%20technology%20widely%20in), when Nicolas Sornin and Olivier Seller began experimenting with chirp spread spectrum (CSS) modulation for low-power, long-range communications​. 
+LoRaWAN's technological roots [date back to 2009 in Grenoble, France](https://blog.semtech.com/a-brief-history-of-lora-three-inventors-share-their-personal-story-at-the-things-conference#:~:text=The%20story%20of%20LoRa%20began,technology%2C%20a%20technology%20widely%20in), when Nicolas Sornin and Olivier Seller began experimenting with chirp spread spectrum (CSS) modulation for low-power, long-range communications​. 
 <!-- truncate -->
 This led to the founding of Cycleo in 2010 with the goal of enabling wireless data links for utility meters using sub-GHz radio. Instead of inventing a new modulation from scratch, Cycleo applied CSS (a technique long used in sonar and radar) to IoT communications – essentially repurposing chirp signals for data transmission​. The breakthrough proved that kilometer-range wireless links could be achieved with very low power, ideal for battery-operated IoT sensors.
 
@@ -213,7 +213,7 @@ A factory might [use LoRaWAN energy meters on equipment](https://akenza.io/blog/
 In commercial real estate and facility management, LoRaWAN is used to make buildings “smart” at a low cost. Heating, ventilation, and air conditioning (HVAC) systems are instrumented with LoRaWAN temperature and humidity sensors in different rooms to optimize climate control. Occupancy sensors and people counters using LoRaWAN help manage meeting room usage or lighting (lights can be automated to turn off when areas are unoccupied). Indoor air quality sensors (for CO₂, VOCs) on LoRaWAN are deployed in offices and schools to ensure healthy ventilation. 
 
 :::tip Want to build your own LoRaWAN dashboard?
-Check out our [MetSci Demo Dashboard Tutorial](/docs/tutorial-extras/004-metsci-demo-dash) to learn how to build a custom dashboard for monitoring your LoRaWAN sensors.
+Check out our [MetSci Demo Dashboard](/docs/tutorial-extras/metsci-demo-dash) to learn how to build a custom dashboard for monitoring your LoRaWAN sensors.
 :::
 
 Building managers increasingly adopt LoRaWAN because a single gateway per building can connect hundreds of sensors through walls on multiple floors – something hard to do with Wi-Fi or Bluetooth. 

@@ -609,8 +609,7 @@ Quick note:  You *can't* see the **Device Metrics** properly in Chirpstack, whic
 ### C. Configure For Fast Firing
 We're going to need some data coming through the tunnel in a bit, so let's set up the LDDS75 to fire every minute for now, then we'll pull the power until we're ready to test.
 
-Use [this guide](https://github.com/gristlekinginc/metsci-site-v2/blob/main/docs/tutorial-basics/008-configure-a-device.md
-) to set up the LDDS75 to fire every minute.  You "could" theoretically do all this with downlinks, but A) I'm not covering that here and B) I want you to have the ability to wire into a sensor and tell it what to do.
+Use [this guide](/docs/tutorial-basics/008-configure-a-device.md) to set up the LDDS75 to fire every minute.  You "could" theoretically do all this with downlinks, but A) I'm not covering that here and B) I want you to have the ability to wire into a sensor and tell it what to do.
 
 However you do it...
 
@@ -1193,7 +1192,7 @@ cards:
 
 #### 3. Class C Integration
 
-I've talked about how to use Class C in the [MetSci Class C via API tutorial](/docs/tutorial-extras/002-classC-kuando_busylight).  You could use that, or you can use Node-RED to pipe data from the LDDS75 to your Class C device, in my case, a Kuando Busylight.
+I've talked about how to use Class C in the [MetSci Class C via API tutorial](/docs/tutorial-extras/002-class_C_kuando_busylight.md).  You could use that, or you can use Node-RED to pipe data from the LDDS75 to your Class C device, in my case, a Kuando Busylight.
 
 Since you've already set up Node-RED, I'll just share the flow I built for mine.
 
