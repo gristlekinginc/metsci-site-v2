@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.meteoscientific.com/blog</id>
-    <title>MetSci Blog</title>
+    <title>MeteoScientific Blog</title>
     <updated>2030-01-02T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://www.meteoscientific.com/blog"/>
-    <subtitle>MetSci Blog</subtitle>
+    <subtitle>MeteoScientific Blog</subtitle>
     <icon>https://www.meteoscientific.com/img/metsci_pro_favicon.svg</icon>
     <entry>
         <title type="html"><![CDATA[Read This First]]></title>
