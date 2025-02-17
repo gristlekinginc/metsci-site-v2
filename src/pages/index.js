@@ -13,10 +13,13 @@ function getTagline(section) {
 }
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
   return (
-    <header className="hero hero--primary">
-      
+    <header className="hero">
+      <img 
+        src="/img/ms_pro_lettertype_white.svg" 
+        alt="MeteoScientific" 
+        className="hero__overlay"
+      />
     </header>
   );
 }

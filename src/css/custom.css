@@ -176,25 +176,70 @@
 }
 
 .hero {
-  background-image: url('/img/hero-bg.png');
-  background-size: cover;
-  background-position: center;
-  min-height: 60vh;  /* Adjust this value to match the image proportions */
-  padding: 4rem 0;
-  text-align: center;
+  background: radial-gradient(
+    circle at 50% -15%,
+    var(--metsci-white) 0%,
+    var(--metsci-red) 15%,
+    var(--metsci-primary) 35%,
+    var(--metsci-black) 60%
+  );
+  min-height: 60vh;
   position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: 150% 150%;
+  background-position: center;
 }
 
-/* Make text more readable against the dark background */
+.hero__overlay {
+  position: relative;
+  width: 60%;
+  max-width: 700px;
+  height: auto;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 30px rgba(252, 245, 240, 0.2));
+}
+
+/* Add planet as a separate element */
+.hero__planet {
+  position: absolute;
+  bottom: -20%;
+  left: -10%;
+  width: 40%;
+  height: 40%;
+  background-image: url('/img/planet.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom left;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* Style the content container */
+.hero__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
 .hero__title {
+  font-family: 'Montserrat', sans-serif; /* Or your preferred font */
+  font-weight: 700;
   color: var(--metsci-white);
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1rem;
 }
 
 .hero__subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
   color: var(--metsci-white);
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Style the YouTube course button to stand out */
