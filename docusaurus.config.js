@@ -4,7 +4,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'MetSci',
+  title: 'MeteoScientific',
   tagline: 'The Business of LoRaWAN',
   favicon: 'img/metsci_pro_favicon.svg',
   url: 'https://www.meteoscientific.com',
@@ -74,8 +74,33 @@ const config = {
         ],
       },
       metadata: [
-        { name: 'og:image', content: '/img/meteoscientific-social-card_1200x630.png' },
+        { name: 'description', content: 'Connecting LoRaWAN business professional' },
+        
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: 'MeteoScientific - The Business of LoRaWAN' },
+        { property: 'og:description', content: 'Connecting LoRaWAN business professional' },
+        { property: 'og:image', content: 'img/metsci-pro-social-card_1200x630.png' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        
         { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'MeteoScientific - The Business of LoRaWAN' },
+        { name: 'twitter:description', content: 'Connecting LoRaWAN business professional' },
+        { name: 'twitter:image', content: 'img/metsci-pro-social-card-x_800x418.png' },
+        
+        { property: 'og:site_name', content: 'MeteoScientific' },
+        
+        { name: 'keywords', content: 'LoRaWAN, business IoT, massive IoT, LPWAN sensors' },
+        { name: 'author', content: 'MeteoScientific' },
+        
+        // SMS/Text Message Preview
+        { property: 'og:image:mobile', content: 'img/metsci-pro-social-card-sms_300x200.png' },
+        { property: 'og:image:mobile:width', content: '300' },
+        { property: 'og:image:mobile:height', content: '200' },
+        
+        // Ensure mobile-first loading
+        { property: 'og:image:type', content: 'image/png' },
+        { property: 'og:image:alt', content: 'MeteoScientific - The Business of LoRaWAN' },
       ],
       footer: {
         style: 'dark',
