@@ -5,6 +5,15 @@ import styles from './styles.module.css';
 // Define the features list with your icons
 const FeatureList = [
   {
+    title: 'Temperature Monitoring',
+    Svg: require('@site/static/img/icon_images/metsci_thermometer.svg').default,
+    description: (
+      <>
+        Keep track of temperature variations with high precision.
+      </>
+    ),
+  },
+  {
     title: 'Air Quality PM2.5',
     Svg: require('@site/static/img/icon_images/metsci_air quality 2_5.svg').default,
     description: (
@@ -23,20 +32,20 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Flower Growth',
-    Svg: require('@site/static/img/icon_images/metsci_flower.svg').default,
-    description: (
-      <>
-        Monitor the growth and health of flowers using advanced sensor technology.
-      </>
-    ),
-  },
-  {
     title: 'Humidity Levels',
     Svg: require('@site/static/img/icon_images/metsci_humidity.svg').default,
     description: (
       <>
         Track and maintain optimal humidity levels for various environments.
+      </>
+    ),
+  },
+  {
+    title: 'Flower Growth',
+    Svg: require('@site/static/img/icon_images/metsci_flower.svg').default,
+    description: (
+      <>
+        Monitor the growth and health of flowers using advanced sensor technology.
       </>
     ),
   },
@@ -64,15 +73,6 @@ const FeatureList = [
     description: (
       <>
         Assess and monitor soil quality to optimize agricultural outputs.
-      </>
-    ),
-  },
-  {
-    title: 'Temperature Monitoring',
-    Svg: require('@site/static/img/icon_images/metsci_thermometer.svg').default,
-    description: (
-      <>
-        Keep track of temperature variations with high precision.
       </>
     ),
   },

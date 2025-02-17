@@ -201,21 +201,6 @@
   filter: drop-shadow(0 0 30px rgba(252, 245, 240, 0.2));
 }
 
-/* Add planet as a separate element */
-.hero__planet {
-  position: absolute;
-  bottom: -20%;
-  left: -10%;
-  width: 40%;
-  height: 40%;
-  background-image: url('/img/planet.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom left;
-  opacity: 0.8;
-  z-index: 1;
-}
-
 /* Style the content container */
 .hero__content {
   position: relative;
