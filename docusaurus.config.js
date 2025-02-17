@@ -7,7 +7,7 @@ const config = {
   title: 'MeteoScientific',
   tagline: 'The Business of LoRaWAN',
   favicon: 'img/metsci_pro_favicon.svg',
-  url: 'https://www.meteoscientific.com',
+  url: 'https://meteoscientific.com',
   baseUrl: '/',
   organizationName: 'gristlekinginc',
   projectName: 'metsci-site-v2',
@@ -79,14 +79,16 @@ const config = {
         { property: 'og:type', content: 'website' },
         { property: 'og:title', content: 'MeteoScientific - The Business of LoRaWAN' },
         { property: 'og:description', content: 'Connecting LoRaWAN business professional' },
-        { property: 'og:image', content: 'img/metsci-pro-social-card_1200x630.png' },
+        { property: 'og:image', content: 'https://meteoscientific.com/img/metsci-pro-social-card_1200x630.png' },
+        { property: 'og:image:secure_url', content: 'https://meteoscientific.com/img/metsci-pro-social-card_1200x630.png' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
+        { property: 'og:image:type', content: 'image/png' },
         
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'MeteoScientific - The Business of LoRaWAN' },
         { name: 'twitter:description', content: 'Connecting LoRaWAN business professional' },
-        { name: 'twitter:image', content: 'img/metsci-pro-social-card-x_800x418.png' },
+        { name: 'twitter:image', content: 'https://meteoscientific.com/img/metsci-pro-social-card-x_800x418.png' },
         
         { property: 'og:site_name', content: 'MeteoScientific' },
         
@@ -94,7 +96,7 @@ const config = {
         { name: 'author', content: 'MeteoScientific' },
         
         // SMS/Text Message Preview
-        { property: 'og:image:mobile', content: 'img/metsci-pro-social-card-sms_300x200.png' },
+        { property: 'og:image:mobile', content: 'https://meteoscientific.com/img/metsci-pro-social-card-sms_300x200.png' },
         { property: 'og:image:mobile:width', content: '300' },
         { property: 'og:image:mobile:height', content: '200' },
         
