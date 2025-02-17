@@ -5,8 +5,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'MetSci',
-  tagline: 'Demystifying LoRaWAN for real-world applications',
-  favicon: 'img/metsci_favicon.ico',
+  tagline: 'The Business of LoRaWAN',
+  favicon: 'img/metsci_pro_favicon.svg',
   url: 'https://www.meteoscientific.com',
   baseUrl: '/',
   organizationName: 'gristlekinginc',

@@ -1,12 +1,28 @@
 :root {
-  /* Existing Colors */
-  --ifm-color-primary: #37bcf5; /* MeteoScientific Blue */
-  --ifm-color-primary-dark: #2e6fa7; /* Darker shade of blue */
-  --ifm-color-primary-darker: #265d8a; /* Even darker shade of blue */
-  --ifm-color-primary-darkest: #1e4c6d; /* Darkest shade of blue */
-  --ifm-color-primary-light: #4ac1f8; /* Lighter shade of blue */
-  --ifm-color-primary-lighter: #5bc7fa; /* Even lighter shade of blue */
-  --ifm-color-primary-lightest: #6dcefc; /* Lightest shade of blue */
+  /* Brand Colors */
+  --metsci-primary: #D94A18;   /* Troposphere Red */
+  --metsci-red: #FA7F2A;       /* Solar Haze */
+  --metsci-blue: #18A7D9;      /* Jet Stream Blue */
+  --metsci-white: #FCF5F0;     /* Cirrus White */
+  --metsci-black: #000000;     /* Stratosphere Black */
+
+  /* Docusaurus theme colors */
+  --ifm-color-primary: #18A7D9; /* Use Jet Stream Blue for highlights/links */
+  --ifm-color-primary-dark: #1696C3;
+  --ifm-color-primary-darker: #1485AD;
+  --ifm-color-primary-darkest: #127497;
+  --ifm-color-primary-light: #2DB1DE;
+  --ifm-color-primary-lighter: #42BBE3;
+  --ifm-color-primary-lightest: #57C5E8;
+
+  /* Background and text colors */
+  --ifm-background-color: var(--metsci-white);
+  --ifm-font-color-base: var(--metsci-black);
+  
+  /* Accent colors */
+  --ifm-color-secondary: #18A7D9;   /* Jet Stream Blue */
+  --ifm-color-info: #D94A18;        /* Troposphere Red */
+
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 
@@ -28,13 +44,15 @@
 /* For dark mode */
 [data-theme='dark'] {
   /* Existing Colors */
-  --ifm-color-primary: #37bcf5; /* MeteoScientific Blue */
-  --ifm-color-primary-dark: #2e6fa7; /* Darker shade of blue */
-  --ifm-color-primary-darker: #265d8a; /* Even darker shade of blue */
-  --ifm-color-primary-darkest: #1e4c6d; /* Darkest shade of blue */
-  --ifm-color-primary-light: #4ac1f8; /* Lighter shade of blue */
-  --ifm-color-primary-lighter: #5bc7fa; /* Even lighter shade of blue */
-  --ifm-color-primary-lightest: #6dcefc; /* Lightest shade of blue */
+  --ifm-color-primary: #18A7D9;
+  --ifm-background-color: var(--metsci-black);
+  --ifm-font-color-base: var(--metsci-white);
+  --ifm-color-primary-dark: #1696C3;
+  --ifm-color-primary-darker: #1485AD;
+  --ifm-color-primary-darkest: #127497;
+  --ifm-color-primary-light: #2DB1DE;
+  --ifm-color-primary-lighter: #42BBE3;
+  --ifm-color-primary-lightest: #57C5E8;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 
   /* Link Color Overrides */
@@ -155,4 +173,33 @@
 [data-theme='dark'] .download-button:hover {
   background-color: var(--ifm-color-primary-darkest);
   color: white;
+}
+
+.hero {
+  background-image: url('/img/hero-bg.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 60vh;  /* Adjust this value to match the image proportions */
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Make text more readable against the dark background */
+.hero__title {
+  color: var(--metsci-white);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero__subtitle {
+  color: var(--metsci-white);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Style the YouTube course button to stand out */
+.button.button--secondary {
+  background-color: var(--metsci-blue);
+  border-color: var(--metsci-blue);
+  color: var(--metsci-white);
 }
