@@ -13,7 +13,7 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "optimize-images": "node scripts/optimize-images.js",
-    "prebuild": "npm run optimize-images"
+    "prebuild": "npm run optimize-images || true"
   },
   "dependencies": {
     "@docusaurus/core": "3.1.1",

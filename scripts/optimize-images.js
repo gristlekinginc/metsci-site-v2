@@ -1,25 +1,23 @@
 const imagemin = require('imagemin');
-const imageminWebp = require('imagemin-webp');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminPngquant = require('imagemin-pngquant');
 
 async function optimizeImages() {
-  // Optimize JPG/PNG
-  await imagemin(['static/img/**/*.{jpg,png}'], {
-    destination: 'static/img/optimized',
-    plugins: [
-      imageminMozjpeg({ quality: 85 }),
-      imageminPngquant({ quality: [0.6, 0.8] })
-    ]
-  });
+  try {
+    const files = await imagemin(['static/img/**/*.{jpg,png}'], {
+      destination: 'static/img/optimized',
+      plugins: [
+        imageminMozjpeg({ quality: 80 }),
+        imageminPngquant({ quality: [0.6, 0.8] })
+      ]
+    });
 
-  // Convert to WebP
-  await imagemin(['static/img/**/*.{jpg,png}'], {
-    destination: 'static/img/optimized',
-    plugins: [
-      imageminWebp({ quality: 85 })
-    ]
-  });
+    console.log('Images optimized:', files.length);
+  } catch (error) {
+    console.error('Error optimizing images:', error);
+    // Don't fail the build if image optimization fails
+    process.exit(0);
+  }
 }
 
 optimizeImages(); 
