@@ -6,6 +6,11 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
+import taglines from '@site/src/data/taglines';
+
+function getTagline(section) {
+  return taglines[section] || taglines.default;
+}
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -21,7 +26,7 @@ export default function Home() {
   return (
     <Layout
       title={`Crush with ${siteConfig.title}`}
-      description="Heavy metal rock 'n roll sensor usage. LFG">
+      description={getTagline('tutorials')}>
       <HomepageHeader />
       <main>
         <HomepageFeatures />
