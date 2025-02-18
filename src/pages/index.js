@@ -3,6 +3,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import OptimizedImage from '@site/src/components/OptimizedImage';
 
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
@@ -19,6 +20,12 @@ function HomepageHeader() {
         src="/img/ms_pro_lettertype_white.svg" 
         alt="MeteoScientific" 
         className="hero__overlay"
+      />
+      <OptimizedImage 
+        src="/img/metsci_logo.svg"
+        alt="MetSci Logo"
+        width={400}
+        height={100}
       />
     </header>
   );

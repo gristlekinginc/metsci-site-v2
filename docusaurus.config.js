@@ -52,7 +52,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      image: 'img/metsci_200x200.png',
       navbar: {
         title: 'MeteoScientific',
         logo: {
@@ -183,9 +182,27 @@ const config = {
       async: true,
     },
     {
-      src: '/js/ga.js',  // We'll create this file
+      src: '/js/ga.js',
       async: true,
-    },
+    }
+  ],
+  stylesheets: [
+    {
+      href: '/css/custom.css',
+      type: 'text/css',
+    }
+  ],
+  // Add preload for largest image
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        href: '/img/metsci_logo.svg', // Update this to your hero/largest image
+        as: 'image',
+        type: 'image/svg+xml'
+      },
+    }
   ],
   plugins: typeof process !== 'undefined' && process.env.NODE_ENV === 'production' 
     ? [
@@ -195,17 +212,30 @@ const config = {
             apiKey: process.env.POSTHOG_API_KEY || 'default-key',
             appUrl: "https://us.i.posthog.com",
             loaded: (posthog) => {
-              posthog.register({
-                $set_once: {
-                  environment: process.env.NODE_ENV,
-                  source: window.location.hostname
-                }
-              });
+              setTimeout(() => {
+                posthog.register({
+                  $set_once: {
+                    environment: process.env.NODE_ENV,
+                    source: window.location.hostname
+                  }
+                });
+              }, 2000);
             }
           },
         ],
+        [
+          '@docusaurus/plugin-ideal-image',
+          {
+            quality: 75,
+            max: 1200,
+            min: 640,
+            steps: 2,
+            disableInDev: false
+          }
+        ]
       ]
     : [],
+  staticDirectories: ['static']
 };
 
 export default config;
