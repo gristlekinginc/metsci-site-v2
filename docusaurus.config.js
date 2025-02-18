@@ -204,37 +204,6 @@ const config = {
       },
     }
   ],
-  plugins: typeof process !== 'undefined' && process.env.NODE_ENV === 'production' 
-    ? [
-        [
-          "posthog-docusaurus",
-          {
-            apiKey: process.env.POSTHOG_API_KEY || 'default-key',
-            appUrl: "https://us.i.posthog.com",
-            loaded: (posthog) => {
-              setTimeout(() => {
-                posthog.register({
-                  $set_once: {
-                    environment: process.env.NODE_ENV,
-                    source: window.location.hostname
-                  }
-                });
-              }, 2000);
-            }
-          },
-        ],
-        [
-          '@docusaurus/plugin-ideal-image',
-          {
-            quality: 75,
-            max: 1200,
-            min: 640,
-            steps: 2,
-            disableInDev: false
-          }
-        ]
-      ]
-    : [],
   staticDirectories: ['static']
 };
 
