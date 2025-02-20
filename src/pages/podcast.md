@@ -7,4 +7,4 @@ description: MeteoScientific - The Business of LoRaWAN
 
 ## The Business of LoRaWAN
 
-This is recorded and produced to further the LoRaWAN ecosystem through sharing of knowledge across networks, operators, device manufacturers, and deployers.
+This is recorded and produced to further the LoRaWAN ecosystem through sharing of knowledge across networks, operators, and device manufacturers.
