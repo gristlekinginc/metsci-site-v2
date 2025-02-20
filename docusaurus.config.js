@@ -65,6 +65,7 @@ const config = {
             position: 'left',
             label: 'Tutorials',
           },
+          { to: '/podcast', label: 'Podcast', position: 'left' },
           { to: '/pricing', label: 'Pricing', position: 'left' }, 
           { to: 'https://console.meteoscientific.com/front/login', label: 'Console', position: 'left' },
           {
@@ -135,7 +136,11 @@ const config = {
               {
                 label: 'FAQ',
                 href: '/faq',
-              }, 
+              },
+              {
+                label: 'Podcast',
+                to: '/podcast',
+              },
             ],
           },
           {
@@ -146,7 +151,7 @@ const config = {
                 href: 'https://discord.gg/4fR5QAq6Vc',
               },
               {
-                label: 'Twitter',
+                label: 'X',
                 href: 'https://x.com/meteoscientific',
               },
               {
