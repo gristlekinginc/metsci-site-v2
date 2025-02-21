@@ -21,12 +21,6 @@ function HomepageHeader() {
         alt="MeteoScientific" 
         className="hero__overlay"
       />
-      <OptimizedImage 
-        src="/img/metsci_logo.svg"
-        alt="MetSci Logo"
-        width={400}
-        height={100}
-      />
     </header>
   );
 }
