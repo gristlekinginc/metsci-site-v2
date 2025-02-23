@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # LoRaWAN - The Big Picture
 
-# Lesson Overview: Understanding the Helium Network
+# Lesson Overview: Understanding How LoRaWAN Works
 
 Let's start with a map of the territory. You're going to hear some terms for the first time. If you don't understand them at first, don't worry about it—we're just getting some reps in so that you have a chance to hear all these terms multiple times.
 
@@ -12,9 +12,11 @@ If you'd prefer a video walk through, go here:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/_VSy5-AQe7E?si=GjTkUVBOlMdWQbLZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-## Introduction to the Helium Network
+## Introduction to the Network
 
-Let's start at the very beginning. We are going to use what's called the **Helium Network**. The Helium Network is a global **LoRaWAN**, which stands for Long Range Wide Area Network. It's a wireless or radio network.
+Let's start at the very beginning. For this tutorial series, we are going to use what's called the **Helium Network**. The Helium Network is a global **LoRaWAN**, which stands for Long Range Wide Area Network. It's a wireless or radio network that anyone can use, without first asking permission or going through a giant setup process.
+
+There are lots of LoRaWAN networks that you can use, both public and private.  Helium may not be the best fit for your use case, but it's an excellent way to get started easily
 
 ## How It Works
 
