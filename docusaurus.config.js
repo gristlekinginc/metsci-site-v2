@@ -173,6 +173,15 @@ const config = {
               },
             ],
           },
+          {
+            title: 'Resources',
+            items: [
+              {
+                label: 'Media Assets',
+                to: '/media',
+              },
+            ],
+          },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} MeteoScientific, Built with Docusaurus.`,
       },
