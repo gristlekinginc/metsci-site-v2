@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[2341],{7940:e=>{e.exports=JSON.parse('{"label":"trades","permalink":"/blog/tags/trades","allTagsPath":"/blog/tags","count":3,"unlisted":false}')}}]);

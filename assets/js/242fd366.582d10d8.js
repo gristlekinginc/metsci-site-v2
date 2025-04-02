@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[118],{5723:e=>{e.exports=JSON.parse('{"label":"environmental science","permalink":"/blog/tags/environmental-science","allTagsPath":"/blog/tags","count":3,"unlisted":false}')}}]);

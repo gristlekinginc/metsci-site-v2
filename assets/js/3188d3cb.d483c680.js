@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[367],{1495:s=>{s.exports=JSON.parse('{"label":"soil sensors","permalink":"/blog/tags/soil-sensors","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

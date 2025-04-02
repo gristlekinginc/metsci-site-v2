@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[3958],{8908:e=>{e.exports=JSON.parse('{"label":"senior care","permalink":"/blog/tags/senior-care","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

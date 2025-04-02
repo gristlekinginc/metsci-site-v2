@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[7463],{4977:e=>{e.exports=JSON.parse('{"label":"temperature sensors","permalink":"/blog/tags/temperature-sensors","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[6848],{2909:e=>{e.exports=JSON.parse('{"label":"actility","permalink":"/blog/tags/actility","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

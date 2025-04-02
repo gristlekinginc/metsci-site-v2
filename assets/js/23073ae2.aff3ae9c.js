@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[1408],{1125:e=>{e.exports=JSON.parse('{"label":"valley winds","permalink":"/blog/tags/valley-winds","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

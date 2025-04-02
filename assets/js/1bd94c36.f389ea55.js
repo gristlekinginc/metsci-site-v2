@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[707],{7208:e=>{e.exports=JSON.parse('{"label":"semtech","permalink":"/blog/tags/semtech","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

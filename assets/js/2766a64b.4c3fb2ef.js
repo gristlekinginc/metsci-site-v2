@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[817],{850:e=>{e.exports=JSON.parse('{"label":"microclimates","permalink":"/blog/tags/microclimates","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

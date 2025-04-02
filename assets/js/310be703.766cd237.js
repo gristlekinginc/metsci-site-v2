@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[4966],{1514:e=>{e.exports=JSON.parse('{"label":"electrician","permalink":"/blog/tags/electrician","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

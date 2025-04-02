@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[9954],{5898:e=>{e.exports=JSON.parse('{"label":"wind","permalink":"/blog/tags/wind","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

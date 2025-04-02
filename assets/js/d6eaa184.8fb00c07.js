@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[4105],{336:e=>{e.exports=JSON.parse('{"label":"alert","permalink":"/blog/tags/alert","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[9049],{1618:e=>{e.exports=JSON.parse('{"label":"military","permalink":"/blog/tags/military","allTagsPath":"/blog/tags","count":2,"unlisted":false}')}}]);

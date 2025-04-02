@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[9949],{5673:e=>{e.exports=JSON.parse('{"label":"vernal pools","permalink":"/blog/tags/vernal-pools","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[2946],{2875:e=>{e.exports=JSON.parse('{"label":"government","permalink":"/blog/tags/government","allTagsPath":"/blog/tags","count":2,"unlisted":false}')}}]);
