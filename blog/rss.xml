@@ -70,7 +70,7 @@ Oh, you actually want to read the blog, and you'd like to know a little more?  C
 <p>The sizes, or "resolutions", range from a <code>res 0</code> hex, of which there are only 110 in the world, each covering about 4.3 million square kilometers, all the way down to a <code>res 15</code> which has over 569 billion hexagons and maps to just under a square meter.</p>
 <p>If you want to check out all the res sizes, <a href="https://h3geo.org/docs/core-library/restable" target="_blank" rel="noopener noreferrer">here’s the list</a>.</p>
 <p>If it’s good enough for Uber to find you at the airport among the other hundred people waiting in the rideshare lot, it's good enough to provide an excellent map of coverage for a LoRaWAN.</p>
-<p>Every hotspot (or gateway, as you like) will cover a given number of <code>res 8</code> hexes.  Quick Red Cobra has reported coverage from 500 hexes with at least a -130 dBm signal.  Not bad!</p>
+<p>Every hotspot (or gateway, as you like) will cover a given number of <code>res 8</code> hexes.  Using the current coverage calculator, the Helium Explorer estimates that Quick Red Cobra has an expected coverage range of 500 hexes with at least a -130 dBm signal.  Not bad!</p>
 <p><img decoding="async" loading="lazy" alt="Quick Red Cobra Hexes covered" src="https://www.meteoscientific.com/assets/images/quick-red-cobra-hexes-covered-1464beff18d07468449a018f8ff46567.png" width="1540" height="655" class="img_ev3q"></p>
 <p>How do you know a hex is covered?</p>
 <p>You can use three methods; the easy way, the paid way, or the DIY way.</p>
