@@ -20,6 +20,10 @@ hola:
 
 # end original tags, start new ones
 
+helium:
+  label: Helium
+  description: Posts related to the Helium LoRaWAN and its global IoT network.
+
 weather:
   label: Weather
   description: Posts related to weather patterns, forecasting, and meteorological conditions.
