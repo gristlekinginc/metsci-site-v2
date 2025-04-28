@@ -67,7 +67,7 @@ That leads us to the Coverage map, which you’ll find by going to the green IoT
 
 ![Coverage Explorer on Helium](/img/blog/2025-04-27-lets-explore-helium-explorer/helium-coverage-map.png)
 
-### COVERAGE PER GATEWAY
+### What Does a Gateway Cover?
 
 On the `IoT` --> `Hotspot Map`, you can look for a specific Hotspot if you know its name. For example, `Quick Red Cobra` is one in downtown San Diego California, where I live.  Hotspots are assigned three-word names (Adjective-Color-Animal) randomly when they join the network.  This makes it easier for non-technical people to remember (and refer to) their hotspot.  Not everyone likes calling 'em a `UG56` or `SX1302 based` or the ol' `LPS8N`.
 
