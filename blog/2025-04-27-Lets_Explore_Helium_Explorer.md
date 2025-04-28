@@ -87,7 +87,7 @@ If you want to check out all the res sizes, [here’s the list](https://h3geo.or
 
 If it’s good enough for Uber to find you at the airport among the other hundred people waiting in the rideshare lot, it's good enough to provide an excellent map of coverage for a LoRaWAN.
 
-Every hotspot (or gateway, as you like) will cover a given number of `res 8` hexes.  Quick Red Cobra has reported coverage from 500 hexes with at least a -130 dBm signal.  Not bad! 
+Every hotspot (or gateway, as you like) will cover a given number of `res 8` hexes.  Using the current coverage calculator, the Helium Explorer estimates that Quick Red Cobra has an expected coverage range of 500 hexes with at least a -130 dBm signal.  Not bad! 
 
 ![Quick Red Cobra Hexes covered](/img/blog/2025-04-27-lets-explore-helium-explorer/quick-red-cobra-hexes-covered.png)
 
