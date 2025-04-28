@@ -1,43 +1,47 @@
 ---
-title: Let's Explore - Helium IoT Explorer
+title: Let's Explore The Helium IoT Explorer
 authors: [nik]
 tags: [lorawan, business, helium]
 ---
 
 One of the very first questions any reasonable business owner will have when they’re deciding whether or not to use LoRaWAN to connect their sensors to the internet is, “How do I get coverage?”<!-- truncate -->
 
-With LoRaWAN, typically you deploy your own gateways and provide your own coverage, but a few networks exist that already provide coverage and will give you free or very cheap access to it.  One of those is the [Helium network](https://world.helium.com/en/iot/hotspots), a global LoRaWAN.  
+With LoRaWAN, you can deploy your own gateways and provide your own coverage, but as I've discussed on [this episode of the MetSci podcast](https://pod.metsci.show/episode/primer-lora-vs-lorawan-how-to-use-it) a few networks exist that already provide coverage and will give you free or very cheap access to it.  One of those is the [Helium network](https://world.helium.com/en/iot/hotspots), a global LoRaWAN.  
 
 We’ll take a look at how to assess whether or not there is already Helium coverage in your area, and if it’s acceptable for your project. Let’s start at their coverage map, found at [`world.helium.com`](https://world.helium.com/en/mobile), which will default to Mobile.
 
 ![Helium World Mobile Map](/img/blog/2025-04-27-lets-explore-helium-explorer/world-helium-mobile.png)
 
-Helium has 2 networks, one is for IoT, and one is for phones.  We’re going to focus on the IoT network, which is the largest LoRaWAN network in the world with over 250,000 LoRaWAN gateways.  Helium calls these gateways “Hotspots” in an attempt to make this technology relatable to the average person.  I’ll use “gateway” and “hotspot” interchangeably here.
+Helium has 2 networks.  One is for IoT, and one is for phones.  We’re going to focus on the IoT network, which is the largest LoRaWAN network in the world with over 250,000 LoRaWAN gateways.  
+
+Helium calls these gateways “Hotspots” in an attempt to make this technology relatable to the average person.  I’ll use “gateway” and “hotspot” interchangeably here.
 
 ### The Hotspot Map
 
-We’ll start by exploring the Hotspot map, which you can find by going to the green IoT button in the top right, then clicking it for the dropdown options and selecting “Hotspot Map”.
+We’ll start by exploring the Hotspot map, which you can find by [going to the green IoT button on the Helium IoT Explorer](https://world.helium.com/en/iot/hotspots), then clicking it to get dropdown options and selecting “Hotspot Map”.
 
 ![Choose IoT Explorer](/img/blog/2025-04-27-lets-explore-helium-explorer/chose-green-iot-then-hotspot-map.png)
 
 You should easily recognize the basic stats, like number of Hotspots and Daily Messages, but “DC burned” may be new to you.  
 
+![Helium IoT Basic Stats](/img/blog/2025-04-27-lets-explore-helium-explorer/helium-basic-stats.png)
+
 Helium is a network powered by cryptocurrency.  The currency, or token, is called an HNT, or Helium Network Token.  It is used to [pay for data credits, or DCs, which allow you to transfer on the network](https://docs.helium.com/tokens/data-credit/).
 
 
-If you’d like, **you can skip the whole cryptocurrency thing** and just buy DCs with whatever currency you’re used to; dollars, euros, yen, whatever.  Trust me, it's pretty easy.  I stand to profit if you buy them from me, so I'll make it as frictionless as possible.  
+If you’d like, **you can skip the whole cryptocurrency thing** and just buy DCs with whatever currency you’re used to; dollars, euros, yen, whatever.  If you'd like to try that, you can do it over on the [MeteoScientific Console](https://console.meteoscientific.com/front/login), although I give you the first 400 DC for free. 
 
 ### The Cost Of Using The Helium Network
 
-One DC covers up to a 24 byte message and equals $0.00001 USD.  Yes, that’s a thousandth of a penny.
+One DC covers up to a 24 byte message and equals `$0.00001` USD.  Yes, that’s a thousandth of a penny.  Over on the MetSci Console (one of many LNS on Helium) I charge a 10x premium, which means you can still run a sensor sending **a packet an hour for a year and spend less than a dollar.**
 
-If you’re sending less than 24 bytes, you still get charged for all 24.  If you’re sending more, you’ll get charged multiple DC per message.
+If you’re sending less than 24 bytes you still get charged for all 24.  If you’re sending more, you’ll get charged multiple DC per message.
 
 You could also buy multiple copies of that message from multiple gateways.
 
 Unlike traditional wireless networks, there is no subscription fee.  You just pay for the data you successfully transfer.
 
-Helium is a permissionless network; there’s no sales staff to talk to first if you want to use it, no crazy sign up process, and if you’ve ever used LoRaWAN before, not much new to learn; you can just use it.
+Helium is a permissionless network; there’s no sales staff to talk to first if you want to use it, no crazy sign up process, and if you’ve ever used LoRaWAN before, not much new to learn; you can just use it.  If you need help, check out my [tutorials](https://www.meteoscientific.com/docs/tutorial-basics/LoRaWAN-Big-Picture).
 
 As you can see, Helium is staggeringly transparent.  On April 27th 2025 when I wrote this, 6.3 million messages had been transferred across the network in the last 24 hours at a cost of 10.4 million DC, or $104.81.
 
@@ -65,7 +69,7 @@ That leads us to the Coverage map, which you’ll find by going to the green IoT
 
 ### COVERAGE PER GATEWAY
 
-On the `IoT` --> `Hotspot Map`, you can look for a specific Hotspot if you know its name. For example, `Quick Red Cobra` is one in downtown San Diego California, where I live.  Hotspots are assigned three-word names (Adjective-Color-Animal) randomly when they join the network; it makes it easier for non-technical people to remember (and refer to) their hotspot.  Not everyone likes calling 'em a `UG56` or `SX1302 based` or the ol' `LPS8N`.
+On the `IoT` --> `Hotspot Map`, you can look for a specific Hotspot if you know its name. For example, `Quick Red Cobra` is one in downtown San Diego California, where I live.  Hotspots are assigned three-word names (Adjective-Color-Animal) randomly when they join the network.  This makes it easier for non-technical people to remember (and refer to) their hotspot.  Not everyone likes calling 'em a `UG56` or `SX1302 based` or the ol' `LPS8N`.
 
 Let’s take a look at Quick Red Cobra and see what we can learn about the coverage this one gateway provides.
 
@@ -83,7 +87,11 @@ If you want to check out all the res sizes, [here’s the list](https://h3geo.or
 
 If it’s good enough for Uber to find you at the airport among the other hundred people waiting in the rideshare lot, it's good enough to provide an excellent map of coverage for a LoRaWAN.
 
-Every hotspot (or gateway, as you like) will cover a given number of `res 8` hexes.  How do you know a hex is covered?  
+Every hotspot (or gateway, as you like) will cover a given number of `res 8` hexes.  Quick Red Cobra has reported coverage from 500 hexes with at least a -130 dBm signal.  Not bad! 
+
+![Quick Red Cobra Hexes covered](/img/blog/2025-04-27-lets-explore-helium-explorer/quick-red-cobra-hexes-covered.png)
+
+How do you know a hex is covered?  
 
 You can use three methods; the easy way, the paid way, or the DIY way.
 
@@ -103,7 +111,7 @@ The DIY way is to build your own mapping solution.  That's fun and rewarding, bu
 
 ### What About Coverage...HERE?
 
-Now, it’s likely that you’re more interested in actual coverage than which gateway is providing it.  For that, you can go back to the coverage map and zoom in on any given area.
+Now, it’s likely that you’re more interested in actual coverage than which gateway is providing it.  For that, you can go [back to the coverage map](https://world.helium.com/en/iot/coverage) and zoom in on any given area.
 
 ![Grenoble Helium Coverage](/img/blog/2025-04-27-lets-explore-helium-explorer/grenoble-helium-coverage.png)
 
@@ -123,8 +131,8 @@ If you need coverage in the mountains, or anywhere a vehicle can’t go, you can
 
 You can also build your own Mapper [following instructions](https://docs.helium.com/iot/coverage-mapping/quickstart) over on the Helium Docs site. 
 
-That wraps it for how to assess LoRaWAN coverage for anywhere in the world on the Helium network.  If you’d like to see coverage on other networks, excellent websites like [https://www.coveragemap.net/] offer maps of [TTN](https://www.thethingsnetwork.org/) and other networks.  
+That wraps it for how to assess LoRaWAN coverage for anywhere in the world on the Helium network.  If you’d like to see coverage on other networks, excellent websites like [Coverage Map](https://www.coveragemap.net/) offer maps of [TTN](https://www.thethingsnetwork.org/) and other networks.  
 
-Not every LoRaWAN offers public mapping information like this (many of them have their own internal tools to manage and monitor their private networks), but if you’re looking for an easy way to see if there’s the kind of LoRaWAN coverage you need for the IoT solution you want, the Helium World Explorer is an excellent place to start.
+Not every LoRaWAN offers public mapping information like this (many of them have their own internal tools to manage and monitor their private networks), but if you’re looking for an easy way to see if there’s the kind of LoRaWAN coverage you need for your IoT solution, the Helium World Explorer is an excellent place to start.
 
 Happy coverage hunting!

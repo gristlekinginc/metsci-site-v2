@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# How to Use the LoRaWAN Console
+# How to Use the Helium Console
 
 This lesson will walk you through the process of using the **MeteoScientific (MetSci) Console**. You can follow along by visiting [console.meteoscientific.com](https://console.meteoscientific.com) and signing up for an account; you'll get 400 free data credits to start. This guide will give you an overview of the console and how data flows within the LoRaWAN network.
 
