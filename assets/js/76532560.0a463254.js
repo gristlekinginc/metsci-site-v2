@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[8945],{706:e=>{e.exports=JSON.parse('{"label":"helium","permalink":"/blog/tags/helium","allTagsPath":"/blog/tags","count":2,"unlisted":false}')}}]);
