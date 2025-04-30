@@ -5,7 +5,7 @@ tags: [lorawan, business, helium]
 ---
 
 
-The number one threat to LoRaWAN isn’t technical issues or a competition, according to Alper Yegin, CEO of the [LoRa Alliance](https://lora-alliance.org/).
+The number one threat to LoRaWAN isn’t technical issues or competition, according to Alper Yegin, CEO of the [LoRa Alliance](https://lora-alliance.org/).
 
 It’s **awareness**.  Not enough people know about LPWANs, let alone LoRaWAN.  What does that mean for you, the business owner who is deploying LoRaWAN to service clients?<!-- truncate -->
 
@@ -23,28 +23,28 @@ That’s something those of us in the LoRaWAN world can forget.  We spend a lot 
 
 > What the customer wants is what matters. You're serving the customer, not your tech desires.
 
-Once you’ve solved their problem, THEN you can start talking about how you solved it, and let that lead into solving even more problems.  This is Humphrey’s **land and expand** strategy, where you land with one solution, then starting going sideways and introduce more sensors types.
+Once you’ve solved their problem, THEN you can start talking about how you solved it, and let that lead into solving even more problems.  This is Humphrey’s **land and expand** strategy, where you land with one solution, then start going sideways to introduce more sensor types.
 
 Now, that doesn’t mean you have to  start with just one sensor.  Bansi at the firm [Macnman](https://www.macnman.com/) recommends starting with at least 100 sensors as the sweet spot for getting enough data and justifying the infrastructure cost.  [In his podcast episode](https://pod.metsci.show/episode/from-handfuls-to-hundreds-bansi-talks-scale) he gives the smoke detector example. 
 
-Think of how much you can cover with one LoRaWAN enabled smoke detector in a ten story building vs multiple LoRaWAN smoke alarms on each floor.  One is cute, the other saves lives.  
+Think of how much you can cover with one LoRaWAN enabled smoke detector in a ten story building vs multiple LoRaWAN smoke alarms on each floor.  One is cute, the other saves lives and machinery.  
 
 Starting focused doesn’t necessarily mean to start small.
 
-Finally, you may not know what problems they have when you go in; maybe you're walking in cold, or you just bumped into someone at the coffee shop.  [Scott Andrews](https://www.senseability.uk/), who's LoRaWAN work spans both the public and private sector advises you to just ask.  "Ask about their machines and what they do and how they work."
+Finally, you may not know what problems they have when you go in; maybe you're walking in cold, or you just bumped into someone at the coffee shop.  [Scott Andrews](https://www.senseability.uk/), whose LoRaWAN work spans both the public and private sector advises you to just ask:  "Ask about their machines and what they do and how they work."
 
-So awareness is the number one threat facing LoRaWAN, but in the course of the 17 conversations I’ve had in the past few weeks starting up [The Business of LoRaWAN podcast](https://pod.metsci.show/), the business side faces other challenges, among them how complicated it can be for non-engineers to use.
+Awareness may be the number one threat facing LoRaWAN, but in the course of the 15 conversations I’ve had in the past few weeks starting up [The Business of LoRaWAN podcast](https://pod.metsci.show/), the business side faces other challenges, among them how complicated it can be for non-engineers to use.
 
 
 ### Make It Easy
 
-Now, this is the difference between encouraging small business owners to deploy their own networks and coming in as a full stack integrator; one has the problem but struggles with the solution.  The other has the solution and needs to find the problem.  
+This is the difference between encouraging small business owners to deploy their own networks and coming in as a full stack integrator; one has the problem but struggles with the solution.  The other has the solution and needs to find the problem.  
 
-One happy middle ground is to make using LoRaWAN a lot easier, and designing for beginners.
+One happy middle ground is to make using LoRaWAN a lot easier by designing for beginners.
 
 That’s what Slaven Damjanovic at [GLAMOS](https://glamos.eu/) has done with his LoRaWAN field tester.  Slaven started GLAMOS just before Helium introduced LoRaWAN to a few hundred thousand people over the course of about 9 months.  
 
-The LoRaWAN field testers he was producing had to be beginner friendly; most of the new Helium entrants had never heard of LoRaWAN, but they wanted to know what coverage was like in their area, and it need to be push-button easy.
+The LoRaWAN field testers he was producing HAD to be beginner friendly; most of the new Helium entrants had never heard of LoRaWAN.  They wanted to know what coverage was like in their area, and it need to be push-button easy.
 
 The easier it is for someone to use a system, whether it’s a field test device like the GLAMOS or a soil moisture sensor, the better.  In fact, by making a device much easier to use you can increase the value of the thing, something that that Harmony Analytica does with their soil moisture sensor.  
 
@@ -54,9 +54,9 @@ All of those are value-add steps that Harmony Analytica offers in its $200 soil 
 
 ### Leverage The Strengths
 
-We might tend to forget about how good LoRaWAN is at solving certain problems, one of which is making almost anything, from sensor to skyscraper, smarter.  
+We tend to forget about how good LoRaWAN is at solving certain problems, one of which is making almost anything, from sensor to skyscraper, smarter.  
 
-Manoj Telrandhe at [TerraQ](https://www.terraq.tech/) did a great job highlighting this, and it had nothing to do with managing uplinks or what spreading factor was used; it was how much area one gateway can cover.
+Manoj Telrandhe at [TerraQ](https://www.terraq.tech/) does a great job highlighting this, and it has nothing to do with managing uplinks or what spreading factor was used; it's how much area one gateway can cover.
 
 TerraQ deploys sensors throughout restaurants, adding HVAC monitoring, energy management (where he has a long history), and food compliance safety reporting.  As these restaurants expand, whether it’s knocking down a wall to make their space bigger or shifting down the street, adding a new sensor is as easy as putting in the batteries and sticking it on the wall (or the equipment.)
 
@@ -72,7 +72,7 @@ Since LoRaWAN is a wide area network, the chances are good that wherever you dep
 
 Test what’s available on site and don’t be afraid to figure out roaming agreements with other providers.  The most pervasive and easiest network to use (completely permissionless) will probably be Helium, a global community network with [coverage across most of the developed world](https://world.helium.com/en/iot/coverage).  
 
-Sign up for a free [MeteoScientific Console account](https://console.meteoscientific.com/front/login) and carry a field tester with you to your next potential client.  You get your first 400 Data Credits (24 byte each) for free, and I think you’ll be pleasantly surprised with the coverage.
+Sign up for a free [MeteoScientific Console account](https://console.meteoscientific.com/front/login) and carry a field tester with you to your next potential client to test it out.  You get your first 400 Data Credits (24 byte each) for free, and I think you’ll be pleasantly surprised with the coverage.
 
 This can make for a great demo to not have to set up a gateway.
 
@@ -91,4 +91,3 @@ However you use LoRaWAN, incorporating these 4 aspects will help you build your 
 Here's to you getting out there and gettin' after it, crushing sensor deployments, making the world a better, smarter place, and helping solve the number one problem in LoRaWAN.
 
 Get 'em, friends!
-
