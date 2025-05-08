@@ -7,41 +7,41 @@ description: How MeteoScientific collects, uses, and protects your data.
 
 _Last updated: May 8, 2025_
 
-This Privacy Policy outlines how MeteoScientific, owned and operated by Gristle King Inc., collects, uses, and protects personal information across all services, including but not limited to meteoscientific.com, metsci.show, and any subdomains.
+At MeteoScientific (owned and operated by Gristle King Inc.), we are committed to protecting your privacy. This policy explains what information we collect, how we use it, and how we keep it safe across all our services, including meteoscientific.com, metsci.show, and any subdomains.
 
 ## 1. Information We Collect
 
-Depending on your interaction with our services, we may collect:
+Depending on how you interact with our services, we may collect:
 
-- Names and email addresses (e.g., newsletter signups or contact forms)  
-- Email engagement data (opens, clicks, bounces)  
-- Basic browser and IP data for analytics and diagnostics  
+- Your name and email address (for example, if you sign up for our newsletter or contact us)
+- Email engagement data (such as opens, clicks, and bounces)
+- Basic browser and IP information for analytics and diagnostics
 
-## 2. How We Use Information
+## 2. How We Use Your Information
 
-We use collected information to:
+We use your information to:
 
-- Send transactional or marketing emails  
-- Improve our website and services  
-- Respond to inquiries or support requests  
-- Monitor usage for abuse prevention  
+- Send you transactional or marketing emails
+- Improve our website and services
+- Respond to your inquiries or support requests
+- Monitor usage to prevent abuse
 
-All marketing communications include a functional unsubscribe link as required by applicable law.
+All marketing emails from us include a clear unsubscribe link.
 
-We do not sell, rent, or share your personal information with third parties except to process communications through trusted service providers (e.g., Mailgun).
+We do not sell, rent, or share your personal information with third parties, except as needed to process communications through trusted service providers (like Mailgun).
 
 ## 3. Data Protection and Security
 
-We use industry-standard tools and protocols to protect your data, including encryption and access controls. However, no system is 100% secure.
+We use industry-standard tools and protocols, including encryption and access controls, to protect your data. However, please note that no system is 100% secure.
 
 ## 4. Your Rights
 
-You may request to view, update, or delete your data by contacting [privacy@meteoscientific.com](mailto:privacy@meteoscientific.com).
+You can request to view, update, or delete your data at any time by contacting us at [privacy@meteoscientific.com](mailto:privacy@meteoscientific.com).
 
 ## 5. Third-Party Services
 
-We use trusted vendors (e.g., Mailgun for email delivery). These third parties process data according to their own privacy practices, which are consistent with our values.
+We use trusted vendors (such as Mailgun for email delivery) to help us provide our services. These third parties process data according to their own privacy practices, which align with our values.
 
 ## 6. Changes to This Policy
 
-We reserve the right to modify this policy. Updates will be posted to me
+We may update this policy from time to time. Any changes will be posted on this page, and your continued use of our services means you accept those changes.
