@@ -173,6 +173,14 @@ const config = {
                 label: 'LinkedIn',
                 href: 'https://www.linkedin.com/in/nikhawks/', 
               },
+              {
+                label: 'Terms of Service',
+                to: '/terms-of-service',
+              },
+              {
+                label: 'Privacy Policy',
+                to: '/privacy-policy',
+              },
             ],
           },
           {
