@@ -173,14 +173,6 @@ const config = {
                 label: 'LinkedIn',
                 href: 'https://www.linkedin.com/in/nikhawks/', 
               },
-              {
-                label: 'Terms of Service',
-                to: '/terms-of-service',
-              },
-              {
-                label: 'Privacy Policy',
-                to: '/privacy-policy',
-              },
             ],
           },
           {
@@ -201,7 +193,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} MeteoScientific, Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} MeteoScientific. <a href="/terms-of-service" style="color:#18A7D9;text-decoration:underline;">Terms</a> | <a href="/privacy-policy" style="color:#18A7D9;text-decoration:underline;">Privacy</a> .`,
       },
       prism: {
         theme: prismThemes.github,
