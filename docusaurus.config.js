@@ -186,6 +186,10 @@ const config = {
                 label: 'Email Sign Up',
                 to: '/email-sign-up',
               },
+              {
+                label: 'Contact',
+                to: '/contact',
+              },
             ],
           },
         ],
