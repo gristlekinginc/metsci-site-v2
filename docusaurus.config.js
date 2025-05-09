@@ -182,6 +182,10 @@ const config = {
                 label: 'Media Assets',
                 to: '/media',
               },
+              {
+                label: 'Email Sign Up',
+                to: '/email-sign-up',
+              },
             ],
           },
         ],
