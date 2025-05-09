@@ -49,4 +49,4 @@ We may update these Terms occasionally. The most recent version is always availa
 
 ---
 
-Have questions? Email us at [support@meteoscientific.com](mailto:support@meteoscientific.com) and we’ll get back to you.
+Have questions? Contact us via the [Contact page](/contact) and we’ll get back to you.
