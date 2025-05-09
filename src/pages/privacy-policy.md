@@ -36,7 +36,7 @@ We use industry-standard tools and protocols, including encryption and access co
 
 ## 4. Your Rights
 
-You can request to view, update, or delete your data at any time by contacting us at [privacy@meteoscientific.com](mailto:privacy@meteoscientific.com).
+You can request to view, update, or delete your data at any time by contacting us via the [Contact page](/contact).
 
 ## 5. Third-Party Services
 
