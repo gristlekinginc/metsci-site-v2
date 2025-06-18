@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import InfoPanes from '@site/src/components/InfoPanes';
 import OptimizedImage from '@site/src/components/OptimizedImage';
 
 import Heading from '@theme/Heading';
@@ -33,7 +33,7 @@ export default function Home() {
       description={getTagline('tutorials')}>
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        <InfoPanes />
       </main>
     </Layout>
   );
