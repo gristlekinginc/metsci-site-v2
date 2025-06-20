@@ -108,93 +108,9 @@ const config = {
         { property: 'og:image:type', content: 'image/png' },
         { property: 'og:image:alt', content: 'MeteoScientific - The Business of LoRaWAN' },
       ],
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Tutorials',
-                to: '/docs/tutorial-basics/LoRaWAN-Big-Picture',
-              },
-              {
-                label: 'YouTube',
-                href: 'https://www.youtube.com/@meteoscientific',
-              },
-              {
-                label: 'Blog',
-                href: '/blog',
-              },  
-            ],
-          },
-          {
-            title: 'Moar',
-            items: [
-              {
-                label: 'About',
-                to: '/about',
-              },
-              {
-                label: 'FAQ',
-                href: '/faq',
-              },
-              {
-                label: 'Podcast',
-                to: '/podcast',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'Discord',
-                href: 'https://discord.gg/4fR5QAq6Vc',
-              },
-              {
-                label: 'X',
-                href: 'https://x.com/meteoscientific',
-              },
-              {
-                label: 'Donate',
-                href: '/donate',
-              },
-            ],
-          },
-          {
-            title: 'Owned By',
-            items: [
-              {
-                label: 'X',
-                to: 'https://x.com/thegristleking',
-              },
-              {
-                label: 'LinkedIn',
-                href: 'https://www.linkedin.com/in/nikhawks/', 
-              },
-            ],
-          },
-          {
-            title: 'Resources',
-            items: [
-              {
-                label: 'Media Assets',
-                to: '/media',
-              },
-              {
-                label: 'Email Sign Up',
-                to: '/email-sign-up',
-              },
-              {
-                label: 'Contact',
-                to: '/contact',
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} MeteoScientific. <a href="/terms-of-service" style="color:#18A7D9;text-decoration:underline;">Terms</a> | <a href="/privacy-policy" style="color:#18A7D9;text-decoration:underline;">Privacy</a> .`,
-      },
+              footer: {
+          // Using custom footer component but need basic config for Docusaurus
+        },
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
