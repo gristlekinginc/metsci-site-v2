@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Workflow
+
+## Docusaurus Commands
+- **Development Server**: `npm start` or `yarn start`
+- **Build**: `npm run build` or `yarn build`
+- **Deploy**: Handled automatically via GitHub Actions → Vercel
+
+## Key Configuration Files
+- **Main Config**: [docusaurus.config.js](mdc:docusaurus.config.js) - Site configuration, plugins, themes
+- **Sidebar**: [sidebars.js](mdc:sidebars.js) - Documentation navigation structure
+- **Package Management**: [package.json](mdc:package.json) - Dependencies and scripts
+- **Styling**: [src/css/custom.css](mdc:src/css/custom.css) - Custom CSS variables and overrides
+
+## Content Organization
+- **Blog Posts**: Date-prefixed Markdown files in [blog/](mdc:blog)
+- **Tutorial Basics**: Sequential numbered files in [docs/tutorial-basics](mdc:docs/tutorial-basics)
+- **Tutorial Extras**: Advanced topics in [docs/tutorial-extras](mdc:docs/tutorial-extras)
+- **Static Assets**: Images and files in [static/](mdc:static)
+
+## Debugging Guidelines
+When debugging issues:
+1. Provide appropriate diagnostic steps before providing solutions, i.e make sure the problem we're solving is actually the problem
+2. Request complete context before suggesting fixes
+3. Use browser developer tools and Docusaurus error messages
+
+## Python Files Special Requirement
+When creating Python files, always include the full file path in comments at the top:
+```python
+# File: /path/to/script.py
+# Purpose: [Description of what the script does]
+```

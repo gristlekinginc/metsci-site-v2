@@ -1,0 +1,39 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# File Structure Guide
+
+## Key Directories
+
+### Content Directories
+- **[docs/](mdc:docs)** - Main documentation with tutorials and guides
+  - **[docs/tutorial-basics/](mdc:docs/tutorial-basics)** - Core LoRaWAN tutorials (numbered 001-009)
+  - **[docs/tutorial-extras/](mdc:docs/tutorial-extras)** - Advanced topics and integrations
+  - **[docs/codecs/](mdc:docs/codecs)** - Device codec documentation
+- **[blog/](mdc:blog)** - Industry articles and technical blog posts
+- **[static/](mdc:static)** - Static assets (images, files, scripts)
+
+### Source Code
+- **[src/components/](mdc:src/components)** - Reusable React components
+  - **[src/components/HomepageFeatures/](mdc:src/components/HomepageFeatures)** - Homepage feature cards
+  - **[src/components/InfoPanes/](mdc:src/components/InfoPanes)** - Information display components
+- **[src/pages/](mdc:src/pages)** - Custom pages (about, contact, etc.)
+- **[src/css/](mdc:src/css)** - Custom styling and CSS variables
+
+### Configuration
+- **[docusaurus.config.js](mdc:docusaurus.config.js)** - Main Docusaurus configuration
+- **[sidebars.js](mdc:sidebars.js)** - Documentation sidebar structure
+- **[package.json](mdc:package.json)** - Dependencies and npm scripts
+- **[vercel.json](mdc:vercel.json)** - Vercel deployment configuration
+
+### Assets Organization
+- **[static/images/](mdc:static/images)** - Tutorial and documentation images
+- **[static/img/](mdc:static/img)** - Branding, icons, and media assets
+- **[static/flows/](mdc:static/flows)** - Node-RED flow JSON files
+- **[static/scripts/](mdc:static/scripts)** - Installation and utility scripts
+
+### Utility Scripts
+- **[scripts/](mdc:scripts)** - Build and optimization scripts
+- **[extra_admin/](mdc:extra_admin)** - Administrative files and backups

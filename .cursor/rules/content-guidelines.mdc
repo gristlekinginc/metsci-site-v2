@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Content Guidelines
+
+## Target Audience
+- **Primary**: Non-technical users learning LoRaWAN and IoT
+- **Approach**: Keep explanations simple, provide step-by-step instructions
+- **Limit**: Provide no more than 2-3 steps at a time to avoid confusion
+
+## Content Types
+
+### Blog Posts
+- **Location**: [blog/](mdc:blog)
+- **Naming**: `YYYY-MM-DD-title.md` format
+- **Topics**: LoRaWAN applications, micrometeorology, industry analysis
+- **Metadata**: Include [authors.yml](mdc:blog/authors.yml) and [tags.yml](mdc:blog/tags.yml) references
+
+### Tutorial Documentation
+- **Basic Tutorials**: [docs/tutorial-basics](mdc:docs/tutorial-basics) - Core LoRaWAN concepts
+- **Advanced Tutorials**: [docs/tutorial-extras](mdc:docs/tutorial-extras) - Specific implementations
+- **Codecs**: [docs/codecs](mdc:docs/codecs) - Device-specific documentation
+
+### Images and Assets
+- **Tutorial Images**: Organize in subdirectories like `tutorial-basics/008-images/`
+- **Blog Images**: Store in [static/img/blog](mdc:static/img/blog) with post-specific folders
+- **Icons**: Use MetSci branded icons from [static/img/icon_images](mdc:static/img/icon_images)
+
+## Writing Style
+- Use clear, simple language
+- Include verification steps ("check that what I'm doing is correct")
+- Provide context for each step
+- Break complex processes into digestible chunks
+
+## Technical Standards
+- All Markdown files should be valid MDX for Docusaurus
+- Include proper front matter with title, description, and tags
+- Reference images using relative paths from static directory

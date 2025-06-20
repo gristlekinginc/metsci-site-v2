@@ -1,0 +1,41 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Branding and Styling Guidelines
+
+## MeteoScientific Brand Colors
+Define these CSS custom properties in [src/css/custom.css](mdc:src/css/custom.css):
+
+```css
+--metsci-primary: #D94A18;   /* Troposphere Red - Primary */
+--metsci-red: #FA7F2A;       /* Solar Haze */
+--metsci-blue: #18A7D9;      /* Jet Stream Blue */
+--metsci-white: #FCF5F0;     /* Cirrus White */
+--metsci-black: #000000;     /* Stratosphere Black */
+```
+
+## Brand Assets
+- **Logo Files**: [static/img/metsci_pro_media/](mdc:static/img/metsci_pro_media)
+- **Icons**: [static/img/icon_images/](mdc:static/img/icon_images)
+  - Weather and sensor-themed SVG icons
+  - Available in multiple color variants (orange, white, black)
+- **Favicon**: [static/img/metsci_favicon.ico](mdc:static/img/metsci_favicon.ico)
+
+## Social Media Assets
+- **Social Card**: [static/img/meteoscientific-social-card_1200x630.png](mdc:static/img/meteoscientific-social-card_1200x630.png)
+- **Twitter Card**: [static/img/metsci_twitter_card_1200x630.png](mdc:static/img/metsci_twitter_card_1200x630.png)
+- **Pro Version**: [static/img/metsci-pro-social-card_1200x630.png](mdc:static/img/metsci-pro-social-card_1200x630.png)
+
+## Typography and Layout
+- Use Docusaurus default typography with MetSci color overrides
+- Maintain consistent spacing and hierarchy
+- Ensure accessibility standards are met
+- Test on both light and dark themes
+
+## Component Styling
+- Keep styles modular using CSS modules (.module.css files)
+- Use CSS custom properties for consistent theming
+- Follow Docusaurus styling conventions
+- Reference examples in [src/components/](mdc:src/components) subdirectories

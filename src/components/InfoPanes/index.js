@@ -22,10 +22,26 @@ const InfoPanesList = [
   {
     title: 'MetSci Projects',
     description: 'Explore projects built by MeteoScientific.',
+    isProjectsPane: true // Special flag for custom layout
+  }
+];
+
+// Projects data for the MetSci Projects pane
+const ProjectsList = [
+  {
+    title: 'Dashboard',
+    link: 'https://grafana.meteoscientific.com/public-dashboards/e6bd9074e3ad4fad935bbcacb510059b',
+    icon: '/img/icon_images/project_icons/cirrus-dashboard.png'
+  },
+  {
+    title: 'Sled Push',
     link: 'https://sled.meteoscientific.com',
-    iconDark: '/img/icon_images/white-sled-transparent.png',
-    iconLight: '/img/icon_images/orange-sled-transparent.png',
-    buttonText: 'View Projects'
+    icon: '/img/icon_images/project_icons/cirrus-sled-driver.png'
+  },
+  {
+    title: 'Parking',
+    link: 'https://parking.paleotreats.com',
+    icon: '/img/icon_images/project_icons/cirrus-parking.png'
   }
 ];
 
@@ -60,14 +76,56 @@ function InfoPane({title, description, link, iconDark, iconLight, buttonText}) {
   );
 }
 
+function ProjectsPane({title, description}) {
+  return (
+    <div className={clsx('col col--4')}>
+      <div className={styles.infoPane}>
+        {/* Cirrus Tools logo at the top */}
+        <div className={styles.infoPaneIcon}>
+          <img 
+            src="/img/icon_images/project_icons/cirrus-tools.png"
+            alt="Cirrus Tools"
+            className={styles.projectsMainIcon}
+          />
+        </div>
+        <h3 className={styles.infoPaneTitle}>{title}</h3>
+        <p className={styles.infoPaneDescription}>{description}</p>
+        
+        {/* Three project icons arranged horizontally */}
+        <div className={styles.projectsGrid}>
+          {ProjectsList.map((project, idx) => (
+            <Link
+              key={idx}
+              to={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.projectLink}
+              title={project.title}
+            >
+              <img 
+                src={project.icon}
+                alt={project.title}
+                className={styles.projectIcon}
+              />
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function InfoPanes() {
   return (
     <section className={styles.infoPanes}>
       <div className="container">
         <div className="row">
-          {InfoPanesList.map((props, idx) => (
-            <InfoPane key={idx} {...props} />
-          ))}
+          {InfoPanesList.map((props, idx) => {
+            if (props.isProjectsPane) {
+              return <ProjectsPane key={idx} {...props} />;
+            }
+            return <InfoPane key={idx} {...props} />;
+          })}
         </div>
       </div>
     </section>
