@@ -142,7 +142,7 @@ The Oyster is attached to the sled; it's the black plastic thing on the front wi
 }}>
   <img 
     src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-with-tracker.png"
-    alt="This is where the tracker will be mounted."
+    alt="Tracker mounted on sled, post-delivery."
     style={{
       maxWidth: '800px',
       width: '100%',
@@ -263,7 +263,7 @@ All of this information about location is displayed on a PMTiles map I generated
   margin: '20px auto'
 }}>
   <img 
-    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/monstra-gpu-and-threadripper-local-ai.jpg"
+    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/monstra-gpu-and-threadripper-local-ai.png"
     alt="Triple GPU machine with Threadripper for running local LLM and AI tasks"
     style={{
       maxWidth: '600px',
