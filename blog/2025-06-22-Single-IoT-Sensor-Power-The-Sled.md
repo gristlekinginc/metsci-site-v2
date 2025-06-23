@@ -133,7 +133,7 @@ It relies on the IoT device of a Digital Matter Oyster2, which is a slightly old
   />
 </div>
 
-The Oyster is attached to the sled.  We added a wheels option so you can make it easier if needed, but most of the time the wheels are just mounted on that pin on the back.
+The Oyster is attached to the sled.  
 
 <div style={{
   display: 'flex',
@@ -141,8 +141,8 @@ The Oyster is attached to the sled.  We added a wheels option so you can make it
   margin: '20px auto'
 }}>
   <img 
-    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-with-tracker.jpg"
-    alt="The sled on delivery with the Oyster2 tracker mounted"
+    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/oyster-goes-here.png"
+    alt="This is where the tracker will be mounted."
     style={{
       maxWidth: '800px',
       width: '100%',
