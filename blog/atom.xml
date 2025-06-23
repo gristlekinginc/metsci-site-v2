@@ -28,6 +28,102 @@ Oh, you actually want to read the blog, and you'd like to know a little more?  C
         <category label="pinned" term="pinned"/>
     </entry>
     <entry>
+        <title type="html"><![CDATA[Is One Sensor Enough?]]></title>
+        <id>https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled</id>
+        <link href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled"/>
+        <updated>2025-06-22T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[How a single IoT sensor can turn your neighborhood into a playground and get people interested in IoT, featuring a heavy metal sled, LoRaWAN tracking, and community building.]]></summary>
+        <content type="html"><![CDATA[<p>What if I told you that a single IoT sensor (yep, just one) could turn your entire neighborhood into a playground that got people interested in IoT?</p>
+<p>There's this story in IoT that you need thousands of sensors to make a difference.  Maybe that's true.  </p>
+<p>Today I wanted to talk about what you can do with just one sensor.  Before we begin with that, I should give you some context.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="action--iot">ACTION &amp; IoT<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#action--iot" class="hash-link" aria-label="Direct link to ACTION &amp; IoT" title="Direct link to ACTION &amp; IoT">​</a></h2>
+<p>For as far back as I can remember, I've been active.  Running, swimming, wrestling, lacrosse, and just being out in the wild moving through terrain.  Action has been the great restorative for me, both a source of daily joy and a catch net for times of depression.</p>
+<p>We are the same in that way, you and I, because we are human.  Humans feel better when they move, when they physically work.  It's in our genes.  A bias for (thinking) action is part of what has made us the dominant species on the planet.</p>
+<p>Over the past few years as I've gotten deeper into IoT, I have set aside much of my old action.  I call it "glueing my face to the computer", and while it has been intensely fascinating to dive into the world of IoT and LoRa and uplinks and routing, it has not been good for action.</p>
+<p>In fact, with a few rare exceptions, like this helicopter delivery of a weather station to a mountain top:</p>
+<video controls="" preload="metadata" poster="/img/blog/video-thumbnails/weather-station-delivery-thumb.png" style="width:100%;max-width:800px;margin:20px auto;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15);background-color:var(--metsci-white)"><source src="https://video.meteoscientific.com/helicopter-delivery-of-iot-weather-station-el-cajon-mtn.mp4" type="video/mp4"><p>Your browser does not support the video tag.</p></video>
+<p>or hiking in a giant 915 MHz antenna and half the accoutrements of a LoRaWAN gateway in a 70 lb pack on that same mountain range:</p>
+<video controls="" preload="metadata" poster="/img/blog/video-thumbnails/giant-antenna-delivery-thumb.png" style="width:100%;max-width:800px;margin:20px auto;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15);background-color:var(--metsci-white)"><source src="https://video.meteoscientific.com/hiking-in-giant-lorawan-915-antenna.mp4" type="video/mp4"><p>Your browser does not support the video tag.</p></video>
+<p>IoT and real world human action seldom overlap.  One of the main selling points of IoT is that you actually do less action.  With a network of sensors, you can focus down to only doing the action that matters.</p>
+<p>In one sense that's much more efficient, and certainly better for a business.  In the other, that brings us closer to death.  I'm not ready to die yet, and so I sought a way to increase action with two caveats:</p>
+<p>First, I would do it with others.  I'm no misanthrope, and while I've had plenty of joyous times alone, there's something genetically satisfying about sharing physical effort with someone else.  It's (part) of what makes sex satisfying, but the joy of joint work is not solely the realm of procreation.</p>
+<p>A hard run with a friend, or a climb out of a deep canyon, or crossing a river, or just lifting weights with a group all trigger deep centers of joy.  We evolved to work together; it's how we brought down mammoths, kept the children safe, maintained and grew the tribe.</p>
+<p>Together is how we best operate.</p>
+<p>Second, I would involve IoT.  I love this tech; I think it's so cool the way we can start to measure the world, record it, and react to the world much faster, more accurately, and over far longer range than ever we could before.  IoT is so clearly the way forward for the way humans sense the world that ignoring it borders on the criminal.</p>
+<p>Still, IoT is a dense thicket.  To use it you typically have to be able to do more than just make text bold or italic; there's code involved, hardware, software, connectivity, and more.  In fact, the deeper you get into IoT, the more that is required you know just to get something simple to work.</p>
+<p>How then can we integrate the joy of action together with the barriers of getting something to actually work that surround IoT?</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="beginnings">BEGINNINGS<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#beginnings" class="hash-link" aria-label="Direct link to BEGINNINGS" title="Direct link to BEGINNINGS">​</a></h2>
+<p>Years ago, when I was deep in my metal working phase, a buddy of mine came by to give me a couple of heavy iron elongated pyramids that looked like teeth off a robot T-rex.</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/dredger_teeth.JPG" alt="Heavy iron dredger teeth from San Diego bay dredger, looking like robot T-rex teeth" style="max-width:800px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>In actual fact they were the worn out teeth of the San Diego bay dredger, the thing that digs out the bottom of the bay so it's deep enough for our various and sundry aircraft carriers, destroyers, and other large ships that dock here in America's Finest city and make up much of the US Pacific fleet.</p>
+<p>For the longest time I didn't know what to do with 'em.  Then one day on the internet back in 2015-ish, I saw some football guys pushing a metal sled.</p>
+<p>Ah, I thought, those dredger teeth would make excellent sled feet, and I could weld together my own heavy metal sled out of scrap I had laying around that I could push around the neighborhood causing all kinds of grinding-steel-on-concrete noise and generally be very pleased with myself as I bulldogged the thing around the block.</p>
+<p>So I did.  I used it a few times because I love action, but other actions called in both real and virtual worlds, and the sled sat next to the weight rack until last Thursday.</p>
+<p>Through a longer turn of events, I ended up pushing the sled to a buddy's house about ½ a mile away as a workout and a challenge for him to push back.</p>
+<p>He did, and as I heard it grinding towards me on the street it hit me that I should share this idea, of pushing the sled between houses in a neighborhood, in a way that combined my love of action with my love of IoT, and the rapidly growing capabilities of vibe-coding (which just means working with AI to build something).</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="coordination">COORDINATION<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#coordination" class="hash-link" aria-label="Direct link to COORDINATION" title="Direct link to COORDINATION">​</a></h2>
+<p>So over the weekend I built a website to coordinate IoT action amongst strangers.</p>
+<p>It relies on the IoT device of a Digital Matter Oyster2, which is a slightly older piece of tech that is enormously stable and delivers on all the promises of IoT &amp; LoRaWAN; long battery life, long communication range, and dead simple to use.</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/oyster2-tracker-on-helium.JPG" alt="Digital Matter Oyster2 IoT tracker device with Helium branding" style="max-width:800px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>The Oyster is attached to the sled.  We added a wheels option so you can make it easier if needed, but most of the time the wheels are just mounted on that pin on the back.</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-with-tracker.jpg" alt="The sled on delivery with the Oyster2 tracker mounted" style="max-width:800px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>When the sled is stationary for more than 7 minutes, the Oyster goes to sleep for 24 hours.  When the sled is moving, an accelerometer in the Oyster wakes the device up and it starts transmitting every 20 seconds.</p>
+<video controls="" preload="metadata" poster="/img/blog/video-thumbnails/get-after-it-sled-pushing-thumb.png" style="width:100%;max-width:800px;margin:20px auto;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15);background-color:var(--metsci-white)"><source src="https://video.meteoscientific.com/sled-pushing-nik.mp4" type="video/mp4"><p>Your browser does not support the video tag.</p></video>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="nerd-talk">Nerd Talk<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#nerd-talk" class="hash-link" aria-label="Direct link to Nerd Talk" title="Direct link to Nerd Talk">​</a></h2>
+<p>The Oyster sends data packets via uplinks through the Helium Network to a LoRaWAN Network Server, or LNS.  In this case, we're using the MeteoScientific LNS Console.</p>
+<p>The <a href="https://console.meteoscientific.com/" target="_blank" rel="noopener noreferrer">MetSci Console</a> is available for anyone to use, just sign up.  I've written a whole series of <a href="https://www.meteoscientific.com/docs/tutorial-basics/LoRaWAN-Big-Picture">Tutorials</a> on how to use it if you need help.  You get your first 400 data packets for free, and after they they cost $.0001 each.  Yeah, pretty cheap.</p>
+<p>The LNS decodes the packets and sends them on via an http integration to a Cloudflare Worker.</p>
+<p>The Worker puts the incoming packets from the Oyster into a Cloudflare D1 database.  It then reads that database and updates the website that coordinates and informs all the human actions.</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/cloudflare-worker-bindings.png" alt="Cloudflare Worker bindings showing connections to Assets, R2 bucket, D1 database, and KV namespace for intersections" style="max-width:600px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>As I've said, Action is one of my loves.</p>
+<p>You can go to the website to see how the rest of it works, but before I send you there, let me walk you through the general workflow.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-real-world">The Real World<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#the-real-world" class="hash-link" aria-label="Direct link to The Real World" title="Direct link to The Real World">​</a></h2>
+<p>Let's say you're a reasonably fit person out walking your dog.  If, like me, you want to work out with other people but joining a gym isn't your thing, you might be interested in a flyer you see on a telephone pole that says "Hard Work - Sled Pushing"</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-pushing-flyer.JPG" alt="Flyer for sled pushing signup in Normal Heights, San Diego California" style="max-width:600px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>You tear off one of the tabs at the bottom which has a QR code and 5 or 6 character password and take it home.</p>
+<p>You scan the QR code and find the site, read through the description, and decide to sign up.</p>
+<p>The very short version of the description is that you're signing up for a heavy metal sled to be pushed to you by a stranger, then you're responsible for "delivering" (by pushing) the sled to the next stranger.</p>
+<p>The distances are bounded by 300 and 1,000 meters so that the push will be neither too long nor short, and the general rules (during the day, of course you can bring a friend, contact me if anything goes wrong) are laid out.</p>
+<p>When you sign up, you enter your email, the handle you want to go by publicly, your address, and the password you entered.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="a-quick-revisit-of-nerdville">A Quick Revisit of Nerdville<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#a-quick-revisit-of-nerdville" class="hash-link" aria-label="Direct link to A Quick Revisit of Nerdville" title="Direct link to A Quick Revisit of Nerdville">​</a></h3>
+<p>The Cloudflare Worker receives that information and uses the Haversine formula to calculate both your address latitude and longitude.  It then runs your coordinates through a Cloudflare KV pair of every intersection in the neighborhood so it can give others a general idea of where you are without giving away your address (i.e. "Nik near 35th and Copley just signed up").</p>
+<p>The Worker puts all that data into a Cloudflare D1 table.  Once you're in the table, the Worker figures out where you should go in the sled delivery queue.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-feedback-loop">The Feedback Loop<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#the-feedback-loop" class="hash-link" aria-label="Direct link to The Feedback Loop" title="Direct link to The Feedback Loop">​</a></h2>
+<p>You can see where you are in the queue on the website, and when the pusher before you starts their push (calculated by the Oyster recording movement outside of a 15 meter radius from the pusher's address), the Worker fires off an email via Mailgun telling you the sled is coming.</p>
+<p>When the sled enters the 15 meter radius around your address, you'll get another email confirming that the sled has been dropped off and giving you the address of where you'll push to.</p>
+<p>This continues on for as long as people sign up; at the end of the queue it just loops back to the beginning.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="making-the-map">Making The Map<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#making-the-map" class="hash-link" aria-label="Direct link to Making The Map" title="Direct link to Making The Map">​</a></h2>
+<p>All of this information about location is displayed on a PMTiles map I generated after downlaading an 80GB map of the entire world and processing out just my little neighborhood using a local machine I call Monstra for the processing (3 x 4070 Super Ti GPUs and a Threadripper).</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/monstra-gpu-and-threadripper-local-ai.jpg" alt="Triple GPU machine with Threadripper for running local LLM and AI tasks" style="max-width:600px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>The PMTiles map is stored in a Cloudflare R2 and displayed on the site, with the live tracker of the sled on it:</p>
+<div style="display:flex;justify-content:center;margin:20px auto"><img src="https://www.meteoscientific.com/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-tracking-map.png" alt="The displayed PMTiles map I built with Monstra" style="max-width:600px;width:100%;border-radius:8px;border:4px solid var(--metsci-primary);box-shadow:0 4px 12px rgba(217, 74, 24, 0.15)"></div>
+<p>So that's the combination of nerd workflow and action.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-next-steps">The Next Steps<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#the-next-steps" class="hash-link" aria-label="Direct link to The Next Steps" title="Direct link to The Next Steps">​</a></h2>
+<p>If you're in our little neighborhood of Normal Heights, you can <a href="https://sled.meteoscientific.com/" target="_blank" rel="noopener noreferrer">sign up to have the sled "delivered" to you</a>, and then you'll be on the hook to deliver it to the next person.
+&nbsp;
+As more people sign up, we get two very important things.</p>
+<p>First, we combine IoT and Action, which is a source of deep joy for me.  Every person that participates is using IoT, and many of them will learn just a little bit more about how they're using it just from interacting with the sled website.  I try to answer their questions up front in the <a href="https://sled.meteoscientific.com/faq" target="_blank" rel="noopener noreferrer">Sled FAQ section</a>) on the sled site; that way they're not afraid to ask.</p>
+<p>Second, I get to connect with the section of all the people in my neighborhood (about 5,000 families total according to US Census statistic) who are willing to engage in a string of hot and sweaty deliveries from and to a stranger.  I've got the feeling they'll be my kind of people.</p>
+<p>There is one other aspect of this one-sensor project that's pretty cool; this system is repeatable and cheap.</p>
+<p>It runs entirely on the free tiers of Cloudflare Workers, D1, R2, and KV. It's all in a Github repo that I'd be happy to share, though I'll warn you that the Worker is messy and for now, it'll be a bit than just "copy/paste" to get it going.</p>
+<p>The only cost is the tracking device.  The Oyster2 is (generally) no longer sold, but you can get the next gen Oyster3 that runs about $130.  I'd recommend getting one from <a href="https://www.lonestartracking.com/tracking-devices/oyster-lora-gps-tracking-device-915mhz/" target="_blank" rel="noopener noreferrer">LoneStar Tracking</a>.  That's where I got my Oyster, and Tommy at LoneStar is good people.</p>
+<p>You could get creative here and find a device that gathers more than just GPS data; say, air quality, or temperature, etc. and display that as well.</p>
+<p>You may have read this and thought this is all too much, and there's some aspect of it that you just couldn't do.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="yes-you-can">Yes, You Can<a href="https://www.meteoscientific.com/blog/2025/06/22/Single-IoT-Sensor-Power-The-Sled#yes-you-can" class="hash-link" aria-label="Direct link to Yes, You Can" title="Direct link to Yes, You Can">​</a></h2>
+<p>If you've read this far, you absolutely have the two critical things required to make a project work; the <strong>focus to read</strong> and the <strong>curiosity to keep going</strong>.  Everything else is just action, and humans are built for action!</p>
+<p>Those two things are all anyone needs to succeed in the world of IoT, which is, after all, the thing that will change our world.</p>
+<p>With those two things and one sensor, you too can expand a new truth about IoT.</p>
+<p>What'll your one-sensor project be?</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Author</div><div class="admonitionContent_BuS1"><p><strong>Nik Hawks</strong> is a LoRaWAN Educator &amp; Builder at <a href="https://meteoscientific.com/" target="_blank" rel="noopener noreferrer">MeteoScientific</a>. He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a <a href="https://pod.metsci.show/" target="_blank" rel="noopener noreferrer">podcast</a> discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.</p></div></div>]]></content>
+        <author>
+            <name>Nik Hawks</name>
+            <uri>https://meteoscientific.com/</uri>
+        </author>
+        <category label="lorawan" term="lorawan"/>
+        <category label="business" term="business"/>
+        <category label="helium" term="helium"/>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Four Ways To Improve Your LoRaWAN Business]]></title>
         <id>https://www.meteoscientific.com/blog/2025/04/30/4-Ways-To-Improve-Your-LoRaWAN-Business</id>
         <link href="https://www.meteoscientific.com/blog/2025/04/30/4-Ways-To-Improve-Your-LoRaWAN-Business"/>
@@ -85,7 +181,8 @@ Oh, you actually want to read the blog, and you'd like to know a little more?  C
 <li>Be unafraid to roam</li>
 </ul>
 <p>Here's to you getting out there and gettin' after it, crushing sensor deployments, making the world a better, smarter place, and helping solve the number one problem in LoRaWAN.</p>
-<p>Get 'em, friends!</p>]]></content>
+<p>Get 'em, friends!</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Author</div><div class="admonitionContent_BuS1"><p><strong>Nik Hawks</strong> is a LoRaWAN Educator &amp; Builder at <a href="https://meteoscientific.com/" target="_blank" rel="noopener noreferrer">MeteoScientific</a>. He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a <a href="https://pod.metsci.show/" target="_blank" rel="noopener noreferrer">podcast</a> discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.</p></div></div>]]></content>
         <author>
             <name>Nik Hawks</name>
             <uri>https://meteoscientific.com/</uri>
@@ -164,7 +261,8 @@ Oh, you actually want to read the blog, and you'd like to know a little more?  C
 <p>You can also build your own Mapper <a href="https://docs.helium.com/iot/coverage-mapping/quickstart" target="_blank" rel="noopener noreferrer">following instructions</a> over on the Helium Docs site.</p>
 <p>That wraps it for how to assess LoRaWAN coverage for anywhere in the world on the Helium network.  If you’d like to see coverage on other networks, excellent websites like <a href="https://www.coveragemap.net/" target="_blank" rel="noopener noreferrer">Coverage Map</a> offer maps of <a href="https://www.thethingsnetwork.org/" target="_blank" rel="noopener noreferrer">TTN</a> and other networks.</p>
 <p>Not every LoRaWAN offers public mapping information like this (many of them have their own internal tools to manage and monitor their private networks), but if you’re looking for an easy way to see if there’s the kind of LoRaWAN coverage you need for your IoT solution, the Helium World Explorer is an excellent place to start.</p>
-<p>Happy coverage hunting!</p>]]></content>
+<p>Happy coverage hunting!</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Author</div><div class="admonitionContent_BuS1"><p><strong>Nik Hawks</strong> is a LoRaWAN Educator &amp; Builder at <a href="https://meteoscientific.com/" target="_blank" rel="noopener noreferrer">MeteoScientific</a>. He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a <a href="https://pod.metsci.show/" target="_blank" rel="noopener noreferrer">podcast</a> discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.</p></div></div>]]></content>
         <author>
             <name>Nik Hawks</name>
             <uri>https://meteoscientific.com/</uri>
@@ -536,7 +634,8 @@ The LPWAN field also includes cellular standards like NB-IoT and LTE-M, and prop
 <p>Imagine an element of soldiers all wearing a bracelet (or vest, or whatever) who could literally feel where other soldiers in their element were?</p>
 <p>Obviously this could be used by firefighters and other rescue elements in chaotic situations.</p>
 <p>By running this over LoRa (or a LoRaWAN) and integrating Reticulum to use multiple communications protocols and integrate other assets (an overhead drone with a LoRaWAN gateway, for example), you could potentially have an extraordinary advantage over a wide area whenever you need to coordinate human activity.</p>
-<p>Pretty cool use case, eh?  Keep on crushing out there, and if you need help with IoT sensors, whether it's designed, deployment, or business-fit, please reach out.</p>]]></content>
+<p>Pretty cool use case, eh?  Keep on crushing out there, and if you need help with IoT sensors, whether it's designed, deployment, or business-fit, please reach out.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Author</div><div class="admonitionContent_BuS1"><p><strong>Nik Hawks</strong> is a LoRaWAN Educator &amp; Builder at <a href="https://meteoscientific.com/" target="_blank" rel="noopener noreferrer">MeteoScientific</a>. He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a <a href="https://pod.metsci.show/" target="_blank" rel="noopener noreferrer">podcast</a> discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.</p></div></div>]]></content>
         <author>
             <name>Nik Hawks</name>
             <uri>https://meteoscientific.com/</uri>
@@ -839,24 +938,6 @@ Unstable atmosphere: <a href="https://www.britannica.com/science/unstable-atmosp
         </author>
         <category label="weather" term="weather"/>
         <category label="particulates" term="particulates"/>
-        <category label="air pollution" term="air pollution"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[How Wind Interacts With Air Pollution Readings]]></title>
-        <id>https://www.meteoscientific.com/blog/2023/06/15/Wind-Air-Pollution</id>
-        <link href="https://www.meteoscientific.com/blog/2023/06/15/Wind-Air-Pollution"/>
-        <updated>2023-06-15T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Anemometers are instruments that measure the speed of the wind. They are often used in weather stations to help predict the weather and to study the Earth’s atmosphere.]]></summary>
-        <content type="html"><![CDATA[<p>Anemometers are instruments that measure the speed of the wind. They are often used in weather stations to help predict the weather and to study the Earth’s atmosphere.</p>
-<p>Air quality measurements are used to measure the amount of pollution or other substances in the air. These measurements can be taken using a variety of different instruments, such as sensors that measure the concentration of specific pollutants or samplers that collect air samples that can be analyzed in a laboratory.</p>
-<p>The interaction between anemometer readings and air quality measurements is important because wind can affect the movement of pollution and other substances in the air. For example, if there is a lot of wind, it can help to disperse pollution, making the air quality better. On the other hand, if there is little wind, the pollution can build up and the air quality can become worse.</p>
-<p>By combining anemometer readings with air quality measurements, scientists and weather forecasters can get a better understanding of how the wind is affecting the movement of pollution and other substances in the air. This information can be used to predict the air quality in a particular area and to take steps to improve it, such as by reducing the amount of pollution being released into the air.</p>
-<p>Overall, the interaction between anemometer readings and air quality measurements is important for understanding and predicting the quality of the air we breathe and the impact it has on our health and the environment.</p>]]></content>
-        <author>
-            <name>MeteoScientific</name>
-            <uri>https://github.com/meteoscientific/</uri>
-        </author>
-        <category label="weather" term="weather"/>
         <category label="air pollution" term="air pollution"/>
     </entry>
 </feed>
