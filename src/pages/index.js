@@ -3,7 +3,6 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import InfoPanes from '@site/src/components/InfoPanes';
-import CustomFooter from '@site/src/components/CustomFooter';
 import OptimizedImage from '@site/src/components/OptimizedImage';
 
 import Heading from '@theme/Heading';
@@ -36,7 +35,6 @@ export default function Home() {
       <main>
         <InfoPanes />
       </main>
-      <CustomFooter />
     </Layout>
   );
 }
