@@ -136,3 +136,9 @@ That wraps it for how to assess LoRaWAN coverage for anywhere in the world on th
 Not every LoRaWAN offers public mapping information like this (many of them have their own internal tools to manage and monitor their private networks), but if you’re looking for an easy way to see if there’s the kind of LoRaWAN coverage you need for your IoT solution, the Helium World Explorer is an excellent place to start.
 
 Happy coverage hunting!
+
+:::info Author
+
+**Nik Hawks** is a LoRaWAN Educator & Builder at [MeteoScientific](https://meteoscientific.com/). He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a [podcast](https://pod.metsci.show) discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.
+
+:::

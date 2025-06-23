@@ -25,3 +25,9 @@ Obviously this could be used by firefighters and other rescue elements in chaoti
 By running this over LoRa (or a LoRaWAN) and integrating Reticulum to use multiple communications protocols and integrate other assets (an overhead drone with a LoRaWAN gateway, for example), you could potentially have an extraordinary advantage over a wide area whenever you need to coordinate human activity.
 
 Pretty cool use case, eh?  Keep on crushing out there, and if you need help with IoT sensors, whether it's designed, deployment, or business-fit, please reach out.
+
+:::info Author
+
+**Nik Hawks** is a LoRaWAN Educator & Builder at [MeteoScientific](https://meteoscientific.com/). He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a [podcast](https://pod.metsci.show) discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.
+
+:::

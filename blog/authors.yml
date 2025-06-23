@@ -11,13 +11,15 @@ metsci:
 
 nik:
   name: Nik Hawks
-  title: Hazard to the delicate
+  title: IoT Educator & Builder
   url: https://meteoscientific.com/
   image_url: /img/Nik_Hawks_profile_pic.jpeg
+  description: Nik writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a podcast discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.
   page: true
   socials:
     x: thegristleking
     linkedin: https://www.linkedin.com/in/nikhawks/
     youtube: https://www.youtube.com/@meteoscientific
+    website: https://www.meteoscientific.com/
    
 

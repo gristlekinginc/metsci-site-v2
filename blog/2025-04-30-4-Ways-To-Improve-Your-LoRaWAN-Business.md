@@ -91,3 +91,9 @@ However you use LoRaWAN, incorporating these 4 aspects will help you build your 
 Here's to you getting out there and gettin' after it, crushing sensor deployments, making the world a better, smarter place, and helping solve the number one problem in LoRaWAN.
 
 Get 'em, friends!
+
+:::info Author
+
+**Nik Hawks** is a LoRaWAN Educator & Builder at [MeteoScientific](https://meteoscientific.com/). He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs a [podcast](https://pod.metsci.show) discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.
+
+:::

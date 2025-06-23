@@ -42,7 +42,7 @@ const config = {
           blogSidebarTitle: 'All Blog Posts',
           sortPosts: 'descending',
           postsPerPage: 'ALL',
-          blogListComponent: '@theme/BlogListPage',
+          blogListComponent: '@theme/BlogListPage'
         },
         theme: {
           customCss: './src/css/custom.css',
