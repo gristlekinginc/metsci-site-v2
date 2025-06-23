@@ -263,7 +263,7 @@ All of this information about location is displayed on a PMTiles map I generated
   margin: '20px auto'
 }}>
   <img 
-    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/monstra-gpu-and-threadripper-local-ai.png"
+    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/monstra-gpu-and-threadripper-local-ai.JPG"
     alt="Triple GPU machine with Threadripper for running local LLM and AI tasks"
     style={{
       maxWidth: '600px',
