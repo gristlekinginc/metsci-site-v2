@@ -29,7 +29,7 @@ Oh, you actually want to read the blog, and you'd like to know a little more?  C
             <link>https://www.meteoscientific.com/blog/2025/06/29/How-Do-You-Keep-Your-Data</link>
             <guid>https://www.meteoscientific.com/blog/2025/06/29/How-Do-You-Keep-Your-Data</guid>
             <pubDate>Sun, 29 Jun 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[How any business can hold on to the data their LoRaWAN sensor produce.]]></description>
+            <description><![CDATA[How any business can hold on to the data their LoRaWAN sensor produces.]]></description>
             <content:encoded><![CDATA[<p>If you're a business owner and psyched on LoRaWAN (or even just curious about it), one of the things you'll have to wrap your head around is how to store your data.</p>
 <p>LoRaWAN devices are generally exceptional at <strong>sending</strong> data from one place to another, but if you want your data to be useful you have to both retain it and be able to integrate it into what you want.</p>
 <p>Now, the economics of LoRaWAN can send you a bunch of different directions here. You could use a fully managed service to just set up all your devices, gateways, and data pipeline for you, but there are two problems with that approach:</p>
