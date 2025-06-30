@@ -666,7 +666,11 @@ If you like this kind of dive into LoRaWAN I've got a set of [Tutorials](/docs/t
 
 Rock 'n roll!
 
--Nik Hawks
+:::info Author
+
+**Nik Hawks** is incurably curious at [MeteoScientific](https://meteoscientific.com/). He writes to educate and delight people considering IoT, and to inspire other IoT nerds to build and deploy their own projects into the world. He runs [The Business of LoRaWAN podcast](https://pod.metsci.show) discussing all things LoRaWAN and is psyched to hear about what you're building, whether it's a one sensor playground or a million sensor rollout.
+
+:::
 
 
 
