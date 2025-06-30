@@ -15,11 +15,11 @@ A) **Less fun** - Why let someone else learn all this rad stuff?
 
 B) **More expensive** - You'll pay someone else to have all your fun.  That's silly.
 
-That depends on your definition of "fun" and "expensive", but I'll assume for now that you're a small business owner who is a little geeky and curious, intrigued by the idea of free data storage at small sizes on a world-class platform, and you have an idea about how you'd use an IoT sensor in your business.
+Obviously this depends on your definition of "fun" and "expensive", but I'll assume for now that you're a business owner who is a little geeky and curious, intrigued by the idea of free data storage on a world-class platform, and you have an idea about how you'd use data from an IoT sensor to give you longer term insights into your business .
 
-If that's NOT you, and you just want someone to handle all this for you, reach out to me via the [Contact](/contact) page and I'll put you in touch with someone who'll do the heavy lifting.
+If that's not you and you just want someone to handle all this for you, reach out to me via the [Contact](/contact) page and I'll put you in touch with someone who'll do the heavy lifting.
 
-Ok, with all the caveats out of the way, let's briefly sketch out the data flow so you have the big concepts, then we'll go through a step by step tutorial for how to get a sensor to send data that you can keep.
+Ok, with all the caveats out of the way, let's briefly sketch out the data flow to give you the big concepts, then we'll go through a step by step tutorial for how to get a sensor to send data that you can keep.
 
 It starts with the sensor sending data.  In this case we'll use an Oyster 2.1 asset tracker from Digital Matter.  Onboarding these to any LNS is straightforward (hell, there's even a `Digital Matter Oyster 2.1` Device Template set up for all users of the [MeteoScientific Console](https://console.meteoscientific.com) that you can use for free)
 
@@ -65,11 +65,11 @@ I usually set up the Device Metrics in MeteoScientific just because I’m a nerd
 
 As you can see above, the tracker I’ve set up for this demo has been moving occasionally, and when it does it transmits the data it’s supposed to transmit (battery voltage, heading, latitude, etc.).
 
-So, where do we send the data?  You’ve got a TON of options here.  At the super low end of devices or volume most of them are free with restrictions ranging from the number of devices you can have to the length of time you can store the data.
+So, where do we send the data?  You’ve got a TON of options here.  For a few devices or very low volume most of them are free, with restrictions ranging from the number of devices you can have to the length of time you can store the data.
 
 Services like [Datacake](https://datacake.co/) or [TagoIO](https://tago.io/) offer free data storage and visualization of data for low device counts (5 or less) and short term data storage (30 days).
 
-What we’re going to do today is slightly more geeky but gives you more data for longer.
+What we’re going to do today is slightly more geeky but gives you way more data for far longer.
 
 It IS less easy, make no mistake.  However, once you learn this you can use it for the rest of your business life, so there's that.  
 
@@ -115,11 +115,11 @@ I’ll make three assumptions here.
 
 First, I’ll assume you have a [Cloudflare](https://www.cloudflare.com/?utm_source=meteoscientific&utm_medium=blog&utm_campaign=how-do-you-keep-your-data) account.  
 
-Second, I’ll assume you have a domain that you manage via Cloudflare.  If you don't, it’s about $11 a year to buy a domain on Cloudflare which you can then use for this project, so if you don’t want to go through the trouble of taking your current domain and futzing around with getting it onto Cloudflare, just buy a new domain and use that.
+Second, I’ll assume you have a domain that you manage via Cloudflare.  If you don't, it’s about $11 a year to buy a domain on Cloudflare which you can then use for this project.  If you don’t want to go through the trouble of taking your current domain and futzing around with getting it onto Cloudflare, just buy a new domain and use that.
 
 Third, I’ll assume you have a LoRaWAN device sending out data you want to track. In my case, it’ll be an [Oyster 2.1 tracker](https://www.lonestartracking.com/tracking-devices/oyster3-4g-5g-waterproof-battery-powered-gps-tracking-device/?utm_source=meteoscientific&utm_medium=blog&utm_campaign=how-do-you-keep-your-data) that I’ve got mounted on my bike.  
 
-I can use this to store all the places that my bike goes, and if I wanted to get nerdy, built a heat map of local LoRaWAN coverage, but that’ll be for another tutorial.
+I can use this to store all the places that my bike goes and call in airstrikes if it gets stolen.  If I wanted to get nerdy, I could use the data to build a heat map of local LoRaWAN coverage, but that’ll be for another tutorial.
 
 <div style={{
   display: 'flex',
@@ -161,7 +161,7 @@ Let's do this!  Sign in to Cloudflare.  Once you’re on the Cloudflare Account 
   />
 </div>
 
-Now you’ll hit the big blue “+ Create Database” button at the top right and then follow the prompts.
+Now you’ll hit the big blue `+ Create Database` button at the top right and then follow the prompts.
 
 <div style={{
   display: 'flex',
@@ -181,7 +181,7 @@ Now you’ll hit the big blue “+ Create Database” button at the top right an
   />
 </div>
 
-Name it (I’ll call mine metsci-bike-tracker), and leave the location as automatic. 
+Name it (I’ll call mine `metsci-bike-tracker`), and leave the location as automatic. 
 
 <div style={{
   display: 'flex',
@@ -203,7 +203,7 @@ Name it (I’ll call mine metsci-bike-tracker), and leave the location as automa
 
 ### Create A Table
 
-Next we’ll create a table manually.  Click the blue “Create table” button at the top right, then select the `Console` tab in your new database and paste in the following command.  To copy, hit the little copy button in the top right of the field, otherwise you'll only get the first few words.
+Next we’ll create a table.  Click the blue “Create table” button at the top right, then select the `Console` tab in your new database and paste in the following command.  To copy, hit the little copy button in the top right of the field, otherwise you'll only get the first few words.
 
 ```
 CREATE TABLE oyster_tracks (   id              TEXT    PRIMARY KEY,   time            TIMESTAMP,   dev_eui         TEXT,   battery_voltage REAL,   fix_failed      BOOLEAN,   latitude        REAL,   longitude       REAL,   speed_kmph      REAL,   heading_deg     REAL,   rssi            INTEGER,   snr             REAL );
@@ -227,7 +227,7 @@ CREATE TABLE oyster_tracks (   id              TEXT    PRIMARY KEY,   time      
   />
 </div>
 
-If you’re not using an Oyster,  modify your table to save whatever you’d like from your device.  The absolute easiest way to get this table-create command is to use ChatGPT, telling it what you want and giving it a recent event log from your device.
+If you’re not using an Oyster, modify your table to save whatever you’d like from your device.  The absolute easiest way to get a custom table-create command is to use ChatGPT, telling it what you want and giving it a recent event log from your device.
 
 The prompt for this would be something like:
 
@@ -241,7 +241,7 @@ battery_voltage, latitude, longitude, rssi, snr.
 
 ```
 
-Each LNS can be a bit different, but to get your Event log in the MeteoScientific LNS (which runs on a custom Chirpstack setup), go into Applications —> your application —> Devices —> your device and select the Events tab, then Download.
+Each LNS can be a bit different, but to get your Event log in the MeteoScientific LNS, go into Applications —> your application —> Devices —> your device and select the Events tab, then Download.
 
 <div style={{
   display: 'flex',
@@ -305,7 +305,7 @@ Choose `Workers` then `Start with Hello World!` option:
   />
 </div>
 
-Name your worker (I’ll use the same name as my database, `metsci-bike-tracker`) and hit Deploy in the bottom right.  You don’t need to change the `worker.js` code here (in fact, you can’t, so don’t even try).
+Name your worker (I’ll use the same name as my database, `metsci-bike-tracker`) and hit Deploy in the bottom right.  You don’t need to change the `worker.js` code here, we'll do that later.
 
 <div style={{
   display: 'flex',
