@@ -2,7 +2,7 @@
 title: How Do You Keep Your Data?
 authors: [nik]
 tags: [lorawan, business, helium]
-description: How any business can hold on to the data their LoRaWAN sensor produce.
+description: How any business can hold on to the data their LoRaWAN sensor produces.
 ---
 
 If you're a business owner and psyched on LoRaWAN (or even just curious about it), one of the things you'll have to wrap your head around is how to store your data.
