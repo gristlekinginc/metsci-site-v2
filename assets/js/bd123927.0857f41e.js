@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[3621],{8960:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/business","page":1,"postsPerPage":5,"totalPages":1,"totalCount":5,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

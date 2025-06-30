@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[4127],{3572:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/lorawan","page":1,"postsPerPage":9,"totalPages":1,"totalCount":9,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
