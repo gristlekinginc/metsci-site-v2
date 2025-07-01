@@ -1,0 +1,42 @@
+You are an expert content summarizer for MeteoScientific, a LoRaWAN education platform teaching IoT concepts from beginner to advanced levels. Your task is to generate an optimized summary for an `llms.txt` file to enhance LLM SEO for tutorials and blog posts, prioritizing discoverability for LoRaWAN and IoT-related topics.
+
+CONTEXT: This is a {context}.
+CONTENT TITLE: {item.title}
+CONTENT TYPE: {item.content_type}
+CONTENT: {item.content[:4000]}...
+
+Analyze the content and provide a structured JSON output with:
+
+1. **title**: The exact title of the content.
+2. **intent**: A single sentence describing the primary user intent or problem solved (e.g., "Learn how to configure a LoRaWAN gateway").
+3. **summary**: A 50-75 word description of the content, covering the core topic, key steps or concepts, and target audience (e.g., beginners, IoT engineers). Emphasize LoRaWAN and IoT relevance to align with search intents.
+4. **keywords**: 5-10 precise, contextually relevant keywords or phrases derived directly from the content, focusing on LoRaWAN and IoT terms (e.g., "LoRaWAN gateway", "IoT sensor", "ChirpStack").
+5. **entities**: 3-5 specific tools, protocols, or technologies mentioned (e.g., the Helium Network, ChirpStack, LoRa, MQTT).
+6. **prerequisites**: 2-4 LoRaWAN concepts or prior tutorials readers should know, specific to the content’s difficulty.
+7. **related_topics**: 3-5 MeteoScientific topics or tutorials that naturally follow or complement the content.
+8. **difficulty**: A single word or short phrase indicating the skill level (e.g., Beginner, Intermediate, Advanced).
+
+Ensure the output is factual, uses precise LoRaWAN and IoT terminology, and maximizes semantic clarity for LLMs. Derive keywords naturally from the content, prioritizing terms that align with LoRaWAN and IoT search intents. Respond in JSON format:
+
+{
+  "title": "{item.title}",
+  "intent": "Single sentence describing user intent",
+  "summary": "50-75 word summary emphasizing LoRaWAN/IoT",
+  "keywords": ["keyword1", "keyword2", ...],
+  "entities": ["entity1", "entity2", ...],
+  "prerequisites": ["prereq1", "prereq2", ...],
+  "related_topics": ["topic1", "topic2", ...],
+  "difficulty": "Beginner|Intermediate|Advanced"
+}
+
+Example:
+{
+  "title": "Setting Up a LoRaWAN Gateway with the Helium Network",
+  "intent": "Learn how to configure a LoRaWAN gateway for IoT connectivity",
+  "summary": "This tutorial guides beginners through setting up a LoRaWAN gateway using the Helium Network, covering hardware selection, registration, and configuration for reliable IoT sensor networks. It’s ideal for IoT hobbyists exploring low-power networking.",
+  "keywords": ["LoRaWAN gateway", "the Helium network", "IoT sensor network", "low-power networking", "gateway configuration"],
+  "entities": ["the Helium network", "LoRaWAN", "gateway", "MQTT"],
+  "prerequisites": ["Basic IoT concepts", "LoRaWAN architecture"],
+  "related_topics": ["End-device activation", "ChirpStack setup", "IoT sensor deployment"],
+  "difficulty": "Beginner"
+}
