@@ -5,12 +5,17 @@ title: Add A Device
 
 # Add A Device
 
-### Step 1: Prepare the ChirpStack Console
+### Step 1: Gather The Details
 
-Here we are in our ChirpStack console, currently in the dashboard with nothing going on. Before we get started, you’ll need three things. I’m assuming you already have a device profile and an application set up, in this case, a soil moisture sensor. However, you’ll also need three other important pieces of information that come with every sensor.
+Before we get started, you'll need two things for every device on Helium, a `DEVEUI` and an `APPKEY`.  
+
+`DEVEUI` stands for DEVice Extended Unique Identifier, and it's part of what Helium uses to figure out where to send the packets it receives in the Helium Packet Router. 
+
+`APPKEY` stands for `Application Key`, and is the "secret handshake" part of the process that makes sure your data is not only identified (with the `DEVEUI`) but is also secure.
 
 ## Want to Watch?
-If watching a video is easier for you than reading, I've recorded one for ya here:
+If watching a video is easier for you than reading, I've recorded one for ya.  The video goes through onboarding a soil moisture sensor.  The written tutorial goes through onboarding a Milesight `WS101 SOS` Smart Button.  I've found it useful to have different examples for the same thing when you're learning.
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/rhNYKyC3Avs?si=1LimXlj78xfzqPb-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### The Three Key Identifiers
@@ -22,27 +27,64 @@ When you get a sensor, every sensor *should* come with three long and complicate
 - AppKey (Application Key)
 ```
 
-> **Note:** EUI stands for Extended Unique Identifier. It’s not something you hear often, but now you know!
+In Chirpstack (which is what the MeteoScientific Console runs on), the AppEUI isn't required.  In fact, there's not even a field for it, so we have to manually make one.  In other LNS versions (say, LORIOT or TTN) the AppEUi can be a critical aspect.
 
-These three identifiers are necessary to add the device to your console and ensure it’s recognized properly.
+Milesight prints the `DEVEUI` on the box, then uses an app to give you the `APPKEY`.  
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/005-add-a-device/milesight-ws101-smart-button.jpg"
+    alt="Milesight WS101 Smart Button with box and instructions"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
+
+In the case of this Milesight `WS101 SOS`, we turn the device on by removing the battery insulating sheet, then configure via NFC.  
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/005-add-a-device/milesight-ws101-setup-toolbox.png"
+    alt="Milesight WS101 SOS configuration screens in the NFC setup app"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
 
 ### Step 2: Add the Device to the ChirpStack Console
 
-Let's move forward with adding the device:
 
 1. **Go to Applications:** 
-   - Navigate to your application (we’ve set this up in a previous video).
+   - Navigate to your application (we've set this up in a previous video).
    - Click on **Add Device**.
 
 2. **Naming Convention:**
    - Use a naming convention that makes sense to you. For example, you might use the name of the device, the last four digits of the DevEUI, and the position of the device.
 
 3. **Fill in Device Details:**
-   - Enter any additional details that are important to you, such as a description or location (e.g., “Avocado Tree in the Backyard”). 
+   - Enter any additional details that are important to you, such as a description or location (e.g., "Avocado Tree in the Backyard"). 
    - Set up the date and any other relevant notes.
 
 4. **Input the DevEUI:**
-   - Typically, you would copy and paste the DevEUI. Don’t bother typing it manually; it’s a big hassle.
+   - Typically, you would copy and paste the DevEUI. Don't bother typing it manually; it's a big hassle.
    - Reputable manufacturers will provide the DevEUI, AppEUI, and AppKey.
 
 5. **Generate EUI and Keys:**
@@ -63,7 +105,7 @@ Let's move forward with adding the device:
 
 ### Step 3: Power On and Monitor the Device
 
-Once you’ve set everything up in the console:
+Once you've set everything up in the console:
 
 1. **Power on the Device:**
    - Wait for the console to recognize the device.
@@ -81,6 +123,6 @@ Once you’ve set everything up in the console:
 
 ### Now...wait.  
 
-After a few minutes, you should see events and frames start to populate. You’ll see the status, battery level, and other details. The console will show you when the sensor requests to join and when it’s accepted.
+After a few minutes, you should see events and frames start to populate. You'll see the status, battery level, and other details. The console will show you when the sensor requests to join and when it's accepted.
 
-That’s how you add a device to the MeteoScientific ChirpStack console. 
+That's how you add a device to the MeteoScientific ChirpStack console. 
