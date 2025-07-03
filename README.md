@@ -10,12 +10,15 @@ This documentation is built using [Docusaurus](https://docusaurus.io/) and deplo
 - ChirpStack configuration tutorials
 - Device management documentation
 
+## Images
+- source images should be at least 1600px wide
+
 ## Contributing
 
 If you find any errors or would like to suggest improvements to our documentation:
 
 1. Submit an issue describing the problem or suggestion
-2. Or DM nik on [X](https://x.com/thegristleking)
+2. Or contact us via the Contact page on the MetSci site.
 
 ## Contact
 
