@@ -28,7 +28,24 @@ Today, we'll be focusing on the [MetSci Console](https://console.meteoscientific
 1. **Sign In**: Head over to [console.meteoscientific.com](https://console.meteoscientific.com) and sign up for an account. 
 2. **Dashboard Overview**: After signing in, you'll land on the dashboard, where you'll see four cards: 
 
-![MetSci Console Dashboard](/images/tutorial-basics/002-images/metsci-demo-console-dashboard.png)
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/002-images/metsci-demo-console-dashboard.png"
+    alt="MeteoScientific Console Dashboard"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
+
    - **Active Devices**: This is the most important card. Here, you can view devices you've set up.
    - **Active Gateways**: You can safely ignore this for now; all Helium's gateways are your active gateways.
    - **Device Data Rate Usage**: This is more technical, and we'll cover it in a separate video.
@@ -40,7 +57,7 @@ Every console account starts with **400 free data credits**. Here are a few thin
 - **Cost of Data Credits**: Each data credit (DC) costs $0.0001. The minimum purchase amount is **50,000 DC**, which costs $5.
 - **1 Data Credit = 24 bytes**: If you're sending a 25 byte packet, it will cost 2 DC.
 - **Usage**: A device sending a 1 DC (24 byte) packet every hour for a year will cost 8,760 DC, or $0.876.
-- **Managing Duplicates**: If you want redundancy, you can get duplicate packets from multiple hotspots. You can do this on a device level or across your tenancy. 
+- **Managing Duplicates**: If you want redundancy, you can get duplicate packets from multiple hotspots. You can do this on a device level or across your tenancy. To set it across your tenancy, choose `Tenant Details` at the top of the page, then look for 
 
 <div style={{
   display: 'flex',
