@@ -16,12 +16,12 @@ If you'd rather do this via video, check that out here:
 Before diving into the console, let's break down the flow of data in the system:
 
 1. **Sensors**: It all starts with a sensor. For example, a sensor detects a leaky pipe and sends a coded packet through the airwaves.
-2. **Hotspots**: The packet is received by a hotspot, which then forwards it to the MetSci console through the Internet.
-3. **LoRaWAN Network Server**: The packet passes through a LoRaWAN Network Server (LNS), which decodes the data.
+2. **Gateway**: The packet is received via radio by a gateway connected to the internet.  Helium calls these "hotspots".  The gateway forwards the packet to the MetSci console through the Internet.
+3. **LoRaWAN Network Server**: The packet passes through the LoRaWAN Network Server (LNS), which decodes the data.
 4. **Console Decoding**: The MetSci console interprets the decoded data, determining if a pipe is leaking, the current temperature, wind speed, etc.
 5. **Applications**: Finally, the decoded data is sent to an application or it can be integrated with other systems to trigger an action; say, if a door is opened a light gets turned on.
 
-Today, we'll be focusing on the **MetSci Console**. 
+Today, we'll be focusing on the [MetSci Console](https://console.meteoscientific.com). 
 
 ## Getting Started with the MetSci Console
 
@@ -32,14 +32,33 @@ Today, we'll be focusing on the **MetSci Console**.
    - **Active Devices**: This is the most important card. Here, you can view devices you've set up.
    - **Active Gateways**: You can safely ignore this for now; all Helium's gateways are your active gateways.
    - **Device Data Rate Usage**: This is more technical, and we'll cover it in a separate video.
-   - **Gateway Map**: This doesn't show in Console.  You'll need to use the [Helium Explorer](https://explorer.helium.com) to view all gateways.
+   - **Gateway Map**: This doesn't show in Console.  You'll need to use the [Helium Explorer](https://world.helium.com/en/network/iot/hotspots) to view all gateways.
 
 ## Tenant Details
 
 Every console account starts with **400 free data credits**. Here are a few things to know about data credits:
 - **Cost of Data Credits**: Each data credit (DC) costs $0.0001. The minimum purchase amount is **50,000 DC**, which costs $5.
-- **Usage**: For a minimal sensor, you could run a device sending 1 DC every hour for a year using just under 9,000 DC.
-- **Managing Duplicates**: If you want redunancy, you can get duplicate packets from multiple hotspots. For now, iff you see a setting called **Current Value**, set it to 1 to avoid unnecessary duplicates.
+- **1 Data Credit = 24 bytes**: If you're sending a 25 byte packet, it will cost 2 DC.
+- **Usage**: A device sending a 1 DC (24 byte) packet every hour for a year will cost 8,760 DC, or $0.876.
+- **Managing Duplicates**: If you want redundancy, you can get duplicate packets from multiple hotspots. You can do this on a device level or across your tenancy. 
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/002-images/set-tenant-wide-multi-buy-dcs.png"
+    alt="Set tenant-wide multi-buy DCS configuration"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
 
 ## Adding Users and API Keys
 

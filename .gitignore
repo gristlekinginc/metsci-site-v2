@@ -59,3 +59,7 @@ venv/
 env/
 ENV/
 .env.local
+
+# Project-specific development tools
+.pushit
+.project_env
