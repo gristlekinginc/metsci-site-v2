@@ -70,7 +70,7 @@ The only other thing to change is the **Expected Uplink Interval.**  I've got mi
 An uplink is the information coming from the sensor. 
 
 :::tip
-In LoRaWAN terms, we're always talking about data moving **from** the sensor. 
+In LoRaWAN, we're always talking in terms of data in relation to the sensor.  Uplinks go UP from the sensor.  Downlinks come DOWN to the sensor. 
 :::
 
 An uplink is a packet sent from the sensor to the hotspot, which then forwards it to the LNS (LoRaWAN Network Server) and onto the console where it gets decoded. 
