@@ -133,5 +133,4 @@ That's it for now, head over to the Console and try creating an Application for 
 
 Rock 'n roll!
 
-
 <ConsoleButton />

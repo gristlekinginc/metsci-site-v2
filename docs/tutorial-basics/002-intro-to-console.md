@@ -99,7 +99,7 @@ Here's a quick breakdown:
 - **Migrating from Legacy**: If you're transitioning from the original Helium Console (almost no one is as of January 2025), there's an option to migrate your data.
 - **User Profile**: You can update your profile details at any time, including your name, address, and company info.
 
-## Let's Hit The Console
+## Hit The Console
 
 That wraps up this overview of the MetSci Console! We'll dive deeper into specific features in the following lessons. If you haven't signed up for a console account yet, head over to [console.meteoscientific.com](https://console.meteoscientific.com), sign up, and poke around.
 <ConsoleButton />
