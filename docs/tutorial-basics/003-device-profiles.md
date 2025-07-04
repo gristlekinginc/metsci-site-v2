@@ -16,13 +16,51 @@ I get it, it's nice to have a video walk-through for this.  If you'd rather watc
 
 ## What is a Device Profile?
 
-A device profile is a template for what a device is, can, and should do. It's pretty straightforward.  It just makes it easier for you to create groups of devices that all do similar things. These could be parking sensors, traffic counters, or whatever devices you're working with. 
+A device profile is a template for what a device is, can, and should do. Device Templates in Chirpstack make it easier for you to create groups of devices that all do similar things. These could be soil moisture sensors, parking sensors, traffic counters, or whatever devices you're working with. 
+
+You can add or manage Device Profiles in your account from the `Device Profiles` section in the menu on the left.
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/003-device-profile/find-device-profiles.png"
+    alt="Manage device profiles in the MeteoScientific Chirpstack LNS"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
 
 Device Profiles are different than Applications, which would be a specific use of a Device or group of Devices.
 
 For example, you might want to track the soil moisture in just one pot that has a small rosemary bush in it.  If you're just doing one plant, in one pot, a Device Profile doesn't make sense.
 
-However, let's say you have ten rosemary bushes in ten pots.  Now it makes more sense to use a Device Template, because you're onboarding the same type of sensor ten times, and you shouldn't need to re-type the name, region, and uplink interval (along with a decoder) every time.
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/003-device-profile/1-rosemary-10-rosemary-device-templates.png"
+    alt="1 soil moisture sensor doesn't need a device template, but 10 might"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
+
+However, let's say you want to set up 10 rosemary bushes with 10 soil moisture sensors in 10 pots.  Now it makes more sense to use a Device Template, because you're onboarding the same type of sensor ten times, and you shouldn't need to re-type the name, region, and uplink interval (along with a decoder) every time.
 
 I've already set up a device profile so we can walk through it together. This is the `MakerFabs - Soil Moisture LoRaWAN - US915 ` device profile. 
 
@@ -43,6 +81,10 @@ I've already set up a device profile so we can walk through it together. This is
     }}
   />
 </div>
+
+:::tip
+The MeteoScientific Console offers many device profile templates that are already set up for you.  You can search through the available templates when you set up a Device Profile.  Use the blue `Select Device Profile Template` in the top right section as you're setting up.
+:::
 
 ### Naming Convention
 
@@ -109,7 +151,27 @@ Once you've configured everything to your liking, hit **Submit** to save the dev
 
 ### Method 1: Using Templates
 
-Let's say you're new and want to add a MakerFab sensor. Instead of manually entering all the details, you can select a **Device Profile Template**. The MeteoScientific console includes a few templates, and more are being added. This means if we have a pre-built template, you can add it easily to Console without having to figure out the codec and other details.
+Let's say you want to add a MakerFab sensor just like mine.  We've already put it in MeteoScientific for ya!  Instead of manually entering all the details, you can select a **Device Profile Template**. 
+
+The MeteoScientific console includes a few templates, and more are being added. This means if we have a pre-built template, you can add it easily to Console without having to figure out the codec and other details.
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/003-device-profile/using-a-device-profile-template.png"
+    alt="Adding a pre-loaded Device Profile Template in the Chirpstack MeteoScientific LNS"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
 
 ### Method 2: Manual Entry
 
@@ -123,8 +185,12 @@ You can add notes, like a link to the device manual or information about where t
 
 For the codec, you'll either paste in the manufacturer's codec or customize it as needed. Once everything is set, hit **Submit** to save the profile.
 
-## Conclusion
+## You're Done!
 
-You've now learned what a device profile is, how it fits into the system, how it gets used, and two ways to add it—either by using a template or manually. 
+You've now learned what a device profile is, how it fits into the system, how it gets used, and two ways to add it — either by using a template or manually. 
+
+Ready to hit the Console?  
+
+<ConsoleButton />
 
 Rock 'n roll!

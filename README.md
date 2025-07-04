@@ -17,6 +17,18 @@ If it's a tutorial or documentation image (screenshots, diagrams, etc.) → put 
 
 If it's a brand asset, icon, or UI element → put it in /static/img/
 
+## Buttons
+You can use these buttons throughout the site.  They should be pretty self explanatory
+<ConsoleButton />
+
+## Link Notes
+Docusaurus URL Rules:
+Number prefixes are stripped: `/005-adding-a-device.md` → `adding-a-device`
+File extension removed: .md is dropped from the URL
+Relative links work: ./adding-a-device links to the same directory
+Absolute paths: /docs/tutorial-basics/adding-a-device also works
+
+
 
 ### Standard Image Styling
 
