@@ -7,7 +7,7 @@ This is a lesson on how to use the device profiles part of the MeteoScientific C
 
 ## Getting Started
 
-If you haven't already signed up for a console account [console.meteoscientific.com](https://console.meteoscientific.com) knock that out now.  It's free to sign up, you get a few DC to test things out, and without an account none of the rest of this will make sense.
+If you haven't already signed up for a [MetSci Console account](https://console.meteoscientific.com), knock that out now.  It's free to sign up, you get enough credits to test things out, and without an account none of the rest of this will make sense.
 
 ## Want to Watch?
 
@@ -16,38 +16,74 @@ I get it, it's nice to have a video walk-through for this.  If you'd rather watc
 
 ## What is a Device Profile?
 
-A device profile is a template for what a device is, can, and should do. It's pretty straightforward.  It just makes it easier for you to create groups of devices that all do similar things. These could be parking sensors, traffic counters, or whatever devices you're working with. I'll also discuss the naming convention I use to keep everything organized.
+A device profile is a template for what a device is, can, and should do. It's pretty straightforward.  It just makes it easier for you to create groups of devices that all do similar things. These could be parking sensors, traffic counters, or whatever devices you're working with. 
 
-I've already set up a device profile, so we can walk through it together. This is the MakerFab Soil Moisture LWUS 915 one-hour device profile. 
+Device Profiles are different than Applications, which would be a specific use of a Device or group of Devices.
+
+For example, you might want to track the soil moisture in just one pot that has a small rosemary bush in it.  If you're just doing one plant, in one pot, a Device Profile doesn't make sense.
+
+However, let's say you have ten rosemary bushes in ten pots.  Now it makes more sense to use a Device Template, because you're onboarding the same type of sensor ten times, and you shouldn't need to re-type the name, region, and uplink interval (along with a decoder) every time.
+
+I've already set up a device profile so we can walk through it together. This is the `MakerFabs - Soil Moisture LoRaWAN - US915 ` device profile. 
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '20px auto'
+}}>
+  <img 
+    src="/images/tutorial-basics/003-device-profile/device-profile.png"
+    alt="MakerFabs Soil Moisture LoRaWAN device profile configuration screen"
+    style={{
+      maxWidth: '800px',
+      width: '100%',
+      borderRadius: '8px',
+      border: '4px solid var(--metsci-primary)',
+      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
+    }}
+  />
+</div>
 
 ### Naming Convention
 
 Inside the profile, I've got the naming convention: 
 
 - **Maker:** MakerFabs
-- **Device:** Soil Moisture LW (LoRaWAN)
+- **Device:** Soil Moisture LoRaWAN
 - **Region:** US-915
-- **Interval:** One-hour
 
-That's just my naming convention. You can use whatever notes will be useful to you or other users in your account. Set your region to whatever region you're in; I'm in the US-915 region here in sunny San Diego, California. 
+
+MakerFabs has another LoRa (not LoRaWAN) sensor, which is why I used the full LoRaWAN name this time. 
+
+You can use whatever notes will be useful to you or other users in your account. Set your region to whatever region you're in. 
+
+I'm in the US-915 region here in sunny San Diego, California. 
 
 ### Default Settings
 
-Almost all the other settings can be left alone. You can change them if you want, but for now, I'd recommend leaving them as they are. The only other thing to change is the **Expected Uplink Interval.**
+Almost all the other settings can be left alone. You can change them if you want, but for now, I'd recommend leaving them as they are. 
+
+The only other thing to change is the **Expected Uplink Interval.**  I've got mine set to 3600 seconds, or once per hour. 
 
 #### What is an Uplink?
 
-An uplink is the information coming from the sensor. In LoRaWAN terms, we're always talking about data moving **from** the sensor. An uplink is a packet sent from the sensor to the hotspot, which then forwards it to the LNS (LoRaWAN Network Server) and onto the console where it gets decoded. The decoded data is then forwarded to app, which can show you what's happening or send a notification "Hey, a pipe is leaking!" or trigger an action `Airstrikes on leaking pipe.`
+An uplink is the information coming from the sensor. 
+
+:::tip
+In LoRaWAN terms, we're always talking about data moving **from** the sensor. 
+:::
+
+An uplink is a packet sent from the sensor to the hotspot, which then forwards it to the LNS (LoRaWAN Network Server) and onto the console where it gets decoded. 
+
+The decoded data is then forwarded to an app or other integration (like a database), which can show you what's happening or send a notification "Hey, a pipe is leaking!" or trigger an action `Airstrikes on leaking pipe.`
 
 If we wanted to send something back down to the sensor, that would be called a **downlink**. 
 
-Most devices are **Class A** devices, meaning they only occasionally send out an uplink and only listen to hear if you have any instructions after they've sent an uplink.  It's part of what makes 'em low power.  They wake up on a timer, fire off a message, see if you've said anything in the meantime, then go back to low power sleep. For example, this soil moisture sensor sends out an uplink every hour.  
+Most devices are **Class A** devices, meaning they only occasionally send out an uplink, and only listen to hear if you have any instructions *right after* they've sent an uplink.  It's part of what makes 'em low power.  
+
+They wake up on a timer, fire off a message, see if you've sent them a message , then go back to low power sleep. They don't listen all the time.
 
 Other devices, called **Class B** and **Class C** devices, can be more active (and more power hungry).  We'll cover them in another lesson.  
-
-Now, even with a Class A device, you might place it in a location where the signal is occasionally be blocked, in which case you may want to adjust the expected uplink interval from your computer rather than wading out into the swamps with your laptop to manually reset. 
-
-On our end, the Console expects a device to send on schedule.  If the device doesn't uplink on time, Console can fire off a notification to us.  This can get a little tiresome; if a device sends an uplink every hour but occasionally fails due to signal interference, you might change the expected uplink interval to 7200 seconds (two hours) to avoid unnecessary warnings.
 
 ### Additional Settings
 
@@ -73,20 +109,22 @@ Once you've configured everything to your liking, hit **Submit** to save the dev
 
 ### Method 1: Using Templates
 
-Let's say you're new and want to add a MakerFab sensor. Instead of manually entering all the details, you can select a **Device Profile Template**. The MeteoScientific console includes a few templates, and more are being added regularly. This means if we have a pre-built template, you can add it easily to Console without having to figure out the codec and other details.
+Let's say you're new and want to add a MakerFab sensor. Instead of manually entering all the details, you can select a **Device Profile Template**. The MeteoScientific console includes a few templates, and more are being added. This means if we have a pre-built template, you can add it easily to Console without having to figure out the codec and other details.
 
 ### Method 2: Manual Entry
 
-If you need to manually add a device profile, you can do so by filling in all the necessary details. For example, if you're adding a Senzemo Send Stick, you would:
+If you need to manually add a device profile, you can do so by filling in all the necessary details. For example, if you're adding a [Senzemo STO10 Stick](https://senzemo.com/products/temperature-only-sensor/), you would:
 
-1. Set the naming convention (e.g., Senzemo Send Stick SMC 30).
+1. Set the naming convention (e.g., Senzemo Temp Only STO10).
 2. Set the region (e.g., US-915).
 3. Set the uplink interval (e.g., 7200 seconds for a two-hour interval).
 
-You can add notes, like a link to the device manual or information about where the device is located. For the codec, you'll either paste in the manufacturer's codec or customize it as needed. Once everything is set, hit **Submit** to save the profile.
+You can add notes, like a link to the device manual or information about where the device is located. 
+
+For the codec, you'll either paste in the manufacturer's codec or customize it as needed. Once everything is set, hit **Submit** to save the profile.
 
 ## Conclusion
 
 You've now learned what a device profile is, how it fits into the system, how it gets used, and two ways to add it—either by using a template or manually. 
 
-Rock and roll—have a great day, and I'll see you on the console!
+Rock 'n roll!
