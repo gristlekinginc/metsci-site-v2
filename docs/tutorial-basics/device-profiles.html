@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="/css/custom.css">
 <script src="https://www.googletagmanager.com/gtag/js?id=G-VNEKDSD64E" async></script>
 <script src="/js/ga.js" async></script><link rel="stylesheet" href="/assets/css/styles.656a9015.css">
-<script src="/assets/js/runtime~main.f0db5335.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.e39a1145.js" defer="defer"></script>
 <script src="/assets/js/main.bd16ac7c.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -45,7 +45,7 @@
 <p>The only other thing to change is the <strong>Expected Uplink Interval.</strong>  I&#x27;ve got mine set to 3600 seconds, or once per hour.</p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-an-uplink">What is an Uplink?<a href="#what-is-an-uplink" class="hash-link" aria-label="Direct link to What is an Uplink?" title="Direct link to What is an Uplink?">​</a></h4>
 <p>An uplink is the information coming from the sensor.</p>
-<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>In LoRaWAN terms, we&#x27;re always talking about data moving <strong>from</strong> the sensor.</p></div></div>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>In LoRaWAN, we&#x27;re always talking in terms of data in relation to the sensor.  Uplinks go UP from the sensor.  Downlinks come DOWN to the sensor.</p></div></div>
 <p>An uplink is a packet sent from the sensor to the hotspot, which then forwards it to the LNS (LoRaWAN Network Server) and onto the console where it gets decoded.</p>
 <p>The decoded data is then forwarded to an app or other integration (like a database), which can show you what&#x27;s happening or send a notification &quot;Hey, a pipe is leaking!&quot; or trigger an action <code>Airstrikes on leaking pipe.</code></p>
 <p>If we wanted to send something back down to the sensor, that would be called a <strong>downlink</strong>.</p>
