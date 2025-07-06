@@ -119,15 +119,7 @@ Finally, let's discuss `Integrations`. Integrations are the main reason you'll u
   />
 </div>
 
-Natively, ChirpStack offers a bunch of different integrations. We'll deal with the first and most confusing, which is `MQTT`. 
-
-In a normal (non-Helium) ChirpStack instance, you can use MQTT without any issue; it's how most "normal" LNS operators send data off their Console. 
-
-However, in a Helium ChirpStack instance like the one we're using with Console, we have a problem.  The Chirpstack native MQTT integration uses an internal MQTT broker, which would mean your broker is also my broker.  That's not a safe way set things up.  As much as we trust each other to swap MQTT spit, I can't trust every asshole on the internet to not try any funny business on a public, permissionless Console.  This means that for security reasons, we don't offer a native MQTT integration. 
-
-This means you'll need to use an `http integration` forwarding to an MQTT broker YOU own and control.  
-
-Because Integrations are so intregral (couldn't resist) to what we do, they're getting their own Tutorial.  For now, just now that the way you get to an Integration is via your Application.
+Because Integrations are so intregral (couldn't resist) to what we do, they have [their own Tutorial](./chirpstack-integrations).  For now, just know that the way you get to an Integration is via your Application.
 
 That's it for now, head over to the Console and try creating an Application for yourself.
 

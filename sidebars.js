@@ -26,6 +26,7 @@ const sidebars = {
         'tutorial-basics/metrics-on-chirpstack',
         'tutorial-basics/configure-a-device',
         'tutorial-basics/good-housekeeping-for-LoRaWAN-sensor-fleets',
+        'tutorial-basics/chirpstack-integrations',
       ],
     },
     {
