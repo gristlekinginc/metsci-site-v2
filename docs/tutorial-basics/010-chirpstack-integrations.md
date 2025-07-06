@@ -28,6 +28,8 @@ Natively, ChirpStack offers a bunch of different integrations:
   />
 </div>
 
+### MQTT Workaround
+
 We'll start with the first and most confusing for many MetSci Console users, which is `MQTT`. 
 
 In a normal *non-Helium* ChirpStack instance, you can use MQTT without any issue. MQTT is how many "normal" LNS operators send data off their Console. 
@@ -37,6 +39,8 @@ However, in a public Helium ChirpStack instance like MeteoScientific's, we have 
 As much as we trust each other to swap MQTT spit, I can't trust every asshole on the internet to not try any funny business on a public, permissionless Console.  This means that for security reasons, we don't offer a native MQTT integration. 
 
 This means if you want to use MQTT on the MeteoScientific Console you'll need to use an `http integration` to forward to an MQTT broker YOU own and control. 
+
+### Other Integrations
 
 Other integrations exist in our Chirpstack; you can send your data to AWS SNS, Azure Service-Bus, GCP Pub/Sub, IFTT, InfluxDB, and more. They're all rad in their own way, but today we're going to focus on the most straighforward integration, one we've already mentioned:  An `http integration`
 
@@ -64,12 +68,14 @@ Once I'm in `Application --> Milesight Table Service --> Integrations` I look fo
   />
 </div>
 
+### The Integration Fields
+
 Hit the `+` sign and it'll bring up the window asking for your details, including 
 - how you're going to encode your payload (we're going to use JSON)
 - where it should send it to
 - if you want to add any headers.  
 
-You can use headers to customize payload formatting, support specific API requirements, or in our case, enable authentication tokens.
+You can use headers to customize payload formatting, support specific API requirements, or in our case, enable authentication tokens.  Relax, I'll give you all of these just a little further down.
 
 <div style={{
   display: 'flex',
@@ -89,15 +95,17 @@ You can use headers to customize payload formatting, support specific API requir
   />
 </div>
 
-Now, you may (like I was) be so excited about LoRaWAN that you just fired up a device, got stoked to see it `JOIN` and get a few uplinks in, and then wonder...what do I do with this?
+Now, you may (like I was) be so excited about LoRaWAN that you just fired up a device, got stoked to see it `JOIN` and get a few uplinks in the Concole, and then wonder, but but but...is it REALLY working?
 
-The very first thing I'd do is try it out.  I'll give you an `endpoint` you can use to test, give you the two `Headers` we'll use, and you'll get to see how the whole thing works.  Neat, right?
+I knew you'd be excited about it, so I built an `endpoint` for you to test your setup right now. 
 
 ### Setting Up The Integration
 
 We're start by choosing the type of Payload encoding we're doing.  I'm using `JSON` for the Milesight button.
 
-Next, we'll fill in the `endpoint`.  This is the place you want your data to go.  I've set up a public test endpoint for you over at [`testpoint.meteoscientific.com`](http://testpoint.meteoscientific.com) that you can use for this tutorial or any time you want to just double check everything is working.
+Next, we'll fill in the `endpoint`.  This is the place you want your data to go.  
+
+In this case, I've set up a public test endpoint for you over at [`testpoint.meteoscientific.com`](http://testpoint.meteoscientific.com).  You can use it for this tutorial or any time you want to just double check everything is working.
 
 Head over there and copy the endpoint URL, then paste it into your integration.  Then click the `+ Add header` button and add two headers:
 - `Key`: `Authorization`
