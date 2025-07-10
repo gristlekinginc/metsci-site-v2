@@ -232,3 +232,75 @@
   border-color: var(--metsci-blue);
   color: var(--metsci-white);
 }
+
+/* Next Steps styling */
+.next-steps-container {
+  background: linear-gradient(135deg, #FA7F2A 0%, #000000 100%);
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+  color: #FCF5F0;
+  border: 3px solid #FA7F2A;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.next-steps-container ol {
+  list-style: none;
+  counter-reset: next-steps-counter;
+  padding: 0;
+  margin: 0;
+}
+
+.next-steps-container li {
+  counter-increment: next-steps-counter;
+  position: relative;
+  padding: 1.8rem 1.8rem 1.8rem 5rem;
+  margin: 1rem 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  border: 1px solid rgba(250, 127, 42, 0.3);
+}
+
+.next-steps-container li:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: #FA7F2A;
+}
+
+.next-steps-container li::before {
+  content: counter(next-steps-counter);
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #FCF5F0;
+  font-weight: 800;
+  font-size: 2rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #18A7D9;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.next-steps-container a {
+  color: #18A7D9;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.next-steps-container a:hover {
+  color: #FCF5F0;
+  text-decoration: underline;
+}
+
+/* Hide the tip icon since we're using it for styling only */
+.next-steps svg {
+  display: none !important;
+}
