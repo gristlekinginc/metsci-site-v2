@@ -64,16 +64,6 @@ ENV/
 .pushit
 .project_env
 
-# Scripts - exclude sensitive automation files only
-scripts/.env
-scripts/*schema*.py
-scripts/*cloudflare*.py
-scripts/daily_schema_sync.sh
-scripts/test_schema_sync.sh
-scripts/setup_daily_sync.sh
-scripts/*.log
-scripts/discovery_output/
-scripts/current_api_state.json
-scripts/schema_sync_results.json
-scripts/README_SCHEMA_AUTOMATION.md
+# Scripts - automation directory (keep out of git)
+/scripts/
 
