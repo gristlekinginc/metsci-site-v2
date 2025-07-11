@@ -15,7 +15,7 @@ Some devices have bluetooth (`BLE`) connectivity.  The manufacturer will have a 
 
 Other devices are a little nerdier...
 
-# Maximum Nerd
+![Maximum Nerd](/img/buttons/maximum_nerd.svg)
 
 We're going full nerd today.  
 

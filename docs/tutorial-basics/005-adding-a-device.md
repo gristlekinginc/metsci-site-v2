@@ -215,7 +215,7 @@ I know you're special, but the most special thing about you right now if you're 
 :::
 
 That's how you add a device to the MeteoScientific ChirpStack console.  From here you can muck about with downlinks, dial in your decoder, grab network or application session IDs from the `Activation` tab and generally enjoy the geekery.  
-
+<ConsoleButton />
 Rock 'n roll!
 
 :::tip Understanding Events vs Frames
