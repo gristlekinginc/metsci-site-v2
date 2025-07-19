@@ -39,11 +39,9 @@ Of those, you really only need 2:
 - AppKey
 ```
 
-In the Helium version of Chirpstack (which is what the MeteoScientific Console runs on), that's all we need.
-
 If, for whatever reason, you feel like you have to add in the AppEUI, you'll have to add in a custom field, which I'll show you how to do below.  In other LNS versions (say, LORIOT or TTN) the AppEUi can be a critical aspect.
 
-Different manufacturers provide these identifiers in different ways; Dragino usually prints them all on the inside cover of the box, RAK does the same.  Some will provide a cxv (especially if you're buying a ton of the same sensors.)
+Different manufacturers provide these identifiers in different ways; Dragino usually prints them all on the inside cover of the box, RAK does the same.  Some will provide a csv (especially if you're buying a ton of the same sensors.)
 
 Milesight prints the `DEVEUI` on the box, then uses their iOS/Android app to give you the `APPKEY`.  
 
@@ -67,7 +65,7 @@ Milesight prints the `DEVEUI` on the box, then uses their iOS/Android app to giv
 
 ### Step 2: Add the Device to the ChirpStack Console
 
-In the case of this Milesight `WS101 SOS`, we turn the device on by removing the battery insulating sheet, then we'll configure it via NFC.  Some devices use BLE, some use USB.  Check the manual that came with it (or run the ol' Googs search on it.)
+In the case of this Milesight `WS101 SOS`, we turn the device on by removing the battery insulating sheet, then we'll configure it via NFC.  Some devices use BLE for configuration, some use USB.  Check the manual that came with it (or run the ol' Googs search on it.)
 
 Here's what the Milesight app looks like when we connect via NFC:
 
@@ -91,7 +89,7 @@ Here's what the Milesight app looks like when we connect via NFC:
 
 In this case, the Milesight app doesn't show the Application Key, so we'll create our own in Chirpstack, then assign our AppKey to the device.
 
-This can vary device to device.  If your device came with an AppKey, go ahead and use it, especially if this is your first onboarding.
+This can vary device to device.  If your device came with an AppKey, go ahead and use it, especially if this is your first onboarding a device.
 
 With the device on and the DEVEUI and APPKEY ready, let's head to the MetSci Console!
 
@@ -149,10 +147,10 @@ With the device on and the DEVEUI and APPKEY ready, let's head to the MetSci Con
 :::tip
 Most manufacturers will have a QR code with the device that'll give you the DevEUI so you can copy/paste from there.
 :::
-   - With some devices (like the soil moisture sensor in the video) you generate your own DevEUI, but for most of them the DevEUI is burned in when you get it.
+   - With some devices (like the soil moisture sensor in the video at the top of this tutorial) you generate your own DevEUI  For most of them, the DevEUI is burned in when you get it.
 
 5. **Add the AppEUI**
-   - Chirpstack doesn't use an `APPEUI` but I'll add one in that's all zeros so you see how to do it.  Go to the `Variable` tab and add a new variable.
+   - Chirpstack doesn't need an `APPEUI` but I'll add one in that's all zeros so you see how to do it.  Go to the `Variable` tab and add a new variable.
    - Use key `app_eui` and the value of 16 zeros, like this: `0000000000000000`
 
 <div style={{
