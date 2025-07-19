@@ -20,20 +20,32 @@ This written tutorial goes through onboarding a Milesight `WS101 SOS` Smart Butt
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/rhNYKyC3Avs?si=1LimXlj78xfzqPb-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-### The Three Key Identifiers
+### The Two Key Identifiers
 
-When you get a sensor it *should* come with three long and complicated numbers:
+When you get a sensor it will come with a bunch of long and complicated numbers:
 ```
+- Dev ADDR (Device Address)
 - DevEUI (Device EUI)
 - AppEUI (Application EUI)
 - AppKey (Application Key)
+- AppSKey (Application Session Key))
+- NetsKey (Network Session Key)
+- SN (Serial Number)
 ```
 
-In Chirpstack (which is what the MeteoScientific Console runs on), **the AppEUI isn't required**.  
+Of those, you really only need 2:
+``` 
+- DevEUI
+- AppKey
+```
 
-In fact, there's not even a field for it, so we'll have to manually make one.  In other LNS versions (say, LORIOT or TTN) the AppEUi can be a critical aspect.
+In the Helium version of Chirpstack (which is what the MeteoScientific Console runs on), that's all we need.
 
-Milesight prints the `DEVEUI` on the box, then uses an app to give you the `APPKEY`.  
+If, for whatever reason, you feel like you have to add in the AppEUI, you'll have to add in a custom field, which I'll show you how to do below.  In other LNS versions (say, LORIOT or TTN) the AppEUi can be a critical aspect.
+
+Different manufacturers provide these identifiers in different ways; Dragino usually prints them all on the inside cover of the box, RAK does the same.  Some will provide a cxv (especially if you're buying a ton of the same sensors.)
+
+Milesight prints the `DEVEUI` on the box, then uses their iOS/Android app to give you the `APPKEY`.  
 
 <div style={{
   display: 'flex',
@@ -78,6 +90,8 @@ Here's what the Milesight app looks like when we connect via NFC:
 </div>
 
 In this case, the Milesight app doesn't show the Application Key, so we'll create our own in Chirpstack, then assign our AppKey to the device.
+
+This can vary device to device.  If your device came with an AppKey, go ahead and use it, especially if this is your first onboarding.
 
 With the device on and the DEVEUI and APPKEY ready, let's head to the MetSci Console!
 
@@ -138,7 +152,7 @@ Most manufacturers will have a QR code with the device that'll give you the DevE
    - With some devices (like the soil moisture sensor in the video) you generate your own DevEUI, but for most of them the DevEUI is burned in when you get it.
 
 5. **Add the AppEUI**
-   - Chirpstack doesn't use an `APPEUI` but Helium likes it.  Go to the `Variable` tab and add a new variable.
+   - Chirpstack doesn't use an `APPEUI` but I'll add one in that's all zeros so you see how to do it.  Go to the `Variable` tab and add a new variable.
    - Use key `app_eui` and the value of 16 zeros, like this: `0000000000000000`
 
 <div style={{
@@ -160,7 +174,8 @@ Most manufacturers will have a QR code with the device that'll give you the DevE
 </div>
 
 6. **Fill in or Generate AppKeys:**
-   - ChirpStack allows you to generate these.  It's good security practice to generate your own.
+   - Use the AppKey your device came with.
+   - If your device didn't come with them, or you lost the label, or if you're just paranoid and don't want the manufacturer to have your AppKey, ChirpStack allows you to generate these. 
    - Copy and store them in a safe place.  
 
 <div style={{
@@ -205,7 +220,7 @@ Most manufacturers will have a QR code with the device that'll give you the DevE
 </div>
 
 :::warning
-If you don't see a frame come through, it is VERY likely you fat-fingered something.  The most common support request I get is "My device isn't joining."  
+If you [have Helium coverage where you are](https://world.helium.com/en/network/iot/coverage) and don't see a frame come through, it is VERY likely you fat-fingered something.  The most common support request I get is "My device isn't joining."  
 
 With one exception (lookin' at you Scott W), it has ALWAYS been one of those, "Oh, I forgot a zero in the APPEUI" or "It used the wrong AppKey", whatever that means.
 
