@@ -304,3 +304,59 @@
 .next-steps svg {
   display: none !important;
 }
+
+/* Audio Player Styling */
+.custom-audio-player audio {
+  background-color: var(--metsci-black) !important;
+  border: 2px solid var(--metsci-red) !important;
+  border-radius: 8px !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-panel {
+  background-color: var(--metsci-black) !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-play-button {
+  background-color: var(--metsci-red) !important;
+  border-radius: 50% !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-timeline {
+  background-color: var(--metsci-blue) !important;
+  border-radius: 10px !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-timeline-progress {
+  background-color: var(--metsci-white) !important;
+  border-radius: 10px !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-seek-back-button,
+.custom-audio-player audio::-webkit-media-controls-seek-forward-button {
+  display: none !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-timeline-thumb {
+  background-color: var(--metsci-white) !important;
+  border-radius: 50% !important;
+}
+
+/* Ensure progress is always visible */
+.custom-audio-player audio::-webkit-media-controls-timeline-container {
+  background-color: var(--metsci-blue) !important;
+  border-radius: 10px !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-timeline-track {
+  background-color: var(--metsci-blue) !important;
+  border-radius: 10px !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-volume-slider {
+  background-color: var(--metsci-blue) !important;
+}
+
+.custom-audio-player audio::-webkit-media-controls-current-time-display,
+.custom-audio-player audio::-webkit-media-controls-time-remaining-display {
+  color: var(--metsci-white) !important;
+}

@@ -36,21 +36,7 @@ It’s best at this point to hear these: here’s what LoRa sounds like when you
     <source src="https://video.meteoscientific.com/actual-lora_mixdown.mp3" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
-  <style jsx>{`
-    .custom-audio-player audio::-webkit-media-controls-panel {
-      background-color: #000000;
-    }
-    .custom-audio-player audio::-webkit-media-controls-play-button {
-      background-color: #FA7F2A;
-      border-radius: 50%;
-    }
-    .custom-audio-player audio::-webkit-media-controls-timeline {
-      background-color: #18A7D9;
-    }
-    .custom-audio-player audio::-webkit-media-controls-volume-slider {
-      background-color: #18A7D9;
-    }
-  `}</style>
+
 </div>
 
 Up chirps and down chirps are more or less **orthogonal**, which is a fancy way of saying that you can hear an up chirp and a down chirp at the same time and they don’t cancel each other out.  Orthogonality is useful when you’re sending a LOT of chirps, which is what LoRa radio waves are full of.   
