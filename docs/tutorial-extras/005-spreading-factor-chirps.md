@@ -254,6 +254,6 @@ That’s it, you now know enough about spreading factor to have a good idea of w
 
 Get out there and crush!  
 
-If you're ready to start chirping on Helium, please sign up for the [MeteoScientific Console](https://console.meteoscientific.com/front/); it's free to sign up, the first 400 DC (24 bytes each) are free and after that cost just $0.0001 each.  Have fun out there!
+If you're ready to start chirping on Helium, go ahead and sign up for the [MeteoScientific Console](https://console.meteoscientific.com/front/).  It's free to sign up, the first 400 DC (24 bytes each) are free and after that cost just $0.0001 each.  Have fun out there!
 
 <ConsoleButton />
