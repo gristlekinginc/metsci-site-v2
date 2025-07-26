@@ -36,7 +36,8 @@ const sidebars = {
         'tutorial-extras/documentation',
         'tutorial-extras/class_C_kuando_busylight',
         'tutorial-extras/Google_Sheets',
-        'tutorial-extras/metsci-demo-dash'
+        'tutorial-extras/metsci-demo-dash',
+        'tutorial-extras/spreading-factor-chirps',
       ],
     },
     {
