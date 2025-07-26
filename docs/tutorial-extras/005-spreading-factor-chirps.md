@@ -18,11 +18,14 @@ A “chirp” is a piece of data, technically called a "symbol", though we'll st
 
 The frequency center is the middle sound of the chirp.  Chirps can go from low to high (an “up chirp”) or from high to low (a “down chirp”).
 
-It’s best at this point to hear these: here’s a very quick up chirp vs down chirp example.
+It’s best at this point to hear these: here’s what LoRa sounds like when you slow it down into the audio spectrum (courtesy Jeremy Cooper aka "Jerm")
+
 ### Audio - Simple Chirps
 
-
-<div className="custom-audio-player">
+<div className="custom-audio-player" style={{
+  marginTop: '25px',
+  marginBottom: '25px'
+}}>
   <audio controls preload="metadata" style={{
     width: '100%',
     height: '50px',
@@ -30,7 +33,7 @@ It’s best at this point to hear these: here’s a very quick up chirp vs down 
     borderRadius: '8px',
     border: '2px solid #FA7F2A'
   }}>
-    <source src="https://video.meteoscientific.com/simple-chirps.mp3" type="audio/mpeg" />
+    <source src="https://video.meteoscientific.com/actual-lora_mixdown.mp3" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
   <style jsx>{`
@@ -64,37 +67,8 @@ For these reasons, chirps are used in military and marine radars as well as iono
 
 An inquisitive person might now say, “Ok, that’s cool.  How much data is in a chirp?”
 
-The answer is that it depends on the Spreading Factor.  You see, all chirps are not equal.  Some are spread out longer, some are compacted shorter.  Some cross a wider section of bandwidth, some a narrower. 
+The answer is that it depends on the Spreading Factor.  You see, all chirps are not equal.  Some are spread out longer, some are compacted shorter.  Some cross a wider section of bandwidth, some a narrower. This leads us directly into the concept of spreading factor.
 
-Let’s have a listen to a few more examples: 
-### Audio - Spreading Factor
-<div className="custom-audio-player">
-  <audio controls preload="metadata" style={{
-    width: '100%',
-    height: '50px',
-    backgroundColor: '#000000',
-    borderRadius: '8px',
-    border: '2px solid #FA7F2A'
-  }}>
-    <source src="https://video.meteoscientific.com/spreading-factor-audio.mp3" type="audio/mpeg" />
-    Your browser does not support the audio element.
-  </audio>
-  <style jsx>{`
-    .custom-audio-player audio::-webkit-media-controls-panel {
-      background-color: #000000;
-    }
-    .custom-audio-player audio::-webkit-media-controls-play-button {
-      background-color: #FA7F2A;
-      border-radius: 50%;
-    }
-    .custom-audio-player audio::-webkit-media-controls-timeline {
-      background-color: #18A7D9;
-    }
-    .custom-audio-player audio::-webkit-media-controls-volume-slider {
-      background-color: #18A7D9;
-    }
-  `}</style>
-</div>
 
 ## Spreading Factors
 
