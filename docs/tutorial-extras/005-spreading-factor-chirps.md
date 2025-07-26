@@ -14,11 +14,11 @@ In the same way that dolphins and bats “chirp” for sonar, we humans have fig
 Knowing a bit more about chirps and spreading factor is helpful in LoRa, partly because this will save you battery life with your LoRa devices, and partly because it’s flat-out rad to know how the world works.
 
 ## The Chirp
-A “chirp” is a piece of data, technically called a "symbol", though we'll stick with `chirp`. A LoRa packet will have lots of chirps in it. Think of these like bird chirps rising from low frequency to high frequency, or the other way around.
+A `chirp` is a piece of data, technically called a "symbol", though we'll stick with `chirp`. A LoRa packet will have lots of chirps in it. Think of these like bird chirps rising from low frequency to high frequency, or the other way around.
 
 The frequency center is the middle sound of the chirp.  Chirps can go from low to high (an “up chirp”) or from high to low (a “down chirp”).
 
-It’s best at this point to hear these: here’s what LoRa sounds like when you slow it down into the audio spectrum (courtesy Jeremy Cooper aka "Jerm")
+It’s best at this point to hear these: here’s what LoRa sounds like when you slow it down into the audio spectrum (*courtesy Jeremy Cooper aka "Jerm"*)
 
 ### Audio - Simple Chirps
 
