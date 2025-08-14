@@ -288,6 +288,8 @@ Of course, you DO get what gateway the thing comes through along with the two ke
 
 By rough, I mean with 5 or 6 gateways you can get to within 5 or 6 kilometers or where the Nanotag is, however...
 
+### When Gateway Positions Are Unknown
+
 **There is one other twist:**  The gateways aren't always where they say they are.
 
 Due to the nature of the crypto incentives in Helium, mostly during the initial buildout of the network when the incentives were insane, some gateway owners "assert" their gateways anywhere from a couple hundred meters to a few thousand kilometers away from where they are.  The closer they are to their assertion point, the harder it is to detect if they really are where they say they are.
@@ -300,6 +302,8 @@ Let’s start by imagining what we’re doing first:  We’re going to build a n
 
 We’re not even going to use the gateway's locations at first; we’re going to build a map based off of many devices that all fire off packets and travel around.  Each time a packet is fired, we create a `fingerprint` of wherever that Nanotag is.
 
+#### Fingerprints
+
 At first, those fingerprints are kind of boring; one packet from `NT8020` received by 6 gateways might give you the following fingerprint:
 
 ```
@@ -310,6 +314,8 @@ Gateway 04: RSSI -120, SNR 4
 Gateway 05: RSSI -105, SNR 11
 Gateway 06: RSSI -92, SNR 13
 ```
+
+#### Quick Radio Terms
 
 RSSI is the Received Signal Strength Indicator, and can be thought of as `Signal Strength`.  SNR is Signal-Noise-Ratio, and can be thought of as `Signal Clarity`.
 
@@ -328,6 +334,8 @@ A multi-packet purchase is a fingerprint that is anchored in time.  This *could*
 `Gateways 01 (-98 dBm, 14 dB), 05 (-105 dBm, 11 dB), 06 (-92 dBm, 13 dB)`: These suggest intermediate distances, likely 2-8 km depending on the environment, with good to fair signal quality. The solid SNR values indicate minimal noise interference, but the varying RSSI points to some obstacles or elevation differences along the paths.
 
 `Gateway 02 (-110 dBm, 9 dB)`: Slightly weaker than the above group, this could mean 5-10 km or equivalent obstruction, with the SNR still positive but approaching levels where packet loss might increase in noisy conditions.
+
+#### What Does A Fingerprint Look Like?
 
 If we were to visualize this in a `nodes-and-edges` kind of way, it might look like this:
 
@@ -380,6 +388,8 @@ At first we just know that one point exists, then that 2 points exist in relatio
 At some point, your relational map starts to match up to a place in the real world; your latent map becomes a real one.
 
 In order to get there, you need a way to sort through the mess.  I did that by building a model using machine learning to shape and train it on a few million data points from hundreds of synthetic cities, buildings, gateways, and transmitters that custom built for this job; basically my own little world.
+
+#### Sim (RF) Cities
 
 
 <div style={{
