@@ -261,10 +261,6 @@ You'll need your Device EUI, or DevEUI if you want to say it the cool way.  You 
 
 Enter that in, then in the `Device Profile` section select `NanoTag - US915` and then `Submit`.
 
-:::tip
-I've found that sometimes you don't immediately get a join.  Sometimes you do.  If you don't get one right away, try adding the `JOINEUI` (which you should have from the same place you got your DEVEUI and APPKEY).
-:::
-
 It'll ask you for your `Application Key`, that should be on the same piece of paper/csv your DevEUI was on.  Paste that in, then hit `Submit`.
 
 Whew, you've got this side of it done.  
@@ -416,7 +412,13 @@ With the model built and tested it, with current results at best of `2 km` and a
 
 This part's easy; you've already added the NanoTag to your MetSci console, all you have to do is tear off the bottom tab.  
 
-Watch over in Console to make sure it joins.  You'll need to be within Helium coverage, must urban and suburban places are, but you can double check over on the [Helium World Explorer](https://world.helium.com/en/network/iot/coverage).  As you can see, San Diego has excellent coverage.
+Watch over in Console to make sure it joins.  
+
+:::tip
+I've found that sometimes you don't immediately get a join.  Sometimes you do.  If you don't get one right away, try adding the `JOINEUI` (which you should have from the same place you got your DEVEUI and APPKEY).
+:::
+
+You'll need to be within Helium coverage, must urban and suburban places are, but you can double check over on the [Helium World Explorer](https://world.helium.com/en/network/iot/coverage).  As you can see, San Diego has excellent coverage.
 
 <div style={{
   display: 'flex',
