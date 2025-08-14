@@ -1,0 +1,56 @@
+---
+sidebar_position: 1
+title: Oyster2 Downlink Generator
+description: Generate downlink commands for configuring Oyster2 LoRaWAN tracking devices
+---
+
+import DownlinkGenerator from '@site/src/components/DownlinkTools/oyster-downlink';
+
+# Oyster2 Downlink Generator
+
+This tool helps you generate downlink commands for configuring Oyster2 LoRaWAN tracking devices. Select the configuration port you want to modify, adjust the parameters, and generate the hex payload to send to your device.
+
+## How to Use
+
+This is a slightly more complicated tool than I'd like, but it's also nice to have full functionality.  
+
+Most of the time you just want to change the uplink interval, which will be `Port 1`.
+
+1. **Select Configuration Port**: Choose which aspect of the device you want to configure from the dropdown
+2. **Adjust Parameters**: Modify the values according to your needs - defaults are shown for reference
+3. **Generate Downlink**: Click the button to create the hex payload
+4. **Send to Device**: Use the generated port and payload in your LoRaWAN network server
+
+:::tip Quick Start
+Most users start with **Port 1 (Set Trip Parameters)** to configure basic tracking behavior, heartbeat intervals, and trip detection settings.
+:::
+
+## Configuration Ports Available
+
+- **Port 1**: Trip Parameters - Core tracking settings, heartbeat intervals (5-second units), and accelerometer settings
+- **Port 2**: After-Hours Schedule (Days 1-4) - Monday through Thursday work hours (15-minute intervals)
+- **Port 3**: After-Hours Schedule (Days 5-7) - Friday through Sunday work hours (15-minute intervals)
+- **Port 4**: Time Zone & Daylight Saving - Configure UTC offset (hours) and DST rules
+- **Port 5**: GPS Parameters (Basic) - GPS fix timeouts (5-second units), accuracy (meters)
+- **Port 6**: GPS Parameters (Advanced) - Daily GPS budget (minutes), satellite timing
+- **Port 7**: LoRaWAN Channels & Data Rate - Channel masks and data rate limits
+- **Port 8**: LoRaWAN Join EUI - Network authentication identifiers
+- **Port 9**: Advanced LoRaWAN Options - Join intervals (days), power limits (dBm)
+- **Port 10**: Man Down Detection - Safety alert timeouts (minutes)
+- **Port 11**: Scheduled Uploads (Times 1-10) - Automated reporting times (15-minute intervals)
+- **Port 12**: Scheduled Uploads (Times 11-12) - Additional automated reporting times
+
+<DownlinkGenerator />
+
+## Important Notes
+
+- Always test configuration changes on a single device before deploying to multiple units
+- Some changes may require the device to rejoin the LoRaWAN network
+- Refer to the Oyster2 technical documentation for detailed parameter explanations
+- Keep track of your downlink sequence numbers to avoid replay attacks
+
+## Need Help?
+
+- Check parameter ranges carefully - invalid values may cause unexpected behavior
+- Most settings take effect immediately, but some require a device restart
+- Contact support if you encounter issues with specific configurations

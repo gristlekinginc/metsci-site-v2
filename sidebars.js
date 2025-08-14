@@ -42,6 +42,13 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Special Projects',
+      items: [
+        'special-projects/nanotags',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Codec Library',
       items: [
         'codecs/overview',

@@ -1,0 +1,371 @@
+The Oyster LoRaWAN provides a number of configurable parameters, to allow its behavior to be tailored to specific applications. Factors affecting the configuration you might choose include:
+
+How many messages per day your network will allow
+How often you intend to change the batteries, and the type of batteries in use
+How detailed a bread-crumb trail you require, or the required time between updates
+How good the GPS reception is in your installation
+How The Oyster Connects (OTAA)
+
+By default, the Oyster connects to a local LoRaWAN network using Over The Air Activation. Each Oyster is provisioned with:
+
+A read-only DevEUI - a 16 digit code uniquely identifying the Oyster (printed on the label)
+A configurable JoinEUI / AppEUI - a 16 digit code identifying the server the device is registered with
+A configurable NwkKey (1.1) / AppKey (1.0) - a 32 digit code that authenticates the Oyster to the network server
+A configurable AppKey (1.1) - a 32 digit code that authenticates the Oyster to the application server
+The default JoinEUI is 70-B3-D5-70-50-00-00-00
+Each Oyster is provisioned with a random default NwkKey and AppKey (1.1)
+A configurable Region and optional Channel Mask
+The channel mask is used in the US915 and AU915 regions, to set the network frequencies
+Other regions don't need the channel mask, as all their networks use the same OTAA frequencies
+Once the region has been configured, the Oyster will attempt to join local networks by transmitting join requests. Any network that hears the join requests and has knowledge of the Oyster's DevEUI, JoinEUI and keys, will allow the Oyster to join the network and transmit data.
+
+The Oyster rejoins the network once a week by default. This renegotiates encryption keys for enhanced security, and ensures continued operation in the event of a network losing the keys (for instance, if the device is mistakenly deleted).
+
+How The Oyster Connects (ABP)
+
+The Oyster can also be configured to connect using Activation By Personalization. When using ABP, each Oyster must be configured with some additional numbers:
+
+A configurable DevAddr - an 8 digit code identifying the Oyster to the network
+32 digit session keys FNwkSIntKey (also known as NwkSKey)and AppSKey,on LoRaWAN 1.0
+32 digit session keys FNwkSIntKey, SNwkSIntKey, NwkSEncKey, and AppSKey, on LoRaWAN 1.1
+ABP allows a LoRaWAN device to connect without exchanging the usual join request and join response, which can save on downlink bandwidth, and allow the device to work when downlink reception is difficult. However, in LoRaWAN 1.0, the ABP mechanism is somewhat problematic. It either suffers from a lack of security (if you configure your device to reset it's uplink frame counts when it resets), or difficulty with configuration (if you don't reset the frame counts, and are in a region requiring dynamic channel configuration). These issues are fixed in the LoRaWAN 1.1 specification, but since the fix negates the chief advantage of ABP by requiring some downlink traffic, we recommend OTAA.
+
+How The Oyster Locates
+
+The Oyster uses an accelerometer to detect movement, allowing it to decide when an asset is in-trip, and when it is stationary. This allows it to schedule the battery-hungry GPS fixes and transmissions as infrequently as possible, to maximize battery life. Each time a status update is scheduled, the Oyster will attempt a GPS fix, then transmit the results (whether or not the fix succeeded). You can configure the Oyster to transmit a status update:
+
+Periodically (ie. 24-hour heartbeat)
+At configured times of the day
+At the start of a trip
+During the trip
+At the end of the trip
+During after-hours trips
+When the 'Man Down' status changes
+Since GPS fixes are very battery hungry, attempting to track an asset full-time will give a relatively short battery life. By comparison, if the Oyster is configured to ignore movement and simply transmit a status uplink once per day, a battery life of over 5 years is readily achievable. If you need lower latency updates, the next step is to enable transmissions at the end of trips. Finally, full tracking is obtained by enabling the in-trip transmissions.
+
+How The Oyster Uses LoRaWAN Airtime
+
+LoRaWAN devices can transmit at various data rates, usually denoted DR0, DR1, DR2, and so forth. The lowest data rate (DR0) takes the longest to transmit, but has the longest range. As the data rate goes up, the range goes down a bit, and the transmission time goes down a lot. Oysters can be configured to use a particular data rate, or a range of data rates (ie. DR2-DR4). Lower data rates will have the longest range, but also use the most battery power and airtime. When configured to use a range of data rates, the Oyster spends an equal amount of airtime using each data rate. The Oyster also has optional Adaptive Data Rate support, which allows the network server to intelligently control the data rate.
+
+There are several factors limiting the maximum transmission rate of an Oyster:
+
+Radio regulations may limit the transmission time
+In Europe the law limits you to 36 seconds of transmit time per hour on most frequencies
+Whereas in Australia there is no legal limit
+Networks may limit the transmission time, to prevent congestion
+The Things Network for instance limits you to 30 seconds of transmit time per day
+At DR0, this gives you 20 messages with 100% range
+At DR1, this gives you 36 messages with 75% range
+At DR2, this gives you 80 messages with 50% range
+At DR3, this gives you 145 messages with 37% range
+At DR4, this gives you 265 messages with 28% range
+At DR5, this gives you 486 messages with 21% range
+In America, data rates are all two increments higher, so DR0 corresponds to DR2 in the above list
+Networks may limit the number of messages, for billing purposes
+Your network might require you to pay more for higher throughput
+Battery life may prove to be a limiting factor
+An Oyster can only send around 5 thousand messages at DR0 on one set of batteries, in typical asset location scenarios
+In asset tracking scenarios the GPS doesn't use as much battery per fix, so you can get around 25 thousand messages
+Using a higher data rate will use less battery per transmission, but doesn't change the battery use of the GPS
+Battery capacity required for one transmission at DR0 is 0.039 to 0.052 mAh, compared to a 1 minute GPS fix of 0.58 mAh
+The radio regulations are automatically enforced by inserting delays between messages where required. It is up to the user to configure their Oyster with a low enough transmission rate to meet network and battery life requirements.
+
+How The Oyster is Configured
+
+The Oyster is configurable over-the-air using downlinks. Websites integrating the Oyster can find the complete protocol specification here. Initial configuration of the region and JoinEUI, as well as firmware updates, are performed with a plug-in USB adapter and a Windows configuration app. An adapter can be obtained from your Oyster distributor. The adapter plugs into the four pin connector below the battery compartment.
+
+To read the available parameters, select your adapter from the drop-down list in the top right, and click Start. The configuration tool will read continuously, and display the existing parameters in the center column. To program new parameters and firmware, enter the desired parameters in the right hand column, and check the Program Parameters checkbox. To update the firmwares only, check the Program Firmware checkbox, and leave the Program Parameters checkbox clear.
+
+
+
+If you click the DevEUI List button, a list of scanned DevEUIs will pop up. You can hot-plug the adapter into many Oysters in sequence to populate the list. Each time an Oyster is programmed the parameter list will flash, the DevEUI list will update, and a chime will sound. The list is in CSV format, so it can be imported into a spreadsheet easily.
+
+The top line in the display shows the DevEUI and version string. In the screenshot above, the DevEUI is 70B3D57050000A09, and the firmware version is 60.2.2.4 (product, hardware revision, major, minor). The configured encryption keys and EUIs can be found in the DevEUI list on the right. Hovering the cursor over a line reveals an action menu ('...') and a help pop-up ('?'), from which you can copy, reset, and inspect parameters and sections. Save and load functions are available in both the File menu and the All Parameters action menu.
+
+
+
+Configuration Options
+
+ There are many settings, but only a handful require customization. These are highlighted below.
+
+General
+
+Heartbeat Fix (0-7620 mins):
+
+The maximum time between status updates. Setting to 1.00:00 results in at least one status update per day. If movement causes additional updates, the next heartbeat update is scheduled for 24 hours after the last movement update. The default is 24 hours.
+
+In Trip Fix (0-7620 s):
+
+The time between status updates when in-trip. Set to zero to disable these updates entirely. Note that in Europe, radio regulations will prevent the effective time between transmissions from dropping lower than about 140 seconds when using the lowest data rate. The default is 10 minutes, to improve the response time when testing, but a more conservative value on the order of an hour makes more sense in terms of battery life.
+
++ After Hours:
+
+The time between status updates when in-trip, and after-hours. This allows you to specify different detail levels outside of normal working hours. You can use it to save battery by not tracking non-business trips, or to provide detailed tracking in the event of theft. Set to zero to disable in-trip fixes when after-hours. The default is 10 minutes.
+
+Trip End Timeout (0-2550 s):
+
+The time required before a trip ends, if no movement is detected. Set to zero to disable trip tracking entirely, which saves a small amount of power by disabling the accelerometer. You will still get heartbeat fixes with the trip tracking disabled. The default is 5 minutes.
+
+Fix On Start:
+
+When set, a status update (GPS fix and transmission) is scheduled at the start of a trip. This is usually a wasteful option, since the start position is generally already known from the end of the previous trip. The default is true.
+
++ After Hours:
+
+When set, a status update is scheduled at the start of a trip when the trip is after-hours. You can use this to implement theft alerting. The default is true.
+
+Fix On End:
+
+When set, a status update is scheduled at the end of a trip. This lets you know where the asset is, with one caveat - if the destination is under cover, it may have no GPS signal, resulting in a transmission, but no position update. The default is true.
+
++ After Hours:
+
+When set, a status update is scheduled at the end of a trip when the trip is after-hours. The default is true.
+
+Disable Statistics:
+
+By default the Oyster will send a statistics message every 3 days. The statistics help keep track of battery usage, and diagnose GPS and vibration issues. However, you may wish to disable the statistics to minimize transmissions.
+
+Basic LoRaWAN
+
+Region:
+
+This selects the radio frequencies to use according to your country. Please be sure to select the correct region, to maintain compliance with your country's radio regulations. Oysters leaving the factory are currently pre-configured for either the European 868 MHz band, US915 or AS923 1.0.3, depending on their hardware type. However, this is subject to change, and in the future the region may be left unset. If the region is unset, the Oyster will not transmit until configured. Otherwise, to prevent the Oyster from transmitting before configuration, click the Start button on the tool, and plug the cable into the Oyster, before inserting the batteries. The region cannot be reconfigured over the air.
+Next to the region you will see the associated LoRaWAN Regional Parameters revision. Currently only AS923 and AU915 have multiple revisions to choose from:
+
+ In AS923, the 1.0.3 version uses both SF10 and SF9 for join requests, rather than just SF10 in the 1.0.2 version
+ In AU915, the 1.0.3 version supports the new 'uplink dwell time' restriction, so it joins at SF10 instead of SF12
+Sub-Band / Channel Mask:
+
+In fixed channel regions (US915 and AU915) you can select a sub-band or channel mask, instead of using all 72 channels at startup. Strict compliance with the LoRaWAN standard requires enabling all channels, but if you are confident that your network will not change its operating frequencies, choosing a sub-band speeds up the join process. If you choose a custom channel mask, the hex string you must provide has the lower numbered channels on the right hand side. For instance, 010F in hex is 100001111 in binary, and selects channels 0-3 and 8. On some older network servers, choosing a sub-band might be mandatory to avoid packet loss. The default is 'All'.
+
+Activation:
+
+This chooses between the default (and recommended) Over The Air Activation, and Activation By Personalization. In OTAA, the Oyster and the network server generate the session encryption keys and device address during a join request / join response exchange. In ABP, you have to generate the encryption keys and device address beforehand, and configure them. When choosing ABP, you also have to choose your LoRaWAN version.
+
+Reset FCnts:
+
+This option is available in ABP 1.0 only, and resets the uplink and downlink frame counts whenever the device is reset. This defeats the encryption entirely, but is required by many networks in LoRaWAN 1.0, so that the network server can detect the device reset and reconfigure the device's channels. It is vital that you pick the setting appropriate to your network, or your device may stop connecting after a reset. If you're not sure, you should probably choose 'Yes'. The default however is 'No', for strict compliance and security.
+
+JoinEUI / AppEUI:
+
+In OTAA, this identifies the server your device is registered with. If you don't set a custom JoinEUI, the default for the Oyster LoRaWAN (70-B3-D5-70-50-00-00-00) will be used. In LoRaWAN 1.1, changing the JoinEUI resets the cryptographic counters used by the join server (RJCnt1, DevNonce and JoinNonce). So if you reset the counters on your join server without changing the JoinEUI there, you can reset them on the device by choosing a temporary JoinEUI, writing it to the device, and then configuring it back again.
+
+NwkKey (1.1) / AppKey (1.0):
+
+In OTAA, this 32 character key authenticates the Oyster with the network server. If you don't set a custom key, the Oyster will use a unique random key, which was written to it in the factory. This default key can be read from the DevEUI list dialog, or the label on the box. It is not printed on the Oyster's label. This key cannot be reconfigured over the air. Please note that this key was renamed by the LoRaWAN standard in the 1.0 to 1.1 upgrade, in the most confusing way possible. So the label on your Oyster will either read AppKey (with no version number), or NwkKey.
+
+AppKey (1.1):
+
+In OTAA, this 32 character key authenticates the Oyster with the LoRaWAN 1.1 application server. This key isn't needed in LoRaWAN 1.0. If you don't set a custom key, the Oyster will use a unique random key, which was written to it in the factory. This default key can be read from the DevEUI list dialog. If your Oyster is new enough, it will be written on the label on the box. On older devices, only the AppKey (1.0) is on the label.
+
+Device Address:
+
+This 8 character number identifies the Oyster with the network server. It is only applicable to ABP activation.
+
+FNwkSIntKey / SNwkSIntKey / NwkSEncKey / AppSKey:
+
+These are the 32 character ABP session keys. Only the first and last are required in LoRaWAN 1.0. They may be referred to as the Network Session Key (NwkSKey) and Application Session Key (AppSKey) on your network server.
+
+Advanced LoRaWAN
+
+Adaptive Data Rate:
+
+ADR is a server side mechanism for controlling the data rate, to optimize network capacity and battery life. By default, the Oyster only requests ADR when out-of-trip. When in-trip, it controls its data rate according to the configured range. Once the trip ends, it switches to its lowest configured data rate and maximum power, and begins requesting ADR from the server. Thereafter, the network server will configure it to a lower power mode if appropriate. You may wish to instead force ADR on at all times, in order to control it using a policy on the network server. It is also possible to force it off at all times, but this can lead to issues on older network servers.
+
+Min / Max Data Rate:
+
+These parameters select the minimum and maximum data rates to transmit at, when ADR is not active. A '0' selects DR0, the lowest data rate with the longest range. If you set both parameters to the same value, the Oyster will always use that rate. If you choose a range, the Oyster will alternate between the allowed data rates in such a way as to spread the transmit time evenly. This means it will use the higher data rates more often. Using a range of data rates allows the network to support more devices per gateway, but reduces your guaranteed range to the range of the highest data rate. Using higher data rates may allow you to send more messages per day. Please see the section 'How The Oyster Uses LoRaWAN Airtime' above. The default is DR0-DR2.
+
+Roaming Rejoin Uplink Period / Time Period:
+
+This sets the initial maximum number of uplinks / minutes between Rejoin0 Requests in LoRaWAN 1.1. These requests facilitate roaming, and can be reconfigured by the network server at runtime. The default values are the maximums, effectively disabling these requests until the server asks for them.
+
+Rejoin / Reset Time Period:
+
+By default, the Oyster rejoins the network once a week, in case the network server has somehow forgotten the session keys. This period can be extended to up to 255 days, or disabled entirely (0). However, if a device is accidentally deleted on the network server, or the network server suffers a database failure and loses the session keys, the server will be unable to decrypt any device data until it has rejoined. Rejoining weekly generates several extra transmissions, but lowers the time spent out of service in the event of an accident. The exact rejoin behavior depends on the Activation and LoRaWAN version:
+
+In ABP, the rejoin is equivalent to removing and reinserting the batteries. All protocol state is reset, with the exception of the uplink and downlink counters (unless you have chosen to reset them as well, in LoRaWAN 1.0)
+In OTAA 1.0, the rejoin is also equivalent to removing and reinserting the batteries. A regular Join Request will be sent.
+In OTAA 1.1, a Rejoin1 Request is used to rejoin without resetting any protocol state. Please note that older network servers might not support this mechanism.
+ADR Ack Limit / Delay:
+
+This parameter control the number of uplinks between checks that the server can still hear the device when ADR is active. The device starts asking for a response once the Limit is reached, and if no response if heard after Delay attempts, the device switches to a lower data rate. The default values (64 and 32) are very slow. Please consult your network support before choosing more aggressive settings, as they may have policies forbidding lower values. In LoRaWAN 1.1, these values can also be set dynamically by the network server.
+
+Receive / Join Delay:
+
+These setting control the timing between a request and a response on the network. You shouldn't change them from the defaults unless instructed to by your network. The defaults are 1 and 5 seconds respectively.
+
+Repetitions:
+
+This sets the default number of frame repetitions (called NbTrans in the standard). Usually this value is one, until the server requests a higher number. You shouldn't change this value unless you have special requirements (for instance, a transmit-only ABP configuration).
+
+Tx EIRP Limit:
+
+This setting restricts the transmit power to the given value, in dBm EIRP. This allows you to save a small amount of battery on the transmission, and limit the peak current draw from the batteries. Limiting the current may be useful in extreme cold weather (less than -20°), where lithium batteries begin to struggle. A setting of 11 dBm drops the peak current from 127 mA down to 34 mA, which is roughly the same as the GPS module current. Lower values are not recommended. Your network server may require knowledge of the maximum power to correctly operate its ADR algorithm. In this case, be sure to configure the device accordingly on the server. The default is maximum power.
+
+Random Tx Delay:
+
+This parameter allows you to insert a random delay before transmission. This may be useful in applications involving a large number of assets on the same vehicle. The random delay spreads the transmissions out, so they don’t interfere with each other. Note that the GPS timing already provides some measure of built-in randomness, so this isn't essential if less than 10 units are involved.
+
+The amount of delay required depends on the data rates in use. For a single spreading factor, you need approximately (Number of units) / 1500 * 1.9^SF). For instance, for 100 units at SF10, you'd need 100 / 1500 * 1.9^10) = 613 / 15 = 41 seconds.
+For multiple spreading factors, the formula is (1/DelayA + 1/DelayB + 1/DelayC + ...)^-1, where DelayX is the delay required for one of the spreading factors. So for 100 units at both SF10 (41 seconds) and SF9 (22 seconds), you'd need (1/41 + 1/22)^-1 = 14 seconds.
+The default is 0 seconds.
+
+Accelerometer
+
+Wakeup Threshold (0.063-0.5 G):
+
+This sets the amount of force, in increments of 63 mG, that will wake the accelerometer up. Setting it too high might result in trips being missed. Increase this value if you have a problem with small vibrations setting off spurious trips. The default is 0.125 G.
+
+Wakeup Duration (0-960 ms):
+
+This is the required time duration, in increments of 80 ms, of the force that will wake the accelerometer up. Increasing this value will make the accelerometer less sensitive to short, sharp forces, but increases the chances of a trip start being missed. The default is 80 ms.
+
+Disable Wake Filter:
+
+Set to disable the trip-start filtering, that is usually applied in addition to the Wakeup Threshold and Wakeup Count. The wake filter rejects small disturbances, requiring sustained jostling before a trip starts. This is good for battery life, but if you require higher sensitivity, or the filtering is causing too much latency for your application, you can disable it. The filter only starts a trip when it has seen 1 seconds worth of above-threshold movement in a 4 second period, or repeated short movements over several 4 second periods. This setting disables the filter during work hours only. The default is false (not disabled).
+
++ After Hours:
+
+Set to disable the trip-start filtering after-hours. This can be useful for theft alerting, as it allows you to detect even minor bumps after-hours, without producing many false positives during normal work hours. The default is false (not disabled).
+
+Basic GPS
+
+Coarse Accuracy Mask (5-100 m):
+
+This is the required position accuracy for a position fix to be considered valid. It provides a lower bound on accuracy. Please note that it works on the estimated accuracy, and it is not uncommon for position fix errors to occasionally be two or three times larger than the mask. Also note that values lower than 20 will be difficult to achieve in practice. The default is 75 meters.
+
+Fine Accuracy Target (0-255 m):
+
+This is the target accuracy for the GPS Fine Timeout setting. The default is 20 meters. Note that values lower than about 6 are not reliably achievable with consumer GPS technology, and will lead to the full GPS Fine Timeout elapsing on each fix attempt.
+
+Coarse Timeout (0-7620 s):
+
+The maximum time to spend waiting for the GPS to get a coarse position fix, per attempt. This limits the battery drain if there is no GPS signal. Values lower than 60 are likely to be problematic in practice, with 35 being an absolute minimum in very good signal. This setting is augmented by the GPS signal validator described in GPS Detect Time below. The default is 3 minutes. Note that the first fix attempt after battery insertion will always try for at least 10 minutes, regardless of any configured limits. If a fix times out the fix failed flag will be set and a message with the last known coordinates will be sent. 
+
+Fine Timeout (0-7620 s):
+
+The maximum time to spend waiting for the GPS accuracy to improve, after a coarse fix is achieved. Once the GPS manages to get a fix satisfying the minimum accuracy targets (Pos Acc Mask below), it waits up to GPS Acc Timeout for the accuracy to improve to GPS Acc Target. This allows you to set an opportunistic accuracy goal, and fall back to a lower accuracy if the goal can't be met. Zero disables the feature. The default is 5 seconds.
+
+Advanced GPS
+
+Require 3D Fix:
+
+This requires that a position fix use 4 satellites, and calculate a height as well as latitude and longitude, before being considered valid. It is recommended, as using only 3 satellites gives less redundancy in the rare event of a satellite failure, increasing the risk of a position fix giving an erroneous result. However, disabling this option can allow fixes to proceed faster, and in adverse conditions such as urban canyons. The default is false.
+
+Discard First Fixes (0-32):
+
+This option discards the first few valid position fixes from the GPS module. This gives the module some time to refine and cross-check its estimate, reducing the risk of an erroneous fix in the rare event of a satellite failure. We recommend the default value of 3.
+
+Speed Accuracy Mask (3-20 km/h):
+
+This is the required accuracy of the speed component of a fix, before the fix is considered valid. The default is 10 km/h.
+
+PDOP Mask (2.5-10):
+
+The PDOP is a measure of how imprecise a GPS fix is, due to the satellites used being too close together to triangulate effectively. This parameter sets an upper bound on the imprecision, for a fix to be considered valid. You can safely use the default value, and specify the Coarse Accuracy Mask instead. The default is 10.
+
+Optimize for Trip Tracking:
+
+This option enables speculative 'freshening' of the GPS satellite information. If enabled, the GPS is kept on for a bit longer than necessary after getting a position fix, downloading all outstanding satellite information. This speeds up the next GPS fix. The extra listen time is only scheduled during trips, or if Autonomous Aiding is enabled. This option should improve battery life for trip tracking applications, but should be left disabled for applications that will generate very few (< 4) position updates in-trip. The default is enabled.
+
+Time Budget (0-7620 s):
+
+This setting allows you to set a daily GPS on-time budget. When non-zero, the Oyster will refuse to spend more than this number of total seconds per day trying to get GPS fixes. This prevent the battery being run down if a lot of unforeseen movement occurs. Once the budget for the day is expended, further GPS fixes and LoRaWAN transmissions are skipped. The default is zero, which disables the feature.
+
+GPS Model:
+
+This informs the GPS module of what sort of motion to expect from the asset, allowing it to make better estimates when moving. The Automotive setting is a safe default, but the Pedestrian and Stationary settings may be useful as well. Setting the model appropriately allows the GPS to filter out noise more effectively.
+
+Satellite Detection Margin (-16-15 dB):
+
+This option adjusts the signal levels required for the GPS signal validator, described below. Setting it higher than 0 requires that GPS signals be stronger, setting it lower than 0 allows them to be weaker, without the signal validator giving up on a fix attempt. The default is 0 - just strong enough to work.
+
+Nth Satellite Timeout (0-1275 s):
+
+These four numbers are timeouts for the GPS signal validator. The signal validator augments the GPS Fix Timeout. While the Fix Timeout is a hard deadline for a fix to succeed, the signal validator looks at the signal strength, and gives up early if the signal is too weak to expect success. The validator is configured with four timeouts, which are the time allowed for the acquisition of the first four suitably powerful satellite signals. For instance, values of (60, 50, 40, 30) would require one strong satellite before the 60s mark, two strong satellites by the 60+50=110s mark, three by the 150s mark, and four by the 180s mark. Setting the first value to zero disables the feature. The defaults are all 1 minute. Setting the first value lower than 45 seconds is not recommended. Like the GPS Coarse Timeout, 35 seconds is an absolute minimum.
+
+Autonomous Aiding:
+
+This enables a GPS feature that predicts future satellite movements, so that position fixes can proceed without listening for all of the satellite information the next time the satellite is in view. It can help fixes succeed in low signal levels, but greatly decreases the accuracy of the fixes. The default is false.
+
+Max Aiding Error (5-1000 m):
+
+This provides a rough limit on the additional error introduced by the Autonomous Aiding feature. This error cannot be detected by the GPS module, so it can't be filtered out by the Pos Acc Mask setting. The actual error can be several times the value set here. Autonomous Aiding is unlikely to be of any use if this value is set below 50. The default is 100 meters.
+
+Timezone
+
+Timezone:
+
+This is the timezone used for after-hours calculations. The default is UTC.
+
+DST Shift:
+
+This is the amount of time that the clock shifts during daylight savings time, if applicable. It applies only to the after-hours and scheduled uploads calculations, and will usually be one hour, or zero to disable daylight savings. The default is disabled.
+
++ Start / End Nth / Day / Month / Time:
+
+These parameters allow you to specify the start and end times of daylight savings, if DST Shift is nonzero. They only apply to the after-hours calculations.
+
+Most countries use a relative specification such as 'The 1st Sunday of April, at 02:00 local time', or 'The Friday before the last Sunday of October, at 2:00 local time'.
+
+For the first example you would choose '1st', 'Sunday', 'April', '2:00'. For the second, you'd choose 'Last', 'Sunday', 'October', '-2d 02:00'.
+
+You can also choose a fixed date and time using for instance 'Absolute Day', 'Day 28', 'April', '02:00'.
+
+The time is always in the current local time zone, including any daylight savings adjustment.
+
+After Hours
+
+Mon / Tue / ... After Hour Start / End:
+
+These parameters allow you to specify which times are after-hours, for the purpose of applying different trip tracking parameters at those times.
+
+Set both the start and end parameters to 00:00 to disable (default).
+
+Set the start to 00:00, and the end to 24:00, to make the entire day after-hours.
+
+Setting a start time to before the end time makes the intervening times after-hours.
+
+Setting the start time to after the end time makes the times between 00:00 and the end time, and between the start time and 24:00, after-hours.
+
+Scheduled Uploads
+
+Scheduled Uploads 1-12:
+
+A heartbeat can be configured, with up to 12 slots, to log a heartbeat at a specific time of the day. This time is set in local time (using the configured timezone and DST) with 7.5 minute intervals. The upload will occur within a variance period of 10 minutes. By default the slots are disabled (00:00:00).
+
+Man Down
+
+Man Down Timeout:
+
+The Man Down indicator is a bit in the Oyster's extended uplink which shows if the device has stopped moving for a configurable time. This can be used to detect if an asset has been idle for a few weeks, a car has been stopped for a few hours, or if livestock have died. The timeout can be set from 10 minutes to 21h10m, in 10 minute increments, or from 1 day to 63 days 12 hours, in 12 hour increments. A value of 0 disables Man Down indication. Note that since the Man Down indicator bit is not present in the standard uplink (port 1), enabling Man Down causes the extended uplink (port 4) to be sent instead. The default is disabled.
+
++ Fix On Set:
+
+This chooses what action to take when the Man Down indicator bit becomes set. You can choose one of:
+
+Do nothing - the bit will upload when the next heartbeat is sent (default)
+Transmit once, assuming the network connection is ready (join has been successful)
+Keep retrying (with backoff) until the network connection is ready, then transmit once
+The current firmware only supports unconfirmed uplinks, even when retrying.
+
++ Fix On Clear:
+
+This chooses what action to take when the Man Down indicator bit becomes clear, and is configured as above.
+
+Custom Channels 1-8
+
+Channel Number:
+
+In variable channel regions (everything except AU915 and US915), it is possible to pre-configure some of the channels. Usually, the device joins on one of the two or three fixed join channels specified by the LoRaWAN Regional Parameters. Thereafter, the server configures the additional channels in the join response (with the 'CFList'), or using individual NewChannelReq messages. However, you may wish to pre-configure the additional channels manually, so that the server doesn't have to. In this case the additional channels are filled in this section, with channel numbers that follow on after the default join channels. For instance, if your region specifies two default join channels (channel 0 and channel 1), you will number your first custom channel '2'. The default value is zero, which disables the channel until the server configures it.
+
+Min / Max Data Rate:
+
+These set the range of data rates supported by the channel. Usually the minimum is zero, and the maximum is between 4 and 7.
+
+Tx / Rx Frequency:
+
+These set the channel center frequencies for uplinks and downlinks respectively. Some networks use two separate frequencies, but most will use the same frequency for both.
+
