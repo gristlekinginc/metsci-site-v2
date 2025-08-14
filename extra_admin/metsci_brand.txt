@@ -1,8 +1,0 @@
-General color scheme:
-#000000 for background
-#FA7F2A for major titles
-#D94A18 as an alternate orange
-#18A7D9 for buttons and highlights
-#FCF5F0 for body text on a dark background
-
-Gradients from orange to black wherever we use gradients

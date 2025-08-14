@@ -67,3 +67,6 @@ ENV/
 # Scripts - automation directory (keep out of git)
 /scripts/
 
+# Admin files and documentation (keep out of git)
+/extra_admin/
+
