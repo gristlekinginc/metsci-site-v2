@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="/css/custom.css">
 <script src="https://www.googletagmanager.com/gtag/js?id=G-VNEKDSD64E" async></script>
 <script src="/js/ga.js" async></script><link rel="stylesheet" href="/assets/css/styles.1539c16d.css">
-<script src="/assets/js/runtime~main.da29608e.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.989ceca2.js" defer="defer"></script>
 <script src="/assets/js/main.c2dcadbe.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -150,9 +150,9 @@
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="lone-wolf">Lone Wolf<a href="#lone-wolf" class="hash-link" aria-label="Direct link to Lone Wolf" title="Direct link to Lone Wolf">​</a></h4>
 <p>If you&#x27;re a lone wolf, you&#x27;ll have to set all of this up on your own, including the map, the database to store all the points, and where you&#x27;re going to embed and display everything.</p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="running-with-the-wolfpack">Running with the Wolfpack<a href="#running-with-the-wolfpack" class="hash-link" aria-label="Direct link to Running with the Wolfpack" title="Direct link to Running with the Wolfpack">​</a></h4>
-<p>If you&#x27;re running with the wolfpack (i.e. contributing to the <a href="https://mapgrid.ai" target="_blank" rel="noopener noreferrer">MAPGRI_AI</a> project), in your MetSci <code>Application</code> set up an http integration to post to the MAPGRID database.</p>
+<p>If you&#x27;re running with the wolfpack (i.e. contributing to the <a href="https://mapgrid.ai" target="_blank" rel="noopener noreferrer">MAPGRI_AI</a> project), in your MetSci <code>Application</code> set up an http integration to post to the MAPGRID database.  This will ONLY work if you have a Nanotag that I gave you (or that you&#x27;ve given me the DevEUI of)</p>
 <p>Set Payload encoding to <code>JSON</code>.</p>
-<p>Set the event endpoint to <code>POST https://mapgrid.ai/submit-data</code></p>
+<p>Set the event endpoint to <code>https://mapgrid.ai/submit-data</code></p>
 <p>Set the Headers to:
 Key <code>Content-Type</code> and Value <code>application/json</code></p>
 <p>Then hit <code>Submit</code>.</p>
