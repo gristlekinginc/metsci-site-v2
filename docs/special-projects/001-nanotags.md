@@ -56,9 +56,9 @@ No buttons, no programming hookups, just tear off the bottom strip to activate a
 
 Obvi I chose Helium as my LoRaWAN, and [MeteoScientific](https://console.meteoscientific.com/front/login) as my LNS. There is no network out there with greater coverage globally and it’s bloody cheap to use. 
 
-Since this is a `SPECIAL PROJECT`, I'll go through the whole thing from the beginning.  If you're just looking see where YOUR Nanotag is on the map, that feature is coming but not here yet.  
+Since this is a `SPECIAL PROJECT`, I'll go through the whole thing from the beginning.  By the end you'll be able to see approximately where your Nanotag is on a map, but it will NOT be with the precision of what you're used to with GPS/GNSS. 
 
-Let’s start with getting this thing onboarded, then I’ll give you the yet-unsolved challenge.
+Since many of you are folks I've met and given a Nanotag to, and you may not be familiar with how the system works, let’s start with getting this thing onboarded.
 
 ### Open a MetSci Console Account
 
@@ -115,7 +115,7 @@ Hit the link, follow the directions, and you’ll see something like this:
 ### Multi Buy - Secret Weapon Part 1
 Go up to `Tenant details` and we’ll set up multi-buy.  In a private console you could do this on a per Application basis, but due to the public and permissionless nature of the MetSci Console you can only set this per account/tenancy.
 
-`Multi-Buy` means what it says; we're going to buy multiple copies of the same packet.  We'll do this because we'll then get the data from multiple gateways, giving us a VERY rough idea of where our NanoTag is in relation to those gateways.
+`Multi-Buy` means what it says; we're going to buy multiple copies of the same packet.  We'll do this because we need to get data from multiple gateways, giving us a VERY rough idea of where our NanoTag is in relation to those gateways.
 
 #### Multi Buy Settings
 
@@ -139,7 +139,7 @@ Go to `Tenant Details` in the top left, look for `Multi-Buy` on the right, and s
   />
 </div>
 
-Multi-Buy allows us to use a type of positioning called `multi-lateration`, which is well-known in the world of radio.  Ham nerds will go "fox-hunting" to find a transmitter, meaasuring the signal strength and clarity from different locations to get a bunch of lines that converge at the transmitter location.  That, by the way, is fun, but it's patty-cakes compared to what we're attempting.
+Multi-Buy allows us to use a type of positioning called `multi-lateration`, which is well-known in the world of radio.  Ham nerds will go "fox-hunting" to find a transmitter, meaasuring the signal strength and clarity from different locations to get a bunch of lines that converge at the transmitter location.  
 
 #### Multi Buy Cost
 
@@ -228,8 +228,7 @@ Now select  `Applications` in the menu on the left, then look for `Add Applicati
 Name your application (I'll use `NanoTag MapGrid`) as my name for this project, but you can call your application whatever you want.  Drop something in the description if you'd like, I usually write myself a little note and include any links, like this:
 
 ```
-This is for the relational mapping project with the Nanothings Nanotags on MeteoScientific, 
-where the goal is to see if we can map out a relational network that maps to the real thing.  
+This is for seeing where my Nanotag is, I should be able to view it on mapgrid.ai.  
 More at meteoscientific.com/docs/special-projects/nanotags
 ```
 
@@ -269,7 +268,7 @@ Now, **BEFORE** you tear the tag and activate your Nanotag, let's talk about wha
 
 ### Wolfpack or Lone Wolf
 
-Most of you reading this will have gotten a NanoTag from me under the general assumption that you'll activate it and contribute your SNR/RSSI/temp readings to a database that I maintain as part of this exploration into how far we can go with relational mapping.  
+Most of you reading this will have gotten a NanoTag from me under the general assumption that you'll activate it and contribute your SNR/RSSI/temp readings to a database that I maintain, which will in turn allow you to see roughly where your NanoTag is.  
 
 There's no actual obligation to do that; you can stick the tracker on a package and send it to your Aunt Mabel then have her slap it on Uncle John's car to see if he's really going to the barbershop every Thursday or if, ahem, some other game is afoot.  That's probably illegal by the way, and I'm not telling you to do that; I'm just saying you don't HAVE to contribute to the [MAPGRID_AI](https://mapgrid.ai) project.
 
@@ -277,7 +276,7 @@ If you're Lone Wolfing it you'll have to set up your own integration to store th
 
 For those of you who want to go a little further with me, here's what to know and set up next BEFORE you rip that tag.
 
-## The Unsolved Challenge
+## Accurate & Precise Positioning Is Hard
 I’ve been fascinated lately by the idea of doing the most with the least, and having a thing that transmits just three things (temp, RSSI, and SNR) and not GNSS location, not jostles or shocks via accelerometer, not occupancy, nothing, is a nice clean restriction.
 
 Of course, you DO get what gateway the thing comes through along with the two key aspects of signal strength and clarity (RSSI and SNR), so you can get a rough idea of location.
@@ -294,9 +293,7 @@ So, not only do we have not fine-tuned locations, our reported locations may be 
 
 Why?  Because it’s hard, it's fun, and as far as I can tell, solving it accurately is quite difficult and requires a certain set of conditions which just happen to exist in San Diego, where I live.
 
-Let’s start by imagining what we’re doing first:  We’re going to build a network map solely from the only knowledge we have: the RSSI (Received Signal Strength Indicator) and the SNR (Signal to Noise Ratio) of the devices.  For now, we'll ignore the temperature.
-
-We’re not even going to use the gateway's locations at first; we’re going to build a map based off of many devices that all fire off packets and travel around.  Each time a packet is fired, we create a `fingerprint` of wherever that Nanotag is.
+Each time a packet is fired from a NanoTag and received by up to 6 gateways, we create a `fingerprint` of wherever that Nanotag is.
 
 #### Fingerprints
 
@@ -377,40 +374,18 @@ As we start adding more gateways heard by two Nanotags isntead of one, we start 
 
 Obviously this is over simplified, and with so little information we have no way of knowing whether we're getting "correct" distances from the RSSI/SNR readings or if they're being distorted by passing through foliage, buildings, or just a few walls.
 
-As more and more Nanotags travel around, sometimes covering the same location but often times different locations, we slowly get a clearer and clearer understanding of where eveyrthing is in **relation** to everything else.  We still don't know where we are in the phsyical world, we just get a more relationally accurate map of how the network exists.
+As more and more Nanotags travel around, sometimes covering the same location but often times different locations, we slowly get a clearer and clearer understanding of where everything is in **relation** to everything else.  We still can't totally trust the gateways, but as more of you activate your Nanotags and more readings go into the database, we can build a better and better map together.
 
 At first we just know that one point exists, then that 2 points exist in relation to each other, than 3, 4, 10, 100, 10,000.
 
 At some point, your relational map starts to match up to a place in the real world; your latent map becomes a real one.
 
-In order to get there, you need a way to sort through the mess.  I did that by building a model using machine learning to shape and train it on a few million data points from hundreds of synthetic cities, buildings, gateways, and transmitters that custom built for this job; basically my own little world.
+In order to get there, you need a way to sort through the mess.  I did that by building a model, which is what drives the map display.
 
-#### Sim (RF) Cities
-
-
-<div style={{
-  display: 'flex',
-  justifyContent: 'center',
-  margin: '20px auto'
-}}>
-  <video 
-    src="https://video.meteoscientific.com/building-synthetic-rf-data.mp4"
-    controls
-    style={{
-      maxWidth: '800px',
-      width: '100%',
-      borderRadius: '8px',
-      border: '4px solid var(--metsci-primary)',
-      boxShadow: '0 4px 12px rgba(217, 74, 24, 0.15)',
-    }}
-  />
-</div>
-
-With the model built and tested it, with current results at best of `2 km` and averaging `7 km`; not bad for no GNSS data!  We'll improve that with `golden gateways` and `golden transmitters`, but first let's move on to getting some data flowing in.
 
 ### Start Your Engines!
 
-This part's easy; you've already added the NanoTag to your MetSci console, all you have to do is tear off the bottom tab.  
+Now that you have some background on how this work, the next part's easy.  You've already added the NanoTag to your MetSci console, all you have to do is tear off the bottom tab.  
 
 Watch over in Console to make sure it joins.  
 
