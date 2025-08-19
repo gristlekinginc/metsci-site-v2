@@ -238,7 +238,7 @@ Hit `Submit`.
 
 Now you'll be back in `Applications`. Hit the `Add device` blue button on the top right and plug in a `Name` (I usually use the device name and then the last four of the S/N, in this case `NanoTag 0820`).
 
-You'll need your Device EUI, or DevEUI if you want to say it the cool way.  You should have that from wherever you got your Nanotag from.  
+You'll need your `Device EUI` and `JoinEUI`.  You should have those from wherever you got your Nanotag from.  
 
 <div style={{
   display: 'flex',
@@ -389,10 +389,6 @@ Now that you have some background on how this work, the next part's easy.  You'v
 
 Watch over in Console to make sure it joins.  
 
-:::tip
-I've found that sometimes you don't immediately get a join.  Sometimes you do.  If you don't get one right away, try adding the `JOINEUI` (which you should have from the same place you got your DEVEUI and APPKEY).
-:::
-
 You'll need to be within Helium coverage, must urban and suburban places are, but you can double check over on the [Helium World Explorer](https://world.helium.com/en/network/iot/coverage).  As you can see, San Diego has excellent coverage.
 
 <div style={{
@@ -520,7 +516,7 @@ Then hit `Submit`.
 You're now contributing to the **MAPGRID_AI** map, thank you and nice work!  
 
 :::note
-As of Aug 13th, 2025, contributing to the map only improves the certainty of gateway location, it does NOT show you were your Nanotag is. 
+As of Aug 2025, contributing to the map only improves the certainty of gateway location, it does NOT show you were your Nanotag is. 
 :::
-As more data comes in, the model will continually be refined and improved, Demonstrating that with very few classes of information and a shitload of data points, a remarkably surprising accuracy can be achieved.
+As more data comes in, the model will continually be refined and improved.
 
