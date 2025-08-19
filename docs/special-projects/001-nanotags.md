@@ -482,7 +482,7 @@ From here, you'll want to send the data somewhere.
 If you're a lone wolf, you'll have to set all of this up on your own, including the map, the database to store all the points, and where you're going to embed and display everything.
 
 #### Running with the Wolfpack
-If you're running with the wolfpack (i.e. contributing to the [MAPGRI_AI](https://mapgrid.ai) project), in your MetSci `Application` set up an http integration to post to the MAPGRID database.  This will ONLY work if you have a Nanotag that I gave you (or that you've given me the DevEUI of)
+If you're running with the wolfpack (i.e. contributing to the [MAPGRID_AI](https://mapgrid.ai) project), in your MetSci `Application` set up an http integration to post to the MAPGRID database.  This will ONLY work if you have a Nanotag that I gave you (or that you've given me the DevEUI of)
 
 Set Payload encoding to `JSON`.
 
