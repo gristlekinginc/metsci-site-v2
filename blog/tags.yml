@@ -116,6 +116,10 @@ applied micrometeorology:
   label: Applied Micrometeorology
   description: It's rad in the books, but how do you actually use it?
 
+lorawan:
+  label: LoRaWAN
+  description: Long Range Wide Area Network (LoRaWAN) is a type of wireless telecommunication network designed for long-range, low-power communication among connected devices and sensors.
+
 LoRaWAN:
   label: LoRaWAN
   description: Long Range Wide Area Network (LoRaWAN) is a type of wireless telecommunication network designed for long-range, low-power communication among connected devices and sensors.
@@ -152,3 +156,58 @@ aviation:
   label: Aviation
   description: Topics centered around aviation, including military and civilian aircraft, logistics, and operational improvements.
 
+iot connectivity:
+  label: IoT Connectivity
+  description: Articles covering the infrastructure and protocols enabling data transfer between devices and the cloud.
+
+asset tracking:
+  label: Asset Tracking
+  description: Solutions and technologies for tracking physical assets using IoT.
+
+remote sensing:
+  label: Remote Sensing
+  description: Technologies and methods for collecting data from remote locations using sensors.
+
+lpwan:
+  label: LPWAN
+  description: Low-Power Wide-Area Network technologies including LoRaWAN, NB-IoT, and LTE-M.
+
+business:
+  label: Business
+  description: The business side of IoT, including ROI, case studies, and market analysis.
+
+senior care:
+  label: Senior Care
+  description: IoT applications in elder care and monitoring.
+
+emergency:
+  label: Emergency
+  description: Use of IoT for emergency response and alerting.
+
+alert:
+  label: Alert
+  description: Systems and protocols for generating automated alerts from sensor data.
+
+networking:
+  label: Networking
+  description: General networking concepts applied to IoT.
+
+synesthesia:
+  label: Synesthesia
+  description: Exploring the intersection of sensory experience and data visualization.
+
+global:
+  label: Global
+  description: International perspectives on IoT deployment.
+
+ttn:
+  label: The Things Network
+  description: Articles about the global collaborative LoRaWAN network.
+
+actility:
+  label: Actility
+  description: Posts featuring Actility and their enterprise IoT solutions.
+
+semtech:
+  label: Semtech
+  description: Updates and news regarding Semtech, the creator of LoRa technology.

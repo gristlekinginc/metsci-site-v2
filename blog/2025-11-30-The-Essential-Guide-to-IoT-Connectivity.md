@@ -31,7 +31,7 @@ A friend of mine reached out the other day asking what to use to track a [redact
     }}
   />
 </div>
-<!-- Target: 'what is iot connectivity' (50 Vol), 'iot data connectivity' (10 Vol) -->
+<!-- Target: 'what is iot connectivity' (50 Vol), 'iot data connectivity' (10 Vol) --> <!-- truncate -->
 
 It made me realize that for those of us in the thick of it, the difference between LoRaWAN and RFID is apparent, but if you're just learning about this IoT thing and haven't given any thought about how the data actually moves from where it is to where you need it, or even why, you might want a primer.  
 

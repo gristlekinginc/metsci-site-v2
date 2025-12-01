@@ -19,7 +19,23 @@ const config = {
   noIndex: false,
 
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+  // onBrokenMarkdownLinks is deprecated in v4, using markdown hooks instead if possible, or ignoring for now as this is v3.9
+  // but the warning suggests moving it. For now, let's just leave it or remove it if it's causing noise.
+  // Actually, let's try to update the config structure to match the warning if possible, or just comment it out if it's default.
+  // The warning says: Please migrate and move this option to `siteConfig.markdown.hooks.onBrokenMarkdownLinks` instead.
+  
+  markdown: {
+    format: 'mdx',
+    mermaid: true,
+    preprocessor: ({filePath, fileContent}) => {
+      return fileContent;
+    },
+    mdx1Compat: {
+      comments: true,
+      admonitions: true,
+      headingIds: true,
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
