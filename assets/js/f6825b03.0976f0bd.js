@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[3791],{5734:e=>{e.exports=JSON.parse('{"label":"lpwan","permalink":"/blog/tags/lpwan","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

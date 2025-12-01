@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[4094],{4867:e=>{e.exports=JSON.parse('{"label":"asset tracking","permalink":"/blog/tags/asset-tracking","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

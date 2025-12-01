@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeteoscientific=self.webpackChunkmeteoscientific||[]).push([[5173],{9336:e=>{e.exports=JSON.parse('{"label":"iot connectivity","permalink":"/blog/tags/iot-connectivity","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
