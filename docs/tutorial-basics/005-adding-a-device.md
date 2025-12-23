@@ -147,7 +147,7 @@ With the device on and the DEVEUI and APPKEY ready, let's head to the MetSci Con
 :::tip
 Most manufacturers will have a QR code with the device that'll give you the DevEUI so you can copy/paste from there.
 :::
-   - With some devices (like the soil moisture sensor in the video at the top of this tutorial) you generate your own DevEUI  For most of them, the DevEUI is burned in when you get it.
+   - With some devices (like the soil moisture sensor in the video at the top of this tutorial), you generate your own DevEUI.  For most devices, however, the DevEUI is burned in when you get it.
 
 5. **Add the AppEUI**
    - Chirpstack doesn't need an `APPEUI` but I'll add one in that's all zeros so you see how to do it.  Go to the `Variable` tab and add a new variable.
