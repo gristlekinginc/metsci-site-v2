@@ -12,7 +12,7 @@ date: 2026-01-01
 
 In the past few decades, citizen scientists have stretched the limit of what's possible for the average person to collect when it comes to atmospheric data.
 
-One of the ways this has happened is through pico balloons.  Unlike the much larger, up-n-burst weather balloons that are released every day by various weather predicting organizations, pico balloons are smaller, far more persistent, and much cheaper.<!-- truncate -->
+One of the ways this has happened is through pico balloons.  Unlike the much larger, up-n-burst weather balloons that are released every day by various weather predicting organizations, pico balloons are smaller, far more persistent, and much cheaper. <!-- truncate -->
 
 A pico balloon ranges in size as it goes up, expanding from a flaccid and floppy 0.0325 cubic meters, (think of billowing carry-out plastic shopping bag) to a tight spheroid of about 0.15 cubic meters (a decent sized beach ball) at an altitude of 13 km or 42k feet, about 10,000 feet higher than commercial airliners typically fly.  "We have reached our cruising altitude of 32,000 feet, sit back and enjoy the flight" is something you may have heard before.
 
@@ -72,7 +72,9 @@ A pico balloon payload that could form an **ephemeral mesh** with other balloons
 A 60 balloon network could theoretically cover 9 million square miles, or the US, China, and Canada. 
 :::
 
-This isn't to claim that a floating point-cloud of balloons would provide reliable coverage of a trade war including an impartial judge, but at under $100 per balloon launch, it's a pretty cheap way to gather lots of atmospheric data over civilizations.
+There's another huge advantage to using LoRa; it's license free.  You don't need a ham license to transmit, you just need access to a network.  I'm biased here and think you should use Helium through the [MetSci Console](https://console.meteoscientific.com/front/login) for the LoRaWAN aspect, but you could use any LoRaWAN, and LoRa itself doesn't even require the WAN part; you just set up your own mesh.
+
+All this isn' to claim that a floating point-cloud of balloons would provide reliable coverage of a trade war including an impartial judge, but at under $100 per balloon launch, it's a pretty cheap way to gather lots of atmospheric data over civilizations.
 
 ### Data Thickness
 Another limitation of WSPR is how thin the data is.  Over a two minute transmission, even [the best of the hams out there are only able to get in 6 bytes on WSPR and a few tens of bytes per frame on QRP Labs telemetry](https://www.youtube.com/watch?v=e-SyV5K_WRc).
