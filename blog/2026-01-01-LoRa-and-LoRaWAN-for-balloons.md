@@ -12,7 +12,7 @@ date: 2026-01-01
 
 In the past few decades, citizen scientists have stretched the limit of what's possible for the average person to collect when it comes to atmospheric data.
 
-One of the ways this has happened is through pico balloons.  Unlike the much larger, up-n-burst weather balloons that are released every day by various weather predicting organizations, pico balloons are smaller, far more persistent, and much cheaper.
+One of the ways this has happened is through pico balloons.  Unlike the much larger, up-n-burst weather balloons that are released every day by various weather predicting organizations, pico balloons are smaller, far more persistent, and much cheaper.<!-- truncate -->
 
 A pico balloon ranges in size as it goes up, expanding from a flaccid and floppy 0.0325 cubic meters, (think of billowing carry-out plastic shopping bag) to a tight spheroid of about 0.15 cubic meters (a decent sized beach ball) at an altitude of 13 km or 42k feet, about 10,000 feet higher than commercial airliners typically fly.  "We have reached our cruising altitude of 32,000 feet, sit back and enjoy the flight" is something you may have heard before.
 
