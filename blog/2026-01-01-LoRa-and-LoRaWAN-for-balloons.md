@@ -171,4 +171,4 @@ Let's go have a look!
 
 *****
 
-In addition to the linked sources above, giant thanks to the [Pico Ballon Group](https://groups.io/g/picoballoon), my buddy gradoj over at [StratoSonde](https://stratosonde.org/), and of course, [Dr. Matthew Patrick](https://github.com/mrpatrick1991) for nerd-sniping into pico balloons in the first place. 
+In addition to the linked sources above, giant thanks to the [Pico Ballon Group](https://groups.io/g/picoballoon), my buddy gradoj over at [StratoSonde](https://stratosonde.org/), and of course, [Dr. Matthew Patrick](https://github.com/mrpatrick1991) for nerd-sniping me into pico balloons in the first place. 

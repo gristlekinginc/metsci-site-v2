@@ -211,3 +211,11 @@ actility:
 semtech:
   label: Semtech
   description: Updates and news regarding Semtech, the creator of LoRa technology.
+
+pico balloons:
+  label: Pico Balloons
+  description: Articles about small, persistent weather balloons used for atmospheric science and long-duration flight tracking.
+
+meteo science:
+  label: Meteo Science
+  description: Meteorological science topics covering weather patterns, atmospheric conditions, and related scientific research.
