@@ -4,15 +4,23 @@
 
 import React, { useState } from 'react';
 import Layout from '@theme/Layout';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [token, setToken] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!token) {
+      setError('Please complete the security check.');
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData(e.target);
@@ -21,6 +29,7 @@ export default function Contact() {
       email: formData.get('email'),
       message: formData.get('message'),
       website: formData.get('website'), // honeypot
+      'cf-turnstile-response': token,
     };
 
     try {
@@ -137,8 +146,16 @@ export default function Contact() {
               <label htmlFor="website">Website</label>
               <input type="text" id="website" name="website" autoComplete="off" tabIndex="-1" />
             </div>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <Turnstile 
+                siteKey="0x4AAAAAAB8KJsd9ZQ5hEolp" // Cloudflare Turnstile Site Key
+                onSuccess={setToken}
+              />
+            </div>
+
             {error && <p className="metsci-contact-error">{error}</p>}
-            <button type="submit" className="metsci-contact-button" disabled={loading}>
+            <button type="submit" className="metsci-contact-button" disabled={loading || !token}>
               {loading ? 'Sending…' : 'Send Message'}
             </button>
           </form>
