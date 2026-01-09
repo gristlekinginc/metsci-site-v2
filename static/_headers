@@ -1,4 +1,11 @@
+# Cloudflare Pages headers
+# See: https://developers.cloudflare.com/pages/configuration/headers/
+
 /*
   Cache-Control: public, max-age=31536000
+
 /static/*
   Cache-Control: public, max-age=31536000
+
+/scripts/*.sh
+  Content-Type: application/x-sh
