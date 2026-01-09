@@ -141,7 +141,7 @@ The Oyster is attached to the sled; it's the black plastic thing on the front wi
   margin: '20px auto'
 }}>
   <img 
-    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-with-tracker.png"
+    src="/img/blog/2025-06-22-single-iot-sensor-power-the-sled/sled-with-tracker.jpg"
     alt="Tracker mounted on sled, post-delivery."
     style={{
       maxWidth: '800px',
