@@ -66,6 +66,20 @@ export async function onRequestPost(context) {
     );
   }
 
+  // --- Store submission in D1 ---
+  const clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
+  const userAgent = request.headers.get("User-Agent") || "unknown";
+  
+  try {
+    await env.METSCI_D1.prepare(
+      `INSERT INTO contact_submissions (name, email, message, ip_address, user_agent, created_at) 
+       VALUES (?, ?, ?, ?, ?, datetime('now'))`
+    ).bind(name, email, message, clientIP, userAgent).run();
+  } catch (dbError) {
+    console.error("D1 insert error:", dbError);
+    // Continue even if D1 fails - email is more important
+  }
+
   // --- Send email via Mailgun ---
   const mailgunDomain = "mg.meteoscientific.com";
   const mailgunApiKey = env.MAILGUN_CONTACT_API;
