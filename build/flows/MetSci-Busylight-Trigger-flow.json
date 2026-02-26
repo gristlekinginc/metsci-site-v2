@@ -1,0 +1,162 @@
+[
+    {
+        "id": "tankMonitorFlow",
+        "type": "tab",
+        "label": "Tank Monitor",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "influxQuery",
+        "type": "influxdb in",
+        "z": "tankMonitorFlow",
+        "influxdb": "influxSettings",
+        "name": "Query Tank Level",
+        "query": "from(bucket: \"sensors\")\n  |> range(start: -3h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ldds75_metsci\")\n  |> filter(fn: (r) => r[\"device\"] == \"LDDS 2\")\n  |> filter(fn: (r) => r[\"_field\"] == \"distance\")\n  |> last()",
+        "x": 180,
+        "y": 120,
+        "wires": [["checkLevel"]]
+    },
+    {
+        "id": "timer",
+        "type": "inject",
+        "z": "tankMonitorFlow",
+        "name": "Check Every 15 Minutes",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "900",
+        "crontab": "",
+        "once": true,
+        "x": 180,
+        "y": 80,
+        "wires": [["influxQuery"]]
+    },
+    {
+        "id": "checkLevel",
+        "type": "function",
+        "z": "tankMonitorFlow",
+        "name": "Check if Tank Full",
+        "func": "// Tank is full when distance is 120mm or less\nconst FULL_THRESHOLD = 120;\nconst currentLevel = msg.payload[0]._value;\n\nif (currentLevel <= FULL_THRESHOLD) {\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "x": 380,
+        "y": 120,
+        "wires": [["enabledCheck"]]
+    },
+    {
+        "id": "flashSequence",
+        "type": "split",
+        "z": "tankMonitorFlow",
+        "name": "Generate 5 Flashes",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 740,
+        "y": 120,
+        "wires": [["delay", "debug"]]
+    },
+    {
+        "id": "delay",
+        "type": "delay",
+        "z": "tankMonitorFlow",
+        "name": "1 Second Apart",
+        "pauseType": "rate",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 900,
+        "y": 120,
+        "wires": [["httpRequest"]]
+    },
+    {
+        "id": "httpRequest",
+        "type": "http request",
+        "z": "tankMonitorFlow",
+        "name": "Send to Busylight",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://console.meteoscientific.com/api/devices/DEVICE_EUI_HERE/queue",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "headers": {
+            "Authorization": "Bearer YOUR_API_TOKEN",
+            "Content-Type": "application/json"
+        },
+        "x": 1060,
+        "y": 120,
+        "wires": [["debug"]]
+    },
+    {
+        "id": "debug",
+        "type": "debug",
+        "z": "tankMonitorFlow",
+        "name": "Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "enableSwitch",
+        "type": "inject",
+        "z": "tankMonitorFlow",
+        "name": "Enable/Disable Alerts",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "payload": "toggle",
+        "x": 180,
+        "y": 180,
+        "wires": [["toggleAlerts"]]
+    },
+    {
+        "id": "toggleAlerts",
+        "type": "function",
+        "z": "tankMonitorFlow",
+        "name": "Toggle Alert State",
+        "func": "// Toggle the enabled state\nlet enabled = flow.get('alertsEnabled') || false;\nenabled = !enabled;\nflow.set('alertsEnabled', enabled);\n\n// Return status message\nreturn { payload: `Alerts ${enabled ? 'enabled' : 'disabled'}` };",
+        "outputs": 1,
+        "x": 380,
+        "y": 180,
+        "wires": [["debug"]]
+    },
+    {
+        "id": "enabledCheck",
+        "type": "function",
+        "z": "tankMonitorFlow",
+        "name": "Check if Enabled",
+        "func": "if (flow.get('alertsEnabled')) {\n    // Generate array of 5 messages\n    msg.payload = Array(5).fill({\n        \"fPort\": 1,\n        \"data\": \"0300FF0000000000\"\n    });\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "x": 560,
+        "y": 120,
+        "wires": [["flashSequence"]]
+    }
+]

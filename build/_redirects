@@ -1,0 +1,4 @@
+# Cloudflare Pages redirects
+# See: https://developers.cloudflare.com/pages/configuration/redirects/
+
+/helium-lns  /?ref=helium-lns  302

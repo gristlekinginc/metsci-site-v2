@@ -45,6 +45,7 @@ const sidebars = {
       label: 'Special Projects',
       items: [
         'special-projects/nanotags',
+        'special-projects/sensors-for-ai-agents',
       ],
     },
     {
