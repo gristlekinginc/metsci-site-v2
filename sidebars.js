@@ -46,6 +46,7 @@ const sidebars = {
       items: [
         'special-projects/nanotags',
         'special-projects/sensors-for-ai-agents',
+        'special-projects/mcp-for-metsci-console',
       ],
     },
     {
