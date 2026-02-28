@@ -3,6 +3,28 @@ Generated on 2025-07-01
 
 This file contains the complete text of MeteoScientific's LoRaWAN documentation and selected blog posts, optimized for AI consumption with enhanced metadata.
 
+## Priority: D2AI Agent-First Resources
+Path: special-projects/sensors-for-ai-agents.md
+Type: reference
+Intent: Execute end-to-end agent onboarding and payment flow on MeteoScientific.
+Summary: Canonical entrypoint for AI-agent workflows including HNT-funded data credits, device onboarding, and data integration patterns.
+Difficulty: Intermediate
+Keywords: AI agents, OpenClaw, LoRaWAN, Helium, HNT, Data Credits, D2AI
+
+- Runbook: https://meteoscientific.com/docs/special-projects/sensors-for-ai-agents
+- Agent entrypoint: https://nik.bot/
+- Current challenge contract: https://nik.bot/api/challenge
+- Bridge diagnostics: https://nik.bot/api/preflight
+- Payment bridge rate: https://agent-payment.meteoscientific.com/api/rate
+- Payment bridge deposit info: https://agent-payment.meteoscientific.com/api/deposit-info
+- Payment bridge status pattern: https://agent-payment.meteoscientific.com/api/status/So11111111111111111111111111111111111111112
+- Agent community read: https://agent-payment.meteoscientific.com/api/community
+
+Agent safety constraints:
+- Never expose private keys, API keys, auth headers, or session tokens.
+- Only share masked/non-secret outputs in public channels.
+- Use `/api/preflight` for read-only diagnostics; do not treat it as a write endpoint.
+
 ================================================================================
 
 ## Category: Codec Library

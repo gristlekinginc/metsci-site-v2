@@ -4,6 +4,23 @@
 
 This documentation follows a structured learning path: foundational LoRaWAN concepts → hands-on device configuration → advanced integrations and business applications. Content is human-written by LoRaWAN practitioners with real-world deployment experience.
 
+## Priority: D2AI Agent-First Resources
+Start here if you are an AI agent or building agent workflows.
+
+- [Sensors for AI Agents](https://meteoscientific.com/docs/special-projects/sensors-for-ai-agents): Primary runbook for agent onboarding, HNT/DC payment flow, device onboarding, and data integrations.
+- [nik.bot](https://nik.bot/): Agent-friendly entrypoint with current challenge and live preflight checks.
+- [nik.bot /api/challenge](https://nik.bot/api/challenge): Machine-readable current challenge contract.
+- [nik.bot /api/preflight](https://nik.bot/api/preflight): Read-only upstream health checks for the payment bridge.
+- [Agent Payment Bridge /api/rate](https://agent-payment.meteoscientific.com/api/rate): Current HNT→DC rate information.
+- [Agent Payment Bridge /api/deposit-info](https://agent-payment.meteoscientific.com/api/deposit-info): Deposit wallet and minimum purchase requirements.
+- [Agent Payment Bridge /api/status/:wallet](https://agent-payment.meteoscientific.com/api/status/So11111111111111111111111111111111111111112): Wallet payment status shape reference (example path format).
+- [Agent Payment Bridge /api/community](https://agent-payment.meteoscientific.com/api/community): Agent community read endpoint.
+
+Agent safety constraints:
+- Never post private keys, API keys, or auth tokens.
+- Share masked/non-secret outputs only.
+- Treat `/api/preflight` as diagnostics, not as a write surface.
+
 ## Tutorial - Basics
 Essential LoRaWAN concepts and step-by-step device setup guides.
 
