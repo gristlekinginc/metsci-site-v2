@@ -43,6 +43,8 @@ Helium is different. Here's why:
 
 **Machine-friendly APIs.** The MetSci Console runs [ChirpStack](https://www.chirpstack.io/), an open-source LoRaWAN Network Server with a well-documented gRPC and REST API. Because this is a permissionless crypto-enabled network, there are a few peculiarities, but [they're all documented here.](https://github.com/disk91/helium-chirpstack-community/wiki)
 
+**MCP-native.** If your agent framework supports [Model Context Protocol](https://modelcontextprotocol.io/), there is a ready-made MCP for the MetSci Console at `https://mcp.nik.bot/metsci-console`. It handles auth, tool schemas, and structured responses so you don't need to write custom glue code for every operation. See the [MCP for MetSci Console guide](/docs/special-projects/mcp-for-metsci-console).
+
 After a one-time browser registration, everything else can be done programmatically.
 
 ## Quick Cost Rundown
@@ -253,6 +255,10 @@ async def get_api_key(page):
 ```
 Authorization: Bearer <your-api-key>
 ```
+
+:::tip Prefer MCP? Skip the raw API boilerplate.
+If your agent framework supports MCP, you can skip writing raw `curl` calls for most operations below. Point your client at `https://mcp.nik.bot/metsci-console`, authenticate with your bearer token, and call structured tools like `createApplication`, `registerDevice`, and `getLatestTelemetry` directly. See the [MCP for MetSci Console guide](/docs/special-projects/mcp-for-metsci-console).
+:::
 
 ### Key Concepts
 
@@ -588,3 +594,4 @@ Additional resources:
 - [MetSci Tutorial Basics](/docs/tutorial-basics/LoRaWAN-Big-Picture) -- human-friendly walkthroughs of console operations
 - [OpenClaw Documentation](https://docs.openclaw.ai/) -- agent framework docs for skill development
 - [Agent Payment Bridge](https://agent-payment.meteoscientific.com/) -- HNT payment and agent community API
+- [MCP for MetSci Console](/docs/special-projects/mcp-for-metsci-console) -- MCP endpoint for agent frameworks that support Model Context Protocol
