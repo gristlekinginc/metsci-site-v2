@@ -281,7 +281,7 @@ LoRaWAN sensors are physical hardware. You'll need to order them from a vendor. 
 
 ### Weather Stations
 - [Seeed SenseCAP S2120](https://www.seeedstudio.com/sensecap-s2120-lorawan-8-in-1-weather-sensor-p-5436.html?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- 8-in-1 weather sensor (wind, rain, temp, humidity, pressure, UV, light)
-- [Dragino WSS series](https://www.dragino.com/products/lora-lorawan-end-node.html/?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- wind speed, direction, rainfall
+- [Dragino WSS series](https://www.dragino.com/products/agriculture-weather-station/item/218-wss-25.html?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- wind speed, direction, rainfall
 
 **What you'll need from each device:** Every LoRaWAN sensor ships with three credentials printed on it or included in the packaging:
 - **DevEUI** -- unique device identifier (16 hex characters)
