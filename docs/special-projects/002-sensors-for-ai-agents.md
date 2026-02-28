@@ -271,17 +271,17 @@ Before onboarding devices, understand these ChirpStack terms:
 LoRaWAN sensors are physical hardware. You'll need to order them from a vendor. Here are recommended options by category:
 
 ### Trackers (GPS/GNSS Location)
-- [Seeed SenseCAP T1000](https://www.seeedstudio.com/sensecap-t1000-tracker) -- compact, long battery life, credit-card sized
-- [Dragino LGT-92](https://www.dragino.com/products/lora-lorawan-end-node/item/142-lgt-92.html) -- affordable GPS tracker
-- [NanoThings NanoTag](https://embeddedworks.net/product/sens697/) -- sticker-format tracker, no buttons, peel-and-go
+- [Seeed SenseCAP T1000](https://www.seeedstudio.com/sensecap-t1000-tracker?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- compact, long battery life, credit-card sized
+- [Dragino LGT-92](https://www.dragino.com/products/lora-lorawan-end-node/item/142-lgt-92.html?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- affordable GPS tracker
+- [NanoThings NanoTag](https://embeddedworks.net/product/sens697/?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- sticker-format tracker, no buttons, peel-and-go
 
 ### Environmental Sensors
-- [Dragino LSN50v2](https://www.dragino.com/products/lora-lorawan-end-node/item/155-lsn50v2.html) -- modular, supports external probes (temperature, soil moisture, etc.)
-- [Milesight EM300 series](https://www.milesight.com/iot/product/lorawan-sensor) -- temperature, humidity, light, CO2
+- [Dragino LSN50v2](https://www.dragino.com/products/lora-lorawan-end-node/item/155-lsn50v2.html?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- modular, supports external probes (temperature, soil moisture, etc.)
+- [Milesight EM300 series](https://www.choovio.com/product/milesight-em300-th-temperature-humidity-sensor/?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- temperature, humidity, light, CO2
 
 ### Weather Stations
-- [Seeed SenseCAP S2120](https://www.seeedstudio.com/sensecap-s2120-lorawan-8-in-1-weather-sensor-p-5436.html) -- 8-in-1 weather sensor (wind, rain, temp, humidity, pressure, UV, light)
-- [Dragino WSS series](https://www.dragino.com/) -- wind speed, direction, rainfall
+- [Seeed SenseCAP S2120](https://www.seeedstudio.com/sensecap-s2120-lorawan-8-in-1-weather-sensor-p-5436.html?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- 8-in-1 weather sensor (wind, rain, temp, humidity, pressure, UV, light)
+- [Dragino WSS series](https://www.dragino.com/products/lora-lorawan-end-node.html/?utm_source=meteoscientific&utm_medium=article&utm_campaign=ai_agents_guide) -- wind speed, direction, rainfall
 
 **What you'll need from each device:** Every LoRaWAN sensor ships with three credentials printed on it or included in the packaging:
 - **DevEUI** -- unique device identifier (16 hex characters)
