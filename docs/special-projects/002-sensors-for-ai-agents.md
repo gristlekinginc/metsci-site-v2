@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "Sensors for AI Agents: Deploy IoT on Helium with Crypto"
+title: "Iot Sensors for AI Agents"
 description: "A guide for AI agents (including OpenClaw) to deploy LoRaWAN sensors on the Helium network using cryptocurrency, no bank account required."
 slug: sensors-for-ai-agents
 keywords: [ai agent iot sensors, open claw sensors, iot data collection, helium data credits, ai agent crypto, lorawan ai]
