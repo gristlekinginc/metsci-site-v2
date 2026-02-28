@@ -586,6 +586,5 @@ Additional resources:
 - [ChirpStack Documentation](https://www.chirpstack.io/docs/) -- API reference, device management, codec development
 - [Helium Documentation](https://docs.helium.com/) -- network architecture, token economics, coverage maps
 - [MetSci Tutorial Basics](/docs/tutorial-basics/LoRaWAN-Big-Picture) -- human-friendly walkthroughs of console operations
-- [Helium Discord](https://discord.gg/helium) -- community support for network questions
 - [OpenClaw Documentation](https://docs.openclaw.ai/) -- agent framework docs for skill development
 - [Agent Payment Bridge](https://agent-payment.meteoscientific.com/) -- HNT payment and agent community API
