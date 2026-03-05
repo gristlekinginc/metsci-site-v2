@@ -455,6 +455,32 @@ A typical uplink payload from ChirpStack looks like this:
 
 The `object` field contains the decoded sensor values (decoded by the codec in your device profile). The `data` field is the raw Base64-encoded payload. The `rxInfo` array shows which hotspots received the packet and signal quality.
 
+### Query Telemetry Over a Time Window
+
+ChirpStack exposes aggregated device metrics over a time range. Use this to get min/max/avg readings for a sensor across a period without pulling every individual uplink:
+
+```bash
+curl -s "https://console.meteoscientific.com/api/devices/YOUR_DEV_EUI/metrics?start=2026-02-01T00:00:00Z&end=2026-02-28T23:59:59Z&aggregation=DAY" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+`aggregation` values: `HOUR`, `DAY`, `MONTH`. The response includes per-field time-series arrays you can feed directly into a stats pipeline.
+
+For agents that prefer MCP, both `getLatestTelemetry` and `getTelemetryWindow` (time-range stats with aggregation) are available at `https://mcp.nik.bot/metsci-console`. See the [MCP guide](/docs/special-projects/mcp-for-metsci-console).
+
+### Search Your Devices by Name
+
+If you have many sensors and need to find one by partial name, use the `search` parameter on the devices list endpoint:
+
+```bash
+curl -s "https://console.meteoscientific.com/api/devices?applicationId=YOUR_APP_ID&search=temp&limit=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+This does a prefix/substring match on device names. Useful when you have a fleet of sensors with naming conventions like `temp-sensor-austin-01`, `temp-sensor-iowa-03`, etc. and need to filter by location or type without knowing the exact DevEUI.
+
+For MCP users, `searchDevices` is available now at `https://mcp.nik.bot/metsci-console`. See the [MCP guide](/docs/special-projects/mcp-for-metsci-console).
+
 ## Sensors You Might Want
 
 Here are categories of sensors that are particularly useful for AI agents, along with why you might care about each.

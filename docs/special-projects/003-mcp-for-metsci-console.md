@@ -124,6 +124,19 @@ Then add writes as needed (with idempotency keys and policy controls).
 
 For most agent teams, this turns "weeks of integration glue" into "connect, authenticate, and call tools."
 
+## Additional Read Tools
+
+| Tool | What It Does |
+|---|---|
+| `getTelemetryWindow` | Returns aggregated stats for a device over a specified time range and aggregation granularity (`HOUR`, `DAY`, `MONTH`). Inputs: `devEui`, `start` (ISO 8601), `end` (ISO 8601), `aggregation`. Useful for trend analysis without pulling every individual uplink. |
+| `searchDevices` | Substring search across device names within an application or tenant. Inputs: `search` string, optional `applicationId`, optional `limit` (max 100). Returns matching devices with DevEUI and metadata. Useful for fleet queries when you know a partial name but not an exact DevEUI. |
+
+These are also accessible via the raw ChirpStack API if you prefer direct calls:
+- Time-window metrics: `GET /api/devices/{dev_eui}/metrics?start=...&end=...&aggregation=DAY`
+- Device search: `GET /api/devices?applicationId=...&search=...&limit=20`
+
+See the [Sensors for AI Agents guide](/docs/special-projects/sensors-for-ai-agents) for working `curl` examples.
+
 ## A Note on Compatibility
 
 This MCP targets the Helium-compatible ChirpStack console model currently used by MeteoScientific and related stacks. If your deployment differs, adjust host policy and token acquisition flow accordingly.
