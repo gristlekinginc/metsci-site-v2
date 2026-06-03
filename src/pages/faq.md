@@ -41,6 +41,16 @@ Please note, MetSci is more of a side project than my full-time job. I've talked
 
 Do not expect immediate 24/7 responses to your queries. Typically, it'll take a day or three for me to get back to you. If you need full-time, paid hardcore Console support, consider reaching out to [Disk91](https://www.disk91.com/2024/news/lpwan/evolution-of-usage-on-the-helium-iot-network/). It won't be cheap and it isn't permissionless, but it'll be top-notch.
 
+## Do you offer an SLA or 24/7 technical support?
+
+No. MeteoScientific is an independent, community-focused utility, not an enterprise-managed helpdesk. The service is provided strictly on a Best-Effort basis. There are no uptime guarantees, financial credits for downtime, or dedicated network engineers monitoring your specific devices.
+
+There are no on-call teams or 3:00 AM emergency lines. If your devices stop communicating, the expectation is that you will open the hardware manual, review your configurations, and troubleshoot your deployment independently.
+
+With hundreds of thousands of devices having successfully joined the network, it is extremely unlikely (though not impossible) that there is a network issue. If there is, you'll probably hear about it first on [X](https://x.com/helium).
+
+If you want immediate support, my suggestion is to have your MetSci Console open in one tab and the documents for your hardware in another, then use Gemini to walk through your issue. Not a guarantee, and it can steer you wrong, but on balance it's the cheapest, fastest, and best support I've found.
+
 ## How do I use Console?
 
 We've got several videos over on the [MetSci YouTube channel](https://www.youtube.com/@meteoscientific) detailing how to use Console. If you prefer to sign up and experiment on your own (some people learn best by doing), you can sign up [here](#).
